@@ -157,7 +157,7 @@ namespace BlueMilk.Testing.Codegen
             _dependency = dependency;
         }
 
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
 
         }
@@ -180,7 +180,7 @@ namespace BlueMilk.Testing.Codegen
             Variable = new Variable(dependency, name);
         }
 
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
             writer.WriteLine("FrameThatBuildsVariable");
         }

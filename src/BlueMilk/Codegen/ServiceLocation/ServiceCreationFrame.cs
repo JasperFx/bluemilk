@@ -51,7 +51,7 @@ namespace BlueMilk.Codegen.ServiceLocation
             yield return _provider;
         }
 
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
             var typeFullName = Service.VariableType.FullNameInCode();
             var declaration = $"var {Service.Usage} = ({typeFullName}){_provider.Usage}.{nameof(IServiceProvider.GetService)}(typeof({typeFullName}))";

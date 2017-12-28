@@ -25,7 +25,7 @@ namespace BlueMilk.IoC
 
         public bool IsDisposable => ImplementationType.CanBeCastTo<IDisposable>();
 
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
             var arguments = _arguments.Select(x => x.Usage).Join(", ");
             var implementationTypeName = ImplementationType.FullNameInCode();

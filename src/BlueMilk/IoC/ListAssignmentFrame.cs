@@ -23,7 +23,7 @@ namespace BlueMilk.IoC
 
         public Variable Variable { get; }
 
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
             var elements = Elements.Select(x => x.Usage).Join(", ");
             writer.Write($"var {Variable.Usage} = new {typeof(List<>).Namespace}.List<{ElementType.FullNameInCode()}>{{{elements}}};");

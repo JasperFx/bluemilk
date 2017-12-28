@@ -42,7 +42,7 @@ namespace BlueMilk.Codegen
         {
         }
 
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
             writer.WriteLine($"var {NowVariable.Now} = {typeof(DateTime).FullName}.{nameof(DateTime.UtcNow)};");
             Next?.GenerateCode(method, writer);
@@ -65,7 +65,7 @@ namespace BlueMilk.Codegen
         {
         }
 
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
             writer.WriteLine($"var {NowVariable.Now} = {typeof(DateTimeOffset).FullName}.{nameof(DateTimeOffset.UtcNow)};");
             Next?.GenerateCode(method, writer);

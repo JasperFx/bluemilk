@@ -8,7 +8,7 @@ namespace BlueMilk.Codegen
         {
         }
 
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
             writer.WriteReturnStatement(method);
         }

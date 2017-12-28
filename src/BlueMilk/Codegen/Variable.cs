@@ -16,10 +16,11 @@ namespace BlueMilk.Codegen
                 .ToArray();
         }
 
-        public static Variable For<T>()
+        public static Variable For<T>(string variableName = null)
         {
-            return new Variable(typeof(T), DefaultArgName(typeof(T)));
+            return new Variable(typeof(T), variableName ?? DefaultArgName(typeof(T)));
         }
+
 
         public static string DefaultArgName(Type argType)
         {

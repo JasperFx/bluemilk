@@ -10,6 +10,13 @@ using BlueMilk.Compilation;
 
 namespace BlueMilk.Codegen
 {
+    public enum DisposalMode
+    {
+        UsingBlock,
+        None
+    
+    }
+    
     public class MethodCall : Frame
     {
         public Dictionary<Type, Type> Aliases { get; } = new Dictionary<Type, Type>();
@@ -49,8 +56,10 @@ namespace BlueMilk.Codegen
                 ReturnVariable = new Variable(variableType, name, this);
             }
 
-            Variables = new Variable[method.GetParameters().Length];
+            Arguments = new Variable[method.GetParameters().Length];
         }
+        
+        
 
         /// <summary>
         /// Call a method on the current object
@@ -74,25 +83,22 @@ namespace BlueMilk.Codegen
             return chain.TryFindVariableByName(type, param.Name, out var variable) ? variable : chain.FindVariable(type);
         }
 
-        public Variable[] Variables { get; }
+        public Variable[] Arguments { get; }
 
-        public bool TrySetParameter(Variable variable)
+        public DisposalMode DisposalMode { get; set; } = DisposalMode.UsingBlock;
+
+        public bool TrySetArgument(Variable variable)
         {
             var parameters = Method.GetParameters().Select(x => x.ParameterType).ToArray();
-            if (parameters.Count(x => variable.VariableType.CanBeCastTo(x)) == 1)
-            {
-                var index = Array.IndexOf(parameters, variable.VariableType);
-                Variables[index] = variable;
+            if (parameters.Count(x => variable.VariableType.CanBeCastTo(x)) != 1) return false;
+            
+            var index = Array.IndexOf(parameters, variable.VariableType);
+            Arguments[index] = variable;
 
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
         }
 
-        public bool TrySetParameter(string parameterName, Variable variable)
+        public bool TrySetArgument(string parameterName, Variable variable)
         {
             var parameters = Method.GetParameters().ToArray();
             var matching = parameters.FirstOrDefault(x =>
@@ -101,7 +107,7 @@ namespace BlueMilk.Codegen
             if (matching == null) return false;
 
             var index = Array.IndexOf(parameters, matching);
-            Variables[index] = variable;
+            Arguments[index] = variable;
 
             return true;
         }
@@ -109,18 +115,18 @@ namespace BlueMilk.Codegen
         public override IEnumerable<Variable> FindVariables(IMethodVariables chain)
         {
             var parameters = Method.GetParameters().ToArray();
-            for (int i = 0; i < parameters.Length; i++)
+            for (var i = 0; i < parameters.Length; i++)
             {
-                if (Variables[i] != null)
+                if (Arguments[i] != null)
                 {
                     continue;
                 }
 
                 var param = parameters[i];
-                Variables[i] = findVariable(param, chain);
+                Arguments[i] = findVariable(param, chain);
             }
 
-            foreach (var variable in Variables)
+            foreach (var variable in Arguments)
             {
                 yield return variable;
             }
@@ -136,9 +142,19 @@ namespace BlueMilk.Codegen
         }
 
 
+        private bool shouldAssignVariableToReturnValue(IGeneratedMethod method)
+        {
+            if (ReturnVariable == null) return false;
 
+            if (IsAsync && method.AsyncMode == AsyncMode.ReturnFromLastNode)
+            {
+                return false;
+            }
 
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+            return true;
+        }
+
+        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
             var invokeMethod = invocationCode();
 
@@ -150,13 +166,13 @@ namespace BlueMilk.Codegen
             }
 
             var isDisposable = false;
-            if (ReturnVariable != null)
+            if (shouldAssignVariableToReturnValue(method))
             {
                 returnValue = $"var {ReturnVariable.Usage} = {returnValue}";
                 isDisposable = ReturnVariable.VariableType.CanBeCastTo<IDisposable>();
             }
 
-            if (isDisposable)
+            if (isDisposable && DisposalMode == DisposalMode.UsingBlock)
             {
                 writer.UsingBlock($"{returnValue}{invokeMethod}", w => Next?.GenerateCode(method, writer));
             }
@@ -178,7 +194,7 @@ namespace BlueMilk.Codegen
                 methodName += $"<{Method.GetGenericArguments().Select(x => x.FullName).Join(", ")}>";
             }
 
-            var callingCode = $"{methodName}({Variables.Select(x => x.Usage).Join(", ")})";
+            var callingCode = $"{methodName}({Arguments.Select(x => x.Usage).Join(", ")})";
             var target = determineTarget();
             var invokeMethod = $"{target}{callingCode}";
             return invokeMethod;

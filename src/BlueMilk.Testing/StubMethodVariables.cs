@@ -40,6 +40,13 @@ namespace BlueMilk.Testing
         public void Store(Variable variable)
         {
             Variables[variable.VariableType] = variable;
+            Extras.Add(variable);
+        }
+
+        public void Store<T>(string variableName = null)
+        {
+            var variable = Variable.For<T>(variableName);
+            Store(variable);
         }
     }
 }

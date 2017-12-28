@@ -71,15 +71,15 @@ namespace BlueMilk.Testing.Codegen
             var generalInt = Variable.For<int>();
 
             // Only one of that type, so it works
-            @call.TrySetParameter(stringVariable)
+            @call.TrySetArgument(stringVariable)
                 .ShouldBeTrue();
 
-            @call.Variables[2].ShouldBeSameAs(stringVariable);
+            @call.Arguments[2].ShouldBeSameAs(stringVariable);
 
             // Multiple parameters of the same type, nothing
-            @call.TrySetParameter(generalInt).ShouldBeFalse();
-            @call.Variables[0].ShouldBeNull();
-            @call.Variables[1].ShouldBeNull();
+            @call.TrySetArgument(generalInt).ShouldBeFalse();
+            @call.Arguments[0].ShouldBeNull();
+            @call.Arguments[1].ShouldBeNull();
         }
 
         [Fact]
@@ -89,12 +89,12 @@ namespace BlueMilk.Testing.Codegen
 
             var generalInt = Variable.For<int>();
 
-            @call.TrySetParameter("count", generalInt)
+            @call.TrySetArgument("count", generalInt)
                 .ShouldBeTrue();
 
-            @call.Variables[0].ShouldBeNull();
-            @call.Variables[1].ShouldBeSameAs(generalInt);
-            @call.Variables[2].ShouldBeNull();
+            @call.Arguments[0].ShouldBeNull();
+            @call.Arguments[1].ShouldBeSameAs(generalInt);
+            @call.Arguments[2].ShouldBeNull();
         }
 
         [Fact]
@@ -137,15 +137,53 @@ namespace BlueMilk.Testing.Codegen
             
             @call.FindVariables(chain).Any().ShouldBeFalse();
         }
-        
-        /* TESTS
-         1. Fill simple values by name and type
-         2. Fill simple values by falling down to type only
 
-         5. FindVariables returns set parameters
-         
-         
-         */
+        [Fact]
+        public void find_simple_variable_by_name_and_type()
+        {
+            var age = Variable.For<int>("age");
+            var count = Variable.For<int>("count");
+
+            var name = Variable.For<string>();
+            
+            var variables = new StubMethodVariables();
+            variables.Store(age);
+            variables.Store(count);
+            variables.Store(name);
+            
+            var @call = MethodCall.For<MethodCallTarget>(x => x.DoSomething(0, 0, null));
+            @call.IsLocal = true;
+
+            var found = @call.FindVariables(variables).ToArray();
+            
+            @call.Arguments[0].ShouldBe(age);
+            @call.Arguments[1].ShouldBe(count);
+            @call.Arguments[2].ShouldBe(name);
+        }
+
+        [Fact]
+        public void find_variables_returns_all_the_set_arguments_too()
+        {
+            var age = Variable.For<int>("age");
+            var count = Variable.For<int>("count");
+
+            var name = Variable.For<string>();
+            
+            var variables = new StubMethodVariables();
+            //variables.Store(age);
+            variables.Store(count);
+            variables.Store(name);
+            
+            var @call = MethodCall.For<MethodCallTarget>(x => x.DoSomething(0, 0, null));
+            @call.IsLocal = true;
+            @call.TrySetArgument("age", age).ShouldBeTrue();
+
+            var found = @call.FindVariables(variables).ToArray();
+            
+            found.ShouldContain(age);
+            found.ShouldContain(count);
+            found.ShouldContain(name);
+        }
 
         [Fact]
         public void use_a_type_alias()
@@ -156,15 +194,23 @@ namespace BlueMilk.Testing.Codegen
 
             var @call = MethodCall.For<MethodCallTarget>(x => x.Throw(null));
             @call.IsLocal = true;
-            
+
             @call.Aliases[typeof(Ball)] = typeof(Basketball);
-            
+
             @call.FindVariables(variables)
                 .Single()
                 .ShouldBeOfType<CastVariable>()
                 .Inner
                 .ShouldBeSameAs(basketball);
         }
+        
+        [Fact]
+        public void default_disposal_mode_is_using()
+        {
+            MethodCall.For<MethodCallTarget>(x => x.Throw(null))
+                .DisposalMode.ShouldBe(DisposalMode.UsingBlock);
+        }
+
     }
 
     public class Ball

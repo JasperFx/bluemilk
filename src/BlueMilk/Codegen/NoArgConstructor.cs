@@ -23,7 +23,7 @@ namespace BlueMilk.Codegen
             creates.Fill(_output);
         }
 
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
             var creation = $"var {_output.Usage} = new {_output.VariableType.FullName.Replace("+", ".")}()";
 
