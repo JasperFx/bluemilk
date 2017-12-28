@@ -2,7 +2,7 @@
 using Shouldly;
 using Xunit;
 
-namespace Jasper.Testing.Internals.Codegen
+namespace BlueMilk.Testing.Codegen
 {
     public class ReflectionExtensionsTests
     {
@@ -10,7 +10,7 @@ namespace Jasper.Testing.Internals.Codegen
         public void get_full_name_in_code_for_generic_type()
         {
             typeof(Handler<Message1>).FullNameInCode()
-                .ShouldBe($"Jasper.Testing.Internals.Codegen.Handler<{typeof(Message1).FullName}>");
+                .ShouldBe($"BlueMilk.Testing.Codegen.Handler<{typeof(Message1).FullName}>");
         }
     }
 

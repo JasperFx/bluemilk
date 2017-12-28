@@ -1,6 +1,6 @@
 using System;
 
-namespace Jasper.Testing.Internals.TargetTypes
+namespace BlueMilk.Testing.TargetTypes
 {
     public abstract class Rule
     {

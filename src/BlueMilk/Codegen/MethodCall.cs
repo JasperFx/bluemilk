@@ -25,6 +25,11 @@ namespace BlueMilk.Codegen
             return new MethodCall(typeof(T), method);
         }
 
+        public MethodCall(Type handlerType, string methodName) : this(handlerType, handlerType.GetMethod(methodName))
+        {
+            
+        }
+
 
         public MethodCall(Type handlerType, MethodInfo method) : base(method.IsAsync())
         {

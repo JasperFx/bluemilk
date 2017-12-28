@@ -5,7 +5,7 @@ using BlueMilk.Compilation;
 using Shouldly;
 using Xunit;
 
-namespace Jasper.Testing.Internals.Codegen
+namespace BlueMilk.Testing.Codegen
 {
     public static class GeneratedMethodExtensions
     {

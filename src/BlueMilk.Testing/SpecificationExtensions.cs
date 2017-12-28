@@ -6,7 +6,7 @@ using System.Linq;
 using Baseline;
 using Shouldly;
 
-namespace Jasper.Testing.Internals
+namespace BlueMilk.Testing
 {
     public static class SpecificationExtensions
     {

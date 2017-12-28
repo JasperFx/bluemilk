@@ -1,11 +1,10 @@
 ﻿using System.Linq;
-using BlueMilk;
-using Jasper.Testing.Internals.TargetTypes;
+using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
-namespace Jasper.Testing.Internals
+namespace BlueMilk.Testing
 {
     public class ServiceRegistryTester
     {

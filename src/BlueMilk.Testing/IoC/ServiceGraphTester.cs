@@ -1,13 +1,12 @@
 ﻿using System.Linq;
-using BlueMilk;
 using BlueMilk.Codegen;
 using BlueMilk.IoC;
-using Jasper.Testing.Internals.TargetTypes;
+using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
-namespace Jasper.Testing.Internals.IoC
+namespace BlueMilk.Testing.IoC
 {
     public class ServiceGraphTester
     {

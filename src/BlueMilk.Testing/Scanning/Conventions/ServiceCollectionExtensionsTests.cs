@@ -1,12 +1,11 @@
 ﻿using System.Linq;
-using BlueMilk;
 using BlueMilk.Scanning.Conventions;
-using Jasper.Testing.Internals.TargetTypes;
+using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
-namespace Jasper.Testing.Internals.Scanning.Conventions
+namespace BlueMilk.Testing.Scanning.Conventions
 {
     public class ServiceCollectionExtensionsTests
     {

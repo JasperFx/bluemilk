@@ -7,7 +7,7 @@ using BlueMilk.Scanning;
 using Shouldly;
 using Xunit;
 
-namespace Jasper.Testing.Internals.Scanning
+namespace BlueMilk.Testing.Scanning
 {
     public static class TypeRepositoryTestExtensions
     {

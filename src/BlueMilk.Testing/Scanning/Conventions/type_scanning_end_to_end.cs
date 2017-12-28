@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
-using BlueMilk;
 using BlueMilk.Scanning.Conventions;
-using Jasper.Testing.Internals.TargetTypes;
+using BlueMilk.Testing.TargetTypes;
 using Shouldly;
 using Xunit;
 
-namespace Jasper.Testing.Internals.Scanning.Conventions
+namespace BlueMilk.Testing.Scanning.Conventions
 {
     public class type_scanning_end_to_end
     {

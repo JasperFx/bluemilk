@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using BlueMilk;
-using BlueMilk.Codegen;
+﻿using BlueMilk.Codegen;
 using BlueMilk.Compilation;
 using BlueMilk.IoC;
-using Jasper.Testing.Internals.TargetTypes;
+using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
-namespace Jasper.Testing.Internals.IoC
+namespace BlueMilk.Testing.IoC
 {
     public class CommentFrame : SyncFrame
     {
@@ -17,33 +14,6 @@ namespace Jasper.Testing.Internals.IoC
         {
             writer.Write("// Kilroy was here.");
             Next?.GenerateCode(method, writer);
-        }
-    }
-
-    public class StubMethodVariables : IMethodVariables
-    {
-        public readonly Dictionary<Type, Variable> Variables = new Dictionary<Type, Variable>();
-
-        public IList<BuildStep> AllKnownBuildSteps { get; } = new List<BuildStep>();
-
-        public Variable FindVariable(Type type)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Variable FindVariableByName(Type dependency, string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool TryFindVariableByName(Type dependency, string name, out Variable variable)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Variable TryFindVariable(Type type, VariableSource source)
-        {
-            return Variables.ContainsKey(type) ? Variables[type] : null;
         }
     }
 

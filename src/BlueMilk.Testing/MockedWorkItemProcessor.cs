@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Jasper.Testing.Internals
+namespace BlueMilk.Testing
 {
     public class WorkItem
     {

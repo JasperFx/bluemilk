@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Shouldly;
 
-namespace Jasper.Testing.Internals
+namespace BlueMilk.Testing
 {
     public static class Exception<T> where T : Exception
     {

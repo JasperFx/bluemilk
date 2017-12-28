@@ -7,7 +7,7 @@ using NSubstitute;
 using Shouldly;
 using Xunit;
 
-namespace Jasper.Testing.Internals.Codegen
+namespace BlueMilk.Testing.Codegen
 {
     public class WriteReturnStatementTests
     {

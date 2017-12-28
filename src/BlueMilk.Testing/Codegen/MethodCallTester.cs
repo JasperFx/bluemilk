@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using BlueMilk.Codegen;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Jasper.Testing.Internals.Codegen
+namespace BlueMilk.Testing.Codegen
 {
     public class MethodCallTester
     {
@@ -94,13 +96,102 @@ namespace Jasper.Testing.Internals.Codegen
             @call.Variables[1].ShouldBeSameAs(generalInt);
             @call.Variables[2].ShouldBeNull();
         }
+
+        [Fact]
+        public void find_handler_if_not_local()
+        {
+            var @call = MethodCall.For<MethodCallTarget>(x => x.GetValue());
+            var chain = Substitute.For<IMethodVariables>();
+
+            var handler = Variable.For<MethodCallTarget>();
+            chain.FindVariable(typeof(MethodCallTarget)).Returns(handler);
+            
+            @call.FindVariables(chain).Single()
+                .ShouldBeSameAs(handler);
+        }
+        
+        [Fact]
+        public void find_no_handler_if_local()
+        {
+            var @call = MethodCall.For<MethodCallTarget>(x => x.GetValue());
+            @call.IsLocal = true;
+            
+            var chain = Substitute.For<IMethodVariables>();
+
+            var handler = Variable.For<MethodCallTarget>();
+            chain.FindVariable(typeof(MethodCallTarget)).Returns(handler);
+            
+            @call.FindVariables(chain).Any().ShouldBeFalse();
+        }
+
+        [Fact]
+        public void find_no_handler_variable_if_it_is_static()
+        {
+            var @call = new MethodCall(typeof(MethodCallTarget), nameof(MethodCallTarget.GoStatic));
+            @call.IsLocal = true;
+            
+            var chain = Substitute.For<IMethodVariables>();
+
+            var handler = Variable.For<MethodCallTarget>();
+            chain.FindVariable(typeof(MethodCallTarget)).Returns(handler);
+            
+            @call.FindVariables(chain).Any().ShouldBeFalse();
+        }
+        
+        /* TESTS
+         1. Fill simple values by name and type
+         2. Fill simple values by falling down to type only
+
+         5. FindVariables returns set parameters
+         
+         
+         */
+
+        [Fact]
+        public void use_a_type_alias()
+        {
+            var variables = new StubMethodVariables();
+            var basketball = Variable.For<Basketball>();
+            variables.Store(basketball);
+
+            var @call = MethodCall.For<MethodCallTarget>(x => x.Throw(null));
+            @call.IsLocal = true;
+            
+            @call.Aliases[typeof(Ball)] = typeof(Basketball);
+            
+            @call.FindVariables(variables)
+                .Single()
+                .ShouldBeOfType<CastVariable>()
+                .Inner
+                .ShouldBeSameAs(basketball);
+        }
+    }
+
+    public class Ball
+    {
+        
+    }
+
+    public class Basketball : Ball
+    {
+        
     }
 
     public class MethodCallTarget
     {
+        public void Throw(Ball ball)
+        {
+            
+        }
+        
         public string GetValue()
         {
             return "foo";
+        }
+
+        public static void GoStatic()
+        {
+            
         }
 
         public ErrorMessage GetError()

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using BlueMilk.Codegen;
-using Jasper.Testing.Internals.TargetTypes;
+using BlueMilk.Testing.TargetTypes;
 using Shouldly;
 using Xunit;
 
-namespace Jasper.Testing.Internals.Codegen
+namespace BlueMilk.Testing.Codegen
 {
     public class VariableTests
     {

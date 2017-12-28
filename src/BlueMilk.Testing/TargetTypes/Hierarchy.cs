@@ -1,5 +1,5 @@
 
-namespace Jasper.Testing.Internals.TargetTypes
+namespace BlueMilk.Testing.TargetTypes
 {
     public class GrandChild
     {
