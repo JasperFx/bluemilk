@@ -36,7 +36,7 @@ namespace BlueMilk.IoC
             return _dependencies;
         }
 
-        protected override Variable buildVariable()
+        protected override Variable buildVariable(BuildMode mode)
         {
             var argName = Variable.DefaultArgName(ServiceType);
             if (Number > 0)
@@ -44,7 +44,7 @@ namespace BlueMilk.IoC
                 argName += Number;
             }
 
-            var args = _dependencies.Select(x => x.Variable).ToArray();
+            var args = _dependencies.Select(x => x.CreateVariable(mode)).ToArray();
 
             return new ConstructorFrame(ServiceType, ImplementationType, argName, args).Variable;
         }

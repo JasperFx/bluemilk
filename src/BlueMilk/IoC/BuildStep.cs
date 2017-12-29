@@ -16,7 +16,6 @@ namespace BlueMilk.IoC
     
     public abstract class BuildStep
     {
-        private readonly Lazy<Variable> _variable;
         public Type ServiceType { get; }
 
         public BuildStep(Type serviceType, ServiceLifetime lifetime)
@@ -24,7 +23,6 @@ namespace BlueMilk.IoC
             ServiceType = serviceType;
             Lifetime = lifetime;
 
-            _variable = new Lazy<Variable>(buildVariable);
         }
 
         public ServiceLifetime Lifetime { get; internal set; }
@@ -39,8 +37,27 @@ namespace BlueMilk.IoC
 
         public abstract IEnumerable<BuildStep> ReadDependencies(BuildStepPlanner planner);
 
-        protected abstract Variable buildVariable();
+        protected abstract Variable buildVariable(BuildMode mode);
+        private Variable _variable;
 
-        public Variable Variable => _variable.Value;
+        private BuildMode? _mode;
+        public Variable CreateVariable(BuildMode mode)
+        {
+            if (_mode != null && _mode != mode)
+            {
+                throw new ArgumentOutOfRangeException(nameof(mode), "Cannot change build modes!");
+            }
+            
+            _mode = mode;
+
+            if (Lifetime == ServiceLifetime.Transient)
+            {
+                return buildVariable(mode);
+            }
+
+            _variable = _variable ?? buildVariable(mode);
+
+            return _variable;
+        }
     }
 }

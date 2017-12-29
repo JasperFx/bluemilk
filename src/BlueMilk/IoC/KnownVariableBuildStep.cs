@@ -18,7 +18,7 @@ namespace BlueMilk.IoC
             yield break;
         }
 
-        protected override Variable buildVariable()
+        protected override Variable buildVariable(BuildMode mode)
         {
             return Variable;
         }

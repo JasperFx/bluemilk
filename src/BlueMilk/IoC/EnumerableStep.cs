@@ -45,9 +45,9 @@ namespace BlueMilk.IoC
             return _childSteps.SelectMany(x => x.ReadDependencies(planner));
         }
 
-        protected override Variable buildVariable()
+        protected override Variable buildVariable(BuildMode mode)
         {
-            var elements = _childSteps.Select(x => x.Variable).ToArray();
+            var elements = _childSteps.Select(x => x.CreateVariable(mode)).ToArray();
             return ServiceType.IsArray
                 ? new ArrayAssignmentFrame(DetermineElementType(ServiceType), elements).Variable
                 : new ListAssignmentFrame(ServiceType, elements).Variable;

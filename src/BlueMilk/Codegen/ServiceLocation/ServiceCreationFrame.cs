@@ -70,6 +70,7 @@ namespace BlueMilk.Codegen.ServiceLocation
             }
         }
 
-        public Variable BuildStepPlannerVariable => _step.Variable;
+        // TODO -- this will have to be smarter for things that use ServiceProvider
+        public Variable BuildStepPlannerVariable => _step.CreateVariable(BuildMode.Inline);
     }
 }
