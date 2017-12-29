@@ -9,6 +9,15 @@ namespace BlueMilk.Testing.Codegen
     public class VariableTests
     {
         [Fact]
+        public void override_the_name()
+        {
+            var variable = Variable.For<HyperdriveMotivator>();
+            variable.OverrideName("thing");
+            
+            variable.Usage.ShouldBe("thing");
+        }
+        
+        [Fact]
         public void default_arg_name_of_normal_class()
         {
             Variable.DefaultArgName<HyperdriveMotivator>()
