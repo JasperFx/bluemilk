@@ -8,7 +8,7 @@ namespace BlueMilk.IoC
     {
         public new Variable Variable { get; }
 
-        public KnownVariableBuildStep(Variable variable) : base(variable.VariableType, false, ServiceLifetime.Scoped)
+        public KnownVariableBuildStep(Variable variable) : base(variable.VariableType, ServiceLifetime.Scoped)
         {
             Variable = variable;
         }

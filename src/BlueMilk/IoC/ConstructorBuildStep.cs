@@ -22,7 +22,7 @@ namespace BlueMilk.IoC
 
 
 
-        public ConstructorBuildStep(Type serviceType, Type implementationType, ServiceLifetime lifetime, ConstructorInfo ctor) : base(serviceType, true, lifetime)
+        public ConstructorBuildStep(Type serviceType, Type implementationType, ServiceLifetime lifetime, ConstructorInfo ctor) : base(serviceType, lifetime)
         {
             _ctor = ctor;
             ImplementationType = implementationType;
@@ -46,10 +46,7 @@ namespace BlueMilk.IoC
 
             var args = _dependencies.Select(x => x.Variable).ToArray();
 
-            var variable = new ConstructorFrame(ServiceType, ImplementationType, argName, args).Variable;
-            variable.CanBeReused = CanBeReused;
-
-            return variable;
+            return new ConstructorFrame(ServiceType, ImplementationType, argName, args).Variable;
         }
     }
 }

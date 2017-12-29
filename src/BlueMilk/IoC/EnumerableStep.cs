@@ -35,7 +35,7 @@ namespace BlueMilk.IoC
             return serviceType.GetGenericArguments().First();
         }
 
-        public EnumerableStep(Type serviceType, BuildStep[] childSteps) : base(serviceType, false, ServiceLifetime.Transient)
+        public EnumerableStep(Type serviceType, BuildStep[] childSteps) : base(serviceType, ServiceLifetime.Transient)
         {
             _childSteps = childSteps;
         }

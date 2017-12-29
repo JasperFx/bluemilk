@@ -19,19 +19,15 @@ namespace BlueMilk.IoC
         private readonly Lazy<Variable> _variable;
         public Type ServiceType { get; }
 
-        public BuildStep(Type serviceType, bool shouldDispose, ServiceLifetime lifetime)
+        public BuildStep(Type serviceType, ServiceLifetime lifetime)
         {
             ServiceType = serviceType;
-            ShouldDispose = shouldDispose;
             Lifetime = lifetime;
 
             _variable = new Lazy<Variable>(buildVariable);
         }
 
-        public bool ShouldDispose { get; }
-        public ServiceLifetime Lifetime { get; }
-
-        public bool CanBeReused => Lifetime != ServiceLifetime.Transient;
+        public ServiceLifetime Lifetime { get; internal set; }
 
         /// <summary>
         /// If you are creating multiple instances of the same concrete type, use

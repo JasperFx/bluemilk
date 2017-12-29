@@ -65,8 +65,7 @@ namespace BlueMilk.IoC
             }
             
             var step = PlanConcreteBuild(descriptor.ServiceType, descriptor.ImplementationType);
-            // TODO -- set the lifecycle
-
+            if (step != null) step.Lifetime = descriptor.Lifetime;
 
             return step;
         }
@@ -107,7 +106,7 @@ namespace BlueMilk.IoC
         {
             try
             {
-                var candidate = _method.AllKnownBuildSteps.FirstOrDefault(x => x.ServiceType == type && x.CanBeReused);
+                var candidate = _method.AllKnownBuildSteps.FirstOrDefault(x => x.ServiceType == type);
                 if (candidate != null) return candidate;
 
                 var step = findStep(type);
@@ -128,7 +127,7 @@ namespace BlueMilk.IoC
         public BuildStep FindStep(ServiceDescriptor descriptor)
         {
             var candidate = _method.AllKnownBuildSteps.OfType<IServiceDescriptorBuildStep>()
-                .FirstOrDefault(x => x.ServiceDescriptor == descriptor && x.CanBeReused);
+                .FirstOrDefault(x => x.ServiceDescriptor == descriptor);
             if (candidate != null) return candidate as BuildStep;
 
             var step = findStep(descriptor);
