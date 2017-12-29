@@ -22,7 +22,7 @@ namespace BlueMilk.IoC
 
 
 
-        public ConstructorBuildStep(Type serviceType, Type implementationType, ServiceLifetime lifetime, ConstructorInfo ctor) : base(serviceType, lifetime != ServiceLifetime.Transient, true)
+        public ConstructorBuildStep(Type serviceType, Type implementationType, ServiceLifetime lifetime, ConstructorInfo ctor) : base(serviceType, true, lifetime)
         {
             _ctor = ctor;
             ImplementationType = implementationType;

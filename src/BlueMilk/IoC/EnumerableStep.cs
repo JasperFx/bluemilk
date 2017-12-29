@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlueMilk.Codegen;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
 {
@@ -34,7 +35,7 @@ namespace BlueMilk.IoC
             return serviceType.GetGenericArguments().First();
         }
 
-        public EnumerableStep(Type serviceType, BuildStep[] childSteps) : base(serviceType, false, false)
+        public EnumerableStep(Type serviceType, BuildStep[] childSteps) : base(serviceType, false, ServiceLifetime.Transient)
         {
             _childSteps = childSteps;
         }

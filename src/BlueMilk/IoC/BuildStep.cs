@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BlueMilk.Codegen;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
 {
@@ -18,18 +19,19 @@ namespace BlueMilk.IoC
         private readonly Lazy<Variable> _variable;
         public Type ServiceType { get; }
 
-        public BuildStep(Type serviceType, bool canBeReused, bool shouldDispose)
+        public BuildStep(Type serviceType, bool shouldDispose, ServiceLifetime lifetime)
         {
             ServiceType = serviceType;
-            CanBeReused = canBeReused;
             ShouldDispose = shouldDispose;
+            Lifetime = lifetime;
 
             _variable = new Lazy<Variable>(buildVariable);
         }
 
         public bool ShouldDispose { get; }
+        public ServiceLifetime Lifetime { get; }
 
-        public bool CanBeReused { get; }
+        public bool CanBeReused => Lifetime != ServiceLifetime.Transient;
 
         /// <summary>
         /// If you are creating multiple instances of the same concrete type, use

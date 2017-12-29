@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BlueMilk.Codegen;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
 {
@@ -7,7 +8,7 @@ namespace BlueMilk.IoC
     {
         public new Variable Variable { get; }
 
-        public KnownVariableBuildStep(Variable variable) : base(variable.VariableType, true, false)
+        public KnownVariableBuildStep(Variable variable) : base(variable.VariableType, false, ServiceLifetime.Scoped)
         {
             Variable = variable;
         }
