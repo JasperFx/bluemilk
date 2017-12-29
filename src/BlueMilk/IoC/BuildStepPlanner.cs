@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Baseline;
 using BlueMilk.Codegen;
@@ -9,34 +10,53 @@ namespace BlueMilk.IoC
 {
     public class BuildStepPlanner
     {
-        public Type ConcreteType { get; }
         private readonly ServiceGraph _graph;
         private readonly IMethodVariables _method;
         private readonly IList<BuildStep> _visited = new List<BuildStep>();
         private readonly Stack<BuildStep> _chain = new Stack<BuildStep>();
 
-        public BuildStepPlanner(Type serviceType, Type concreteType, ServiceGraph graph, IMethodVariables method)
+        public BuildStepPlanner(ServiceGraph graph, IMethodVariables method)
         {
-            if (!concreteType.IsConcrete()) throw new ArgumentOutOfRangeException(nameof(concreteType), "Must be a concrete type");
-
-            ConcreteType = concreteType;
             _graph = graph;
             _method = method;
 
+        }
 
-            var ctor = graph.ChooseConstructor(concreteType);
+        public ConstructorBuildStep PlanConcreteBuild(Type concreteType)
+        {
+            return PlanConcreteBuild(concreteType, concreteType);
+        }
+
+        public ConstructorBuildStep PlanConcreteBuild(Type serviceType, Type concreteType)
+        {
+            if (!concreteType.IsConcrete()) throw new ArgumentOutOfRangeException(nameof(concreteType), "Must be a concrete type");
+            
+            var ctor = _graph.ChooseConstructor(concreteType);
             if (ctor == null)
             {
                 CanBeReduced = false;
+                return null;
             }
-            else
-            {
-                Top = new ConstructorBuildStep(serviceType, concreteType, ServiceLifetime.Scoped, ctor);
-                Visit(Top);
-            }
+            
+            var step = new ConstructorBuildStep(serviceType, concreteType, ServiceLifetime.Scoped, ctor);
+            Visit(step);
+
+            return step;
         }
 
-        public ConstructorBuildStep Top { get; private set; }
+        public ConstructorBuildStep PlanConcreteBuild(ServiceDescriptor descriptor)
+        {
+            if (descriptor.ImplementationType == null || !descriptor.ImplementationType.IsConcrete())
+            {
+                throw new ArgumentOutOfRangeException(nameof(descriptor), $"ServiceDescriptor must specify a concrete {nameof(ServiceDescriptor.ImplementationType)}");
+            }
+            
+            var step = PlanConcreteBuild(descriptor.ServiceType, descriptor.ImplementationType);
+            // TODO -- set the lifecycle
+
+
+            return step;
+        }
 
         public bool CanBeReduced { get; private set; } = true;
 

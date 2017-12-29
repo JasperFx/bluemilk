@@ -34,12 +34,15 @@ namespace BlueMilk.Codegen.ServiceLocation
     public class ServiceCreationFrame : SyncFrame
     {
         private readonly BuildStepPlanner _planner;
+        private readonly BuildStep _step;
         private Variable _provider;
 
-        public ServiceCreationFrame(Type serviceType, BuildStepPlanner planner)
+        public ServiceCreationFrame(Type serviceType, BuildStepPlanner planner, BuildStep step)
         {
             _planner = planner;
+            _step = step;
             Service = new ServiceVariable(serviceType, this);
+            
         }
 
         public Variable Service { get; }
@@ -67,6 +70,6 @@ namespace BlueMilk.Codegen.ServiceLocation
             }
         }
 
-        public Variable BuildStepPlannerVariable => _planner.Top.Variable;
+        public Variable BuildStepPlannerVariable => _step.Variable;
     }
 }

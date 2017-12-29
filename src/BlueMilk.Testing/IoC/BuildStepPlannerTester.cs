@@ -30,7 +30,10 @@ namespace BlueMilk.Testing.IoC
 
         private BuildStepPlanner executePlan<T>()
         {
-            return new BuildStepPlanner(typeof(T), typeof(T), theGraph, theMethod);
+            var planner = new BuildStepPlanner(theGraph, theMethod);
+            var top = planner.PlanConcreteBuild(typeof(T));
+
+            return planner;
         }
 
         [Fact]

@@ -164,7 +164,7 @@ namespace BlueMilk.Codegen
 
         public string Declaration => $"{VariableType.FullName} {Usage}";
 
-        public static Argument For<T>(string argName = null)
+        public new static Argument For<T>(string argName = null)
         {
             return new Argument(typeof(T), argName ?? DefaultArgName(typeof(T)));
         }

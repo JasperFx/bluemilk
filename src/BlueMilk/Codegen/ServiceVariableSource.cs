@@ -26,13 +26,18 @@ namespace BlueMilk.Codegen
         {
             var @default = _services.FindDefault(type);
             BuildStepPlanner planner = null;
+            BuildStep step = null;
+            
             if (@default?.ImplementationType != null && @default.Lifetime != ServiceLifetime.Singleton)
             {
-                planner = new BuildStepPlanner(type, @default.ImplementationType, _services, _method);
+                planner = new BuildStepPlanner(_services, _method);
+                step = planner.PlanConcreteBuild(@default);
             }
+            
+            
 
 
-            return new ServiceCreationFrame(type, planner).Service;
+            return new ServiceCreationFrame(type, planner, step).Service;
         }
     }
 }
