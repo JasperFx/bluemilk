@@ -4,6 +4,15 @@ using BlueMilk.Codegen;
 
 namespace BlueMilk.IoC
 {
+    public enum BuildMode
+    {
+        Inline,
+        ContainerActivation,
+        Resolver
+    }
+
+
+    
     public abstract class BuildStep
     {
         private readonly Lazy<Variable> _variable;

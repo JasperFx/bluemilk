@@ -8,12 +8,22 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
 {
+    public enum PlanningDetermination
+    {
+        ConstructorsOnly,
+        RequiresServiceProvider,
+        Missing
+    }
+    
+    
     public class BuildStepPlanner
     {
         private readonly ServiceGraph _graph;
         private readonly IMethodVariables _method;
         private readonly IList<BuildStep> _visited = new List<BuildStep>();
         private readonly Stack<BuildStep> _chain = new Stack<BuildStep>();
+        
+        private readonly List<string> _errorMessages = new List<string>();
 
         public BuildStepPlanner(ServiceGraph graph, IMethodVariables method)
         {
@@ -21,6 +31,8 @@ namespace BlueMilk.IoC
             _method = method;
 
         }
+
+        public IReadOnlyList<string> ErrorMessages => _errorMessages;
 
         public ConstructorBuildStep PlanConcreteBuild(Type concreteType)
         {
@@ -34,7 +46,8 @@ namespace BlueMilk.IoC
             var ctor = _graph.ChooseConstructor(concreteType);
             if (ctor == null)
             {
-                CanBeReduced = false;
+                _errorMessages.Add($"Could not determine a suitable, public constructor for concrete type {concreteType.FullNameInCode()}");
+                Determination = PlanningDetermination.Missing;
                 return null;
             }
             
@@ -58,7 +71,7 @@ namespace BlueMilk.IoC
             return step;
         }
 
-        public bool CanBeReduced { get; private set; } = true;
+        public PlanningDetermination Determination { get; private set; } = PlanningDetermination.ConstructorsOnly;
 
         public void Visit(BuildStep step)
         {
@@ -76,9 +89,10 @@ namespace BlueMilk.IoC
 
             foreach (var dep in step.ReadDependencies(this))
             {
+                // TODO -- have this check for a "MissingStep" instead of a null
                 if (dep == null)
                 {
-                    CanBeReduced = false;
+                    Determination = PlanningDetermination.Missing;
                     return;
                 }
 

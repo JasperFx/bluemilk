@@ -46,7 +46,7 @@ namespace BlueMilk.Codegen.ServiceLocation
         }
 
         public Variable Service { get; }
-        public bool CanBeReduced => _planner?.CanBeReduced ?? false;
+        public bool CanBeReduced => _planner?.Determination == PlanningDetermination.ConstructorsOnly;
 
         public override IEnumerable<Variable> FindVariables(IMethodVariables chain)
         {

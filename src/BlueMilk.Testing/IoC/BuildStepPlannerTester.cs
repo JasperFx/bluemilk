@@ -40,14 +40,14 @@ namespace BlueMilk.Testing.IoC
         public void not_reduceable_if_no_public_ctors()
         {
             executePlan<NoPublicCtorGuy>()
-                .CanBeReduced.ShouldBeFalse();
+                .Determination.ShouldBe(PlanningDetermination.Missing);
         }
 
         [Fact]
         public void not_reduceable_if_cannot_resolve_all()
         {
             executePlan<WidgetUsingGuy>()
-                .CanBeReduced.ShouldBeFalse();
+                .Determination.ShouldBe(PlanningDetermination.Missing);
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace BlueMilk.Testing.IoC
             theServices.AddTransient<IWidget, AWidget>();
 
             executePlan<WidgetUsingGuy>()
-                .CanBeReduced.ShouldBeTrue();
+                .Determination.ShouldBe(PlanningDetermination.ConstructorsOnly);
         }
 
     }
