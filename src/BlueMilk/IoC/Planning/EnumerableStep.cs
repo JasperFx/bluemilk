@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlueMilk.Codegen;
+using BlueMilk.IoC.Frames;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BlueMilk.IoC
+namespace BlueMilk.IoC.Planning
 {
     public class EnumerableStep : BuildStep
     {

@@ -5,7 +5,7 @@ using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Compilation;
 
-namespace BlueMilk.IoC
+namespace BlueMilk.IoC.Frames
 {
     public class ConstructorFrame : SyncFrame
     {

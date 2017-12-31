@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Baseline;
 using BlueMilk.Codegen.ServiceLocation;
-using BlueMilk.IoC;
+using BlueMilk.IoC.Planning;
 using BlueMilk.Util;
 
 namespace BlueMilk.Codegen

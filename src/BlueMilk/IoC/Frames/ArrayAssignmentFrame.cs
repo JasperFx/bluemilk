@@ -5,14 +5,14 @@ using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Compilation;
 
-namespace BlueMilk.IoC
+namespace BlueMilk.IoC.Frames
 {
-    public class ListAssignmentFrame : Frame
+    public class ArrayAssignmentFrame : Frame
     {
-        public ListAssignmentFrame(Type serviceType, Variable[] elements) : base(false)
+        public ArrayAssignmentFrame(Type elementType, Variable[] elements) : base(false)
         {
-            ElementType = EnumerableStep.DetermineElementType(serviceType);
-            Variable = new Variable(serviceType, Variable.DefaultArgName(ElementType) + "List", this);
+            ElementType = elementType;
+            Variable = new Variable(elementType.MakeArrayType(), Variable.DefaultArgName(elementType) + "Array", this);
 
             Elements = elements;
         }
@@ -26,7 +26,7 @@ namespace BlueMilk.IoC
         public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
         {
             var elements = Elements.Select(x => x.Usage).Join(", ");
-            writer.Write($"var {Variable.Usage} = new {typeof(List<>).Namespace}.List<{ElementType.FullNameInCode()}>{{{elements}}};");
+            writer.Write($"var {Variable.Usage} = new {ElementType.FullNameInCode()}[]{{{elements}}};");
             Next?.GenerateCode(method, writer);
         }
 

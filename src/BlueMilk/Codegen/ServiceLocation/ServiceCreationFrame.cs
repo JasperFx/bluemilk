@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Baseline;
 using BlueMilk.Compilation;
-using BlueMilk.IoC;
+using BlueMilk.IoC.Planning;
 
 namespace BlueMilk.Codegen.ServiceLocation
 {

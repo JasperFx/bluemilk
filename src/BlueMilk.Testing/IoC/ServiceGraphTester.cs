@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using BlueMilk.Codegen;
-using BlueMilk.IoC;
 using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

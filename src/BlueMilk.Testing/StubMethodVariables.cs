@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlueMilk.Codegen;
-using BlueMilk.IoC;
+using BlueMilk.IoC.Planning;
 
 namespace BlueMilk.Testing
 {

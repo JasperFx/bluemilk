@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using BlueMilk.IoC;
+using BlueMilk.IoC.Planning;
 
 namespace BlueMilk.Codegen
 {

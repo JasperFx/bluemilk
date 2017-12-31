@@ -1,6 +1,6 @@
 ﻿using BlueMilk.Codegen;
 using BlueMilk.Compilation;
-using BlueMilk.IoC;
+using BlueMilk.IoC.Planning;
 using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;

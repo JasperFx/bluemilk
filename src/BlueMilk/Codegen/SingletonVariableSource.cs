@@ -1,5 +1,4 @@
 ﻿using System;
-using BlueMilk.IoC;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Codegen

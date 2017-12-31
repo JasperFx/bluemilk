@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Baseline;
 using BlueMilk.Codegen;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BlueMilk.IoC
+namespace BlueMilk.IoC.Planning
 {
     public enum PlanningDetermination
     {
@@ -86,7 +85,8 @@ namespace BlueMilk.IoC
 
             _chain.Push(step);
 
-            foreach (var dep in step.ReadDependencies(this))
+            var dependencies = step.ReadDependencies(this).ToArray();
+            foreach (var dep in dependencies)
             {
                 // TODO -- have this check for a "MissingStep" instead of a null
                 if (dep == null)
@@ -98,6 +98,10 @@ namespace BlueMilk.IoC
 
                 Visit(dep);
             }
+
+            // Fugly, but it helps quite a bit later in ordering
+            step.Dependencies = dependencies.Concat(dependencies.SelectMany(x => x.Dependencies)).Distinct().ToArray();
+            
 
             _chain.Pop();
         }

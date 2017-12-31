@@ -2,7 +2,7 @@
 using BlueMilk.Codegen;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BlueMilk.IoC
+namespace BlueMilk.IoC.Planning
 {
     public class KnownVariableBuildStep : BuildStep
     {

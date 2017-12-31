@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using BlueMilk.IoC;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Codegen

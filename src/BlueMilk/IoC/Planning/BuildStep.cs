@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BlueMilk.Codegen;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BlueMilk.IoC
+namespace BlueMilk.IoC.Planning
 {
     public enum BuildMode
     {
@@ -59,5 +59,7 @@ namespace BlueMilk.IoC
 
             return _variable;
         }
+        
+        public BuildStep[] Dependencies { get; internal set; }
     }
 }

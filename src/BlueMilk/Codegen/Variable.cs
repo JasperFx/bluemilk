@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Baseline;
-using BlueMilk.IoC;
+using BlueMilk.IoC.Planning;
 
 namespace BlueMilk.Codegen
 {

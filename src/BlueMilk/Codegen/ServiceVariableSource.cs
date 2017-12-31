@@ -1,6 +1,6 @@
 ﻿using System;
 using BlueMilk.Codegen.ServiceLocation;
-using BlueMilk.IoC;
+using BlueMilk.IoC.Planning;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Codegen

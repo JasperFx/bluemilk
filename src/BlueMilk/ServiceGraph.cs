@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Baseline;
+using BlueMilk.IoC.Planning;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BlueMilk.IoC
+namespace BlueMilk
 {
     public class ServiceGraph
     {
