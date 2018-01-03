@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Resolvers;
 
 namespace BlueMilk
 {
     public class ResolverGraph
     {
+        public static ResolverGraph Empty()
+        {
+            return new ResolverGraph(new ServiceGraph(new ServiceRegistry()));
+        }
+        
         private readonly ServiceGraph _services;
         public readonly IDictionary<Type, IResolver> ByType = new ConcurrentDictionary<Type, IResolver>();
         public readonly IDictionary<Type, IDictionary<string, IResolver>> ByTypeAndName = new ConcurrentDictionary<Type, IDictionary<string, IResolver>>();
@@ -14,6 +20,20 @@ namespace BlueMilk
         public ResolverGraph(ServiceGraph services)
         {
             _services = services;
+        }
+
+        public void Register(Instance instance, IResolver resolver)
+        {
+            if (!ByTypeAndName.ContainsKey(instance.ServiceType))
+            {
+                ByTypeAndName[instance.ServiceType] = new ConcurrentDictionary<string, IResolver>();
+            }
+            
+            ByTypeAndName[instance.ServiceType][instance.Name] = resolver;
+            if (instance.IsDefault)
+            {
+                ByType[instance.ServiceType] = resolver;
+            }
         }
 
         public IResolver For(Type serviceType)

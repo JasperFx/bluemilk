@@ -9,25 +9,26 @@ namespace BlueMilk
     public class ServiceFamily
     {
         private readonly Dictionary<string, Instance> _instances = new Dictionary<string, Instance>();
-        
-        
+
+
         public Type ServiceType { get; }
 
         public ServiceFamily(Type serviceType, Instance[] instances)
         {
-            if (instances.Length == 0) throw new ArgumentOutOfRangeException(nameof(instances), "Cannot be an empty array");
-            
+            if (instances.Length == 0)
+                throw new ArgumentOutOfRangeException(nameof(instances), "Cannot be an empty array");
+
             foreach (var instance in instances)
             {
                 instance.IsDefault = false;
             }
 
             instances.Last().IsDefault = true;
-            
+
             ServiceType = serviceType;
 
             Default = instances.Last();
-            
+
 
             makeNamesUnique(instances);
 
@@ -35,7 +36,12 @@ namespace BlueMilk
             {
                 _instances.Add(instance.Name, instance);
             }
+
+            All = instances;
         }
+
+        // Has to be in order here
+        public Instance[] All { get; }
 
         private void makeNamesUnique(IEnumerable<Instance> instances)
         {

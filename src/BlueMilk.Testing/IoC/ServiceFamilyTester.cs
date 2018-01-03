@@ -41,6 +41,20 @@ namespace BlueMilk.Testing.IoC
         }
         
         [Fact]
+        public void stores_all_in_order()
+        {
+            var allInstances = new Instance[]{
+                ConstructorInstance.For<IWidget, AWidget>(),
+                ConstructorInstance.For<IWidget, AWidget>(),
+                ConstructorInstance.For<IWidget, ColorWidget>(), 
+                ConstructorInstance.For<IWidget, MoneyWidget>(), 
+            };
+            var family = new ServiceFamily(typeof(IWidget), allInstances);
+            
+            family.All.ShouldBe(allInstances);
+        }
+        
+        [Fact]
         public void setting_the_is_default_property_on_instance()
         {
             var family = new ServiceFamily(typeof(IWidget), new Instance[]{
