@@ -62,35 +62,4 @@ namespace BlueMilk
     {
         
     }
-
-    public class ServiceFamily
-    {
-        private readonly Dictionary<string, Instance> _instances = new Dictionary<string, Instance>();
-        
-        
-        public Type ServiceType { get; }
-
-        public ServiceFamily(Type serviceType, Instance[] instances)
-        {
-            ServiceType = serviceType;
-
-            Default = instances.Last();
-
-            makeNamesUnique(instances);
-
-            foreach (var instance in instances)
-            {
-                _instances.Add(instance.Name, instance);
-            }
-        }
-
-        private void makeNamesUnique(IEnumerable<Instance> instances)
-        {
-            // TODO -- add suffixes where necessary
-        }
-
-        public Instance Default { get; }
-
-        public IReadOnlyDictionary<string, Instance> Instances => _instances;
-    }
 }
