@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using BlueMilk.Codegen;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +15,14 @@ namespace BlueMilk.IoC.Instances
     
     public class ConstructorInstance : Instance
     {
+        public static readonly string NoPublicConstructors = "No public constructors";
+        public static readonly string NoPublicConstructorCanBeFilled = "Cannot fill the dependencies of any of the public constructors";
+        
+        public static ConstructorInstance For<T>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+        {
+            return For<T, T>(lifetime);
+        }
+        
         public static ConstructorInstance For<T, TConcrete>(ServiceLifetime lifetime = ServiceLifetime.Transient)
             where TConcrete : T
         {
@@ -33,6 +43,34 @@ namespace BlueMilk.IoC.Instances
         public override void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers)
         {
             throw new NotImplementedException();
+        }
+
+        protected override IEnumerable<Instance> createPlan(NewServiceGraph services)
+        {
+            var constructors = ImplementationType
+                .GetConstructors();
+
+            if (constructors.Any())
+            {
+                Constructor = constructors
+                    .OrderByDescending(x => x.GetParameters().Length)
+                    .FirstOrDefault(services.CouldBuild);
+
+                if (Constructor == null)
+                {
+                    ErrorMessages.Add(NoPublicConstructorCanBeFilled);
+                }
+            }
+            else
+            {
+                ErrorMessages.Add(NoPublicConstructors);
+            }
+            
+
+            
+            // TODO -- more here!
+            return base.createPlan(services);
+
         }
     }
 }

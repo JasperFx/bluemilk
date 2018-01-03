@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Baseline;
 using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,6 +57,12 @@ namespace BlueMilk
         {
             return FindFamily(serviceType)?.Instances.Values.ToArray() ?? new Instance[0];
         }
+        
+        public bool CouldBuild(ConstructorInfo ctor)
+        {
+            return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null);
+        }
+
     }
 
     public class ResolverGraph
