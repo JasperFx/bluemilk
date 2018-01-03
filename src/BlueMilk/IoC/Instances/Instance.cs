@@ -63,6 +63,8 @@ namespace BlueMilk.IoC.Instances
         public Instance[] Dependencies { get; protected set; } = new Instance[0];
 
 
-        public abstract void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers);
+        public abstract void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope);
+
+        public bool IsDefault { get; set; } = false;
     }
 }

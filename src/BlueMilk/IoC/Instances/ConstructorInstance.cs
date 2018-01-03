@@ -10,7 +10,8 @@ namespace BlueMilk.IoC.Instances
     public enum CreationStyle
     {
         InlineSingleton,
-        Resolver
+        Generated,
+        NoArg
     }
     
     public class ConstructorInstance : Instance
@@ -40,7 +41,7 @@ namespace BlueMilk.IoC.Instances
         
         public Type ResolverBaseType { get; private set; }
 
-        public override void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers)
+        public override void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
         {
             throw new NotImplementedException();
         }

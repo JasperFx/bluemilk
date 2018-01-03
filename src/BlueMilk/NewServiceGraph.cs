@@ -64,9 +64,4 @@ namespace BlueMilk
         }
 
     }
-
-    public class ResolverGraph
-    {
-        
-    }
 }

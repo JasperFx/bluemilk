@@ -16,7 +16,7 @@ namespace BlueMilk.IoC.Instances
             Name = instance?.GetType().NameInCode() ?? serviceType.NameInCode();
         }
 
-        public override void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers)
+        public override void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
         {
             throw new NotImplementedException();
         }
