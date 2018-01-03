@@ -1,5 +1,9 @@
 ﻿using System;
-using BlueMilk.Codegen;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using BlueMilk.Compilation;
+using BlueMilk.IoC.Planning;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -30,20 +34,35 @@ namespace BlueMilk.IoC.Instances
         }
 
         public string Name { get; set; }
-    }
+        
+        public bool HasPlanned { get; protected internal set; }
 
-    public class LambdaInstance : Instance
-    {
-        public static LambdaInstance For<T>(Func<IServiceProvider, T> factory,
-            ServiceLifetime lifetime = ServiceLifetime.Transient)
+        public void CreatePlan(NewServiceGraph services)
         {
-            return new LambdaInstance(typeof(T), s => factory(s), lifetime);
+            var dependencies = createPlan(services);
+
+            Dependencies = dependencies.Concat(dependencies.SelectMany(x => x.Dependencies)).Distinct().ToArray();
+
+            HasPlanned = true;
+        }
+
+        protected virtual IEnumerable<Instance> createPlan(NewServiceGraph services)
+        {
+            return Enumerable.Empty<Instance>();
+        }
+
+        public readonly IList<string> ErrorMessages = new List<string>();
+        
+        public BuildStep BuildStep { get; protected set; }
+
+        public virtual void GenerateCode(ISourceWriter writer)
+        {
+            // Nothing
         }
         
-        public LambdaInstance(Type serviceType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime) : base(serviceType, factory, lifetime)
-        {
-            Name = serviceType.NameInCode();
-        }
-        
+        public Instance[] Dependencies { get; protected set; } = new Instance[0];
+
+
+        public abstract void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers);
     }
 }

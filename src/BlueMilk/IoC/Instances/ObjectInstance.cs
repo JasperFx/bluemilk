@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using BlueMilk.Codegen;
 
 namespace BlueMilk.IoC.Instances
@@ -14,7 +15,10 @@ namespace BlueMilk.IoC.Instances
         {
             Name = instance?.GetType().NameInCode() ?? serviceType.NameInCode();
         }
-        
-        
+
+        public override void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
