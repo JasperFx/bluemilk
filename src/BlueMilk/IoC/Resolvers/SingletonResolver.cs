@@ -1,4 +1,5 @@
 ﻿using System;
+using Baseline;
 
 namespace BlueMilk.IoC.Resolvers
 {
@@ -22,9 +23,17 @@ namespace BlueMilk.IoC.Resolvers
             
             lock (_locker)
             {
-                if (_topLevelScope == null)
+                if (_service == null)
                 {
                     _service = Build(_topLevelScope);
+                    if (_service is IDisposable)
+                    {
+                        _topLevelScope.Disposables.Add((IDisposable) _service);
+                    }
+                    
+                    // TODO -- will need to also do this by name.
+                    // May not do this by default in some cases
+                    _topLevelScope.Register(typeof(T), _service);
                 }
             }
 

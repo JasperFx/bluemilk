@@ -20,6 +20,18 @@ namespace BlueMilk.Testing
         }
     }
 
+    public class DisposableClock : IClock, IDisposable
+    {
+        public DateTime Now()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
     public class MockedWorkItemProcessor
     {
         private readonly IClock _clock;

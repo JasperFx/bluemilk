@@ -7,12 +7,13 @@ namespace BlueMilk.IoC
 {
     public class Scope : IServiceScope, IDisposable
     {
-        private readonly IList<IDisposable> _disposables = new List<IDisposable>();
         private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
-        
+
+        public IList<IDisposable> Disposables { get; } = new List<IDisposable>();
+
         public void RegisterDisposable(IDisposable disposable)
         {
-            _disposables.Add(disposable);
+            Disposables.Add(disposable);
         }
 
         public void Register(Type serviceType, object service)
@@ -34,7 +35,7 @@ namespace BlueMilk.IoC
 
         public void Dispose()
         {
-            foreach (var disposable in _disposables)
+            foreach (var disposable in Disposables)
             {
                 disposable.SafeDispose();
             }

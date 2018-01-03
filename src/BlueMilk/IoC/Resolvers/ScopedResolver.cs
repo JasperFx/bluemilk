@@ -11,6 +11,8 @@ namespace BlueMilk.IoC.Resolvers
             if (!scope.TryFind(out T service))
             {
                 service = (T) Build(scope);
+                
+                // TODO -- will need to watch whether this is the default or not
                 scope.Register(ServiceType, service);
                 if (service is IDisposable) scope.RegisterDisposable(service as IDisposable);
             }
