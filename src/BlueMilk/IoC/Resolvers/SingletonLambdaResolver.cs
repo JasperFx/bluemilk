@@ -7,9 +7,9 @@ namespace BlueMilk.IoC.Resolvers
     {
         private readonly Func<IServiceProvider, object> _builder;
         
-        public SingletonLambdaResolver(ServiceDescriptor descriptor, Scope topLevelScope) : base(topLevelScope)
+        public SingletonLambdaResolver(Func<IServiceProvider, object> builder, Scope topLevelScope) : base(topLevelScope)
         {
-            _builder = descriptor.ImplementationFactory;
+            _builder = builder;
         }
         
         public override T Build(Scope scope)

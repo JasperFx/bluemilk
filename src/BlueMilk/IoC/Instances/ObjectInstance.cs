@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using BlueMilk.Codegen;
+using BlueMilk.IoC.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -17,7 +18,7 @@ namespace BlueMilk.IoC.Instances
             Name = instance?.GetType().NameInCode() ?? serviceType.NameInCode();
         }
 
-        public override void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
+        public override IResolver BuildResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
         {
             throw new NotImplementedException();
         }

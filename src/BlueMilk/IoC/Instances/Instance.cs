@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Planning;
+using BlueMilk.IoC.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -59,8 +60,7 @@ namespace BlueMilk.IoC.Instances
         
         public Instance[] Dependencies { get; protected set; } = new Instance[0];
 
-
-        public abstract void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope);
+        public abstract IResolver BuildResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope);
 
         public bool IsDefault { get; set; } = false;
     }

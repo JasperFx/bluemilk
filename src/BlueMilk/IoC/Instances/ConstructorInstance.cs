@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BlueMilk.Codegen;
+using BlueMilk.IoC.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -44,7 +45,7 @@ namespace BlueMilk.IoC.Instances
         
         public Type ResolverBaseType { get; private set; }
 
-        public override void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
+        public override IResolver BuildResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
         {
             throw new NotImplementedException();
         }

@@ -24,24 +24,23 @@ namespace BlueMilk.IoC.Instances
             return new LambdaInstance(typeof(T), s => factory(s), lifetime);
         }
 
-        public override void RegisterResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
+        public override IResolver BuildResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
         {
-            throw new NotImplementedException();
-//            switch (Lifetime)
-//            {
-//                case ServiceLifetime.Transient:
-//                    return typeof(TransientLambdaResolver<>).Clo;
-//
-//                case ServiceLifetime.Scoped:
-//                    return typeof(ScopedLambdaResolver<>);
-//
-//                case ServiceLifetime.Singleton:
-//                    return typeof(SingletonLambdaResolver<>);
-//            }
-//            
-//            var resolver = determineResolverType().CloseAndBuildAs<IResolver>(this, ServiceType);
-//            resolvers.ByType[ServiceType] = resolver;
+            switch (Lifetime)
+            {
+                case ServiceLifetime.Transient:
+                    return typeof(TransientLambdaResolver<>).CloseAndBuildAs<IResolver>(Factory, ServiceType);
+
+                case ServiceLifetime.Scoped:
+                    return typeof(ScopedLambdaResolver<>).CloseAndBuildAs<IResolver>(Factory, ServiceType);
+
+                case ServiceLifetime.Singleton:
+                    return typeof(SingletonLambdaResolver<>).CloseAndBuildAs<IResolver>(Factory, rootScope, ServiceType);
+            }
+            
+            throw new ArgumentOutOfRangeException(nameof(Lifetime));
         }
+
 
     }
 }

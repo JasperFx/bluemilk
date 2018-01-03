@@ -23,11 +23,7 @@ namespace BlueMilk.Testing.IoC.Instances
             var instance = LambdaInstance.For<IClock>(s => new Clock(), ServiceLifetime.Transient);
             instance.IsDefault = true;
             
-            
-            
-            instance.RegisterResolver(null, theResolvers, null);
-
-            theResolvers.ByType[typeof(IClock)]
+            instance.BuildResolver(null, theResolvers, null)
                 .ShouldBeOfType<TransientLambdaResolver<IClock>>();
         }
         
@@ -37,11 +33,7 @@ namespace BlueMilk.Testing.IoC.Instances
             var instance = LambdaInstance.For<IClock>(s => new Clock(), ServiceLifetime.Scoped);
             instance.IsDefault = true;
             
-            
-            
-            instance.RegisterResolver(null, theResolvers, null);
-
-            theResolvers.ByType[typeof(IClock)]
+            instance.BuildResolver(null, theResolvers, null)
                 .ShouldBeOfType<ScopedLambdaResolver<IClock>>();
         }
         
@@ -51,11 +43,7 @@ namespace BlueMilk.Testing.IoC.Instances
             var instance = LambdaInstance.For<IClock>(s => new Clock(), ServiceLifetime.Singleton);
             instance.IsDefault = true;
             
-            
-            
-            instance.RegisterResolver(null, theResolvers, null);
-
-            theResolvers.ByType[typeof(IClock)]
+            instance.BuildResolver(null, theResolvers, null)
                 .ShouldBeOfType<SingletonLambdaResolver<IClock>>();
         }
     }

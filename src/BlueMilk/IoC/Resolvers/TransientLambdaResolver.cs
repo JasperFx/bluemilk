@@ -7,9 +7,9 @@ namespace BlueMilk.IoC.Resolvers
     {
         private readonly Func<IServiceProvider, object> _builder;
         
-        public TransientLambdaResolver(ServiceDescriptor descriptor)
+        public TransientLambdaResolver(Func<IServiceProvider, object> builder)
         {
-            _builder = descriptor.ImplementationFactory;
+            _builder = builder;
         }
         
         public override object Build(Scope scope)
