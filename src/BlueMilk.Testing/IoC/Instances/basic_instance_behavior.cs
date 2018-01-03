@@ -11,7 +11,7 @@ namespace BlueMilk.Testing.IoC.Instances
         public void for_returns_the_instance()
         {
             var @object = new ObjectInstance(typeof(string),"foo");
-            Instance.For(@object)
+            Instance.For(ServiceDescriptor.Singleton(@object))
                 .ShouldBeSameAs(@object);
         }
 
@@ -22,7 +22,6 @@ namespace BlueMilk.Testing.IoC.Instances
             var instance = Instance.For(descriptor)
                 .ShouldBeOfType<ObjectInstance>();
             
-            instance.ImplementationInstance.ShouldBe(descriptor.ImplementationInstance);
             instance.ServiceType.ShouldBe(descriptor.ServiceType);
             instance.Lifetime.ShouldBe(descriptor.Lifetime);
         }
@@ -47,7 +46,7 @@ namespace BlueMilk.Testing.IoC.Instances
             var instance = Instance.For(descriptor)
                 .ShouldBeOfType<LambdaInstance>();
             
-            instance.ImplementationFactory.ShouldBe(descriptor.ImplementationFactory);
+            instance.Factory.ShouldBe(descriptor.ImplementationFactory);
             instance.ServiceType.ShouldBe(descriptor.ServiceType);
             instance.Lifetime.ShouldBe(descriptor.Lifetime);
         }

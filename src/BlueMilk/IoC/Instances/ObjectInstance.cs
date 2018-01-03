@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using BlueMilk.Codegen;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
@@ -11,7 +12,7 @@ namespace BlueMilk.IoC.Instances
             return new ObjectInstance(typeof(T), @object);
         }
         
-        public ObjectInstance(Type serviceType, object instance) : base(serviceType, instance)
+        public ObjectInstance(Type serviceType, object instance) : base(serviceType, ServiceLifetime.Singleton)
         {
             Name = instance?.GetType().NameInCode() ?? serviceType.NameInCode();
         }

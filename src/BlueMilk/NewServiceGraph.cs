@@ -24,7 +24,7 @@ namespace BlueMilk
             Services = services;
 
             services
-                .Where(x => !x.ServiceType.IsGenericType)
+                .Where(x => !x.ServiceType.IsGenericType && !x.ServiceType.CanBeCastTo<Instance>())
                 .Select(Instance.For)
                 .GroupBy(x => x.ServiceType)
                 .Select(x => new ServiceFamily(x.Key, x.ToArray()))

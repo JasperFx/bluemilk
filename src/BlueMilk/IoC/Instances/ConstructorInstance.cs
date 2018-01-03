@@ -16,6 +16,7 @@ namespace BlueMilk.IoC.Instances
     
     public class ConstructorInstance : Instance
     {
+        public Type ImplementationType { get; }
         public static readonly string NoPublicConstructors = "No public constructors";
         public static readonly string NoPublicConstructorCanBeFilled = "Cannot fill the dependencies of any of the public constructors";
         
@@ -30,9 +31,11 @@ namespace BlueMilk.IoC.Instances
             return new ConstructorInstance(typeof(T), typeof(TConcrete), lifetime);
         } 
         
-        public ConstructorInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(serviceType, implementationType, lifetime)
+        public ConstructorInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(serviceType, lifetime)
         {
+            ImplementationType = implementationType;
             Name = implementationType.NameInCode();
+            
         }
         
         public CreationStyle CreationStyle { get; private set; }

@@ -39,6 +39,7 @@ namespace BlueMilk.Testing.IoC
             var theGraph = new NewServiceGraph(theServices);
 
             theGraph.FindDefault(typeof(IWidget))
+                .ShouldBeOfType<ConstructorInstance>()
                 .ImplementationType.ShouldBe(typeof(MoneyWidget));
 
         }
@@ -54,6 +55,7 @@ namespace BlueMilk.Testing.IoC
             var theGraph = new NewServiceGraph(theServices);
 
             theGraph.FindAll(typeof(IWidget))
+                .OfType<ConstructorInstance>()
                 .Select(x => x.ImplementationType)
                 .ShouldHaveTheSameElementsAs(typeof(AWidget), typeof(MoneyWidget));
 

@@ -8,11 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
-    public abstract class Instance : ServiceDescriptor
+    public abstract class Instance
     {
+        public Type ServiceType { get; }
+
         public static Instance For(ServiceDescriptor service)
         {
-            if (service is Instance instance) return instance;
+            if (service.ImplementationInstance is Instance instance) return instance;
             
             if (service.ImplementationInstance != null) return new ObjectInstance(service.ServiceType, service.ImplementationInstance);
             
@@ -20,19 +22,14 @@ namespace BlueMilk.IoC.Instances
 
             return new ConstructorInstance(service.ServiceType, service.ImplementationType, service.Lifetime);
         }
-        
-        protected Instance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(serviceType, implementationType, lifetime)
+
+        protected Instance(Type serviceType, ServiceLifetime lifetime)
         {
+            ServiceType = serviceType;
+            Lifetime = lifetime;
         }
 
-        protected Instance(Type serviceType, object instance) : base(serviceType, instance)
-        {
-        }
-
-        protected Instance(Type serviceType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime) : base(serviceType, factory, lifetime)
-        {
-        }
-
+        public ServiceLifetime Lifetime { get; set; } = ServiceLifetime.Transient;
         public string Name { get; set; }
         
         public bool HasPlanned { get; protected internal set; }

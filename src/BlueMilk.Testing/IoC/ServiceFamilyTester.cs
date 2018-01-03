@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Baseline;
 using BlueMilk.IoC.Instances;
 using BlueMilk.Testing.TargetTypes;
 using Shouldly;
@@ -16,7 +17,7 @@ namespace BlueMilk.Testing.IoC
                 ConstructorInstance.For<IWidget, ColorWidget>(), 
             });
             
-            family.Default.ImplementationType.ShouldBe(typeof(ColorWidget));
+            family.Default.As<ConstructorInstance>().ImplementationType.ShouldBe(typeof(ColorWidget));
         }
         
         [Fact]
