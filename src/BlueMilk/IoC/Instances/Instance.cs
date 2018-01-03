@@ -1,4 +1,5 @@
 ﻿using System;
+using BlueMilk.Codegen;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -31,31 +32,18 @@ namespace BlueMilk.IoC.Instances
         public string Name { get; set; }
     }
 
-    public class ConstructorInstance : Instance
-    {
-        public ConstructorInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(serviceType, implementationType, lifetime)
-        {
-        }
-    }
-
     public class LambdaInstance : Instance
     {
+        public static LambdaInstance For<T>(Func<IServiceProvider, T> factory,
+            ServiceLifetime lifetime = ServiceLifetime.Transient)
+        {
+            return new LambdaInstance(typeof(T), s => factory(s), lifetime);
+        }
+        
         public LambdaInstance(Type serviceType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime) : base(serviceType, factory, lifetime)
         {
+            Name = serviceType.NameInCode();
         }
-    }
-
-    public class ObjectInstance : Instance
-    {
-        public static ObjectInstance For<T>(T @object)
-        {
-            return new ObjectInstance(typeof(T), @object);
-        }
-        
-        public ObjectInstance(Type serviceType, object instance) : base(serviceType, instance)
-        {
-        }
-        
         
     }
 }
