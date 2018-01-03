@@ -39,5 +39,21 @@ namespace BlueMilk.Testing.IoC
             family.Instances.ContainsKey("ColorWidget2").ShouldBeTrue();
             family.Instances.ContainsKey("MoneyWidget").ShouldBeTrue();
         }
+        
+        [Fact]
+        public void setting_the_is_default_property_on_instance()
+        {
+            var family = new ServiceFamily(typeof(IWidget), new Instance[]{
+                ConstructorInstance.For<IWidget, AWidget>(),
+                ConstructorInstance.For<IWidget, AWidget>(),
+                ConstructorInstance.For<IWidget, AWidget>(),
+                ConstructorInstance.For<IWidget, ColorWidget>(), 
+                ConstructorInstance.For<IWidget, ColorWidget>(), 
+                ConstructorInstance.For<IWidget, MoneyWidget>(), 
+            });
+            
+            family.Instances["MoneyWidget"].IsDefault.ShouldBeTrue();
+            family.Instances.Values.Where(x => x.Name != "MoneyWidget").Each(x => x.IsDefault.ShouldBeFalse());
+        }
     }
 }

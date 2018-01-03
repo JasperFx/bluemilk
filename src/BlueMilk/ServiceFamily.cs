@@ -15,9 +15,19 @@ namespace BlueMilk
 
         public ServiceFamily(Type serviceType, Instance[] instances)
         {
+            if (instances.Length == 0) throw new ArgumentOutOfRangeException(nameof(instances), "Cannot be an empty array");
+            
+            foreach (var instance in instances)
+            {
+                instance.IsDefault = false;
+            }
+
+            instances.Last().IsDefault = true;
+            
             ServiceType = serviceType;
 
             Default = instances.Last();
+            
 
             makeNamesUnique(instances);
 
