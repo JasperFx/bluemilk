@@ -14,7 +14,7 @@ namespace BlueMilk.Codegen
         public string ClassName { get; }
         private Type _baseType;
         private readonly IList<Type> _interfaces = new List<Type>();
-        private readonly IList<GeneratedMethod> _methods = new List<GeneratedMethod>();
+        private readonly IList<IGeneratedMethod> _methods = new List<IGeneratedMethod>();
 
         public GeneratedClass(GenerationRules rules, string className)
         {
@@ -62,9 +62,9 @@ namespace BlueMilk.Codegen
         public IEnumerable<Type> Interfaces => _interfaces;
 
 
-        public IEnumerable<GeneratedMethod> Methods => _methods;
+        public IEnumerable<IGeneratedMethod> Methods => _methods;
 
-        public void AddMethod(GeneratedMethod method)
+        public void AddMethod(IGeneratedMethod method)
         {
             method.ArrangeFrames(this);
             _methods.Add(method);

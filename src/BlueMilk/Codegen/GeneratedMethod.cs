@@ -13,6 +13,9 @@ namespace BlueMilk.Codegen
         bool Virtual { get; set; }
         AsyncMode AsyncMode { get; }
         IEnumerable<Argument> Arguments { get; }
+        InjectedField[] Fields { get; }
+        void WriteMethod(ISourceWriter writer);
+        void ArrangeFrames(GeneratedClass @class);
     }
 
     public class GeneratedMethod : IGeneratedMethod
