@@ -16,6 +16,12 @@ namespace BlueMilk.Testing.Codegen
 
         public InjectedField[] Fields { get; set; } = new InjectedField[0];
 
+        public IList<Frame> Frames { get; } = new List<Frame>();
+
+        public IList<IVariableSource> Sources { get; } = new List<IVariableSource>();
+
+        public IList<Variable> DerivedVariables { get; } = new List<Variable>();
+
         public void WriteMethod(ISourceWriter writer)
         {
             

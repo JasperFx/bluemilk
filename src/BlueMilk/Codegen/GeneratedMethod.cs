@@ -13,7 +13,10 @@ namespace BlueMilk.Codegen
         bool Virtual { get; set; }
         AsyncMode AsyncMode { get; }
         IEnumerable<Argument> Arguments { get; }
-        InjectedField[] Fields { get; }
+        InjectedField[] Fields { get; set; }
+        IList<Frame> Frames { get; }
+        IList<IVariableSource> Sources { get; }
+        IList<Variable> DerivedVariables { get; }
         void WriteMethod(ISourceWriter writer);
         void ArrangeFrames(GeneratedClass @class);
     }
@@ -43,9 +46,7 @@ namespace BlueMilk.Codegen
 
         public void WriteMethod(ISourceWriter writer)
         {
-            var returnValue = AsyncMode == AsyncMode.AsyncTask
-                ? "async Task"
-                : "Task";
+            var returnValue = determineReturnExpression();
 
             if (Overrides)
             {
@@ -59,44 +60,59 @@ namespace BlueMilk.Codegen
 
             Top.GenerateCode(this, writer);
 
+            writeReturnStatement(writer);
+
+            writer.FinishBlock();
+        }
+
+        protected void writeReturnStatement(ISourceWriter writer)
+        {
             if (AsyncMode == AsyncMode.ReturnCompletedTask)
             {
                 writer.Write("return Task.CompletedTask;");
             }
+        }
 
-            writer.FinishBlock();
+        protected string determineReturnExpression()
+        {
+            var returnValue = AsyncMode == AsyncMode.AsyncTask
+                ? "async Task"
+                : "Task";
+            return returnValue;
         }
 
         public void ArrangeFrames(GeneratedClass @class)
         {
             var compiler = new MethodFrameArranger(this, @class);
-            compiler.Arrange();
+            compiler.Arrange(out _asyncMode, out _top);
         }
 
-        public string ToExitStatement()
+        public virtual string ToExitStatement()
         {
             if (AsyncMode == AsyncMode.AsyncTask) return "return;";
 
             return $"return {typeof(Task).FullName}.{nameof(Task.CompletedTask)};";
         }
 
-        public AsyncMode AsyncMode { get; internal set; } = AsyncMode.AsyncTask;
+        public AsyncMode AsyncMode => _asyncMode;
 
-        public Frame Top { get; internal set; }
+        public Frame Top => _top;
 
-        public InjectedField[] Fields { get; internal set; } = new InjectedField[0];
+        public InjectedField[] Fields { get; set; } = new InjectedField[0];
 
         public IList<Frame> Frames { get; }
 
         public IEnumerable<Argument> Arguments => _arguments;
 
+        // TODO -- need a test here. It's used within Jasper, but still
         public Visibility Visibility { get; set; } = Visibility.Public;
 
-        public readonly IList<Variable> DerivedVariables = new List<Variable>();
+        // TODO -- need a test here. It's used within Jasper, but still
+        public IList<Variable> DerivedVariables { get; } = new List<Variable>();
 
-        public readonly IList<IVariableSource> Sources = new List<IVariableSource>();
-
-
+        public IList<IVariableSource> Sources { get; } = new List<IVariableSource>();
+        private AsyncMode _asyncMode = AsyncMode.AsyncTask;
+        private Frame _top;
     }
 }
 

@@ -10,13 +10,13 @@ namespace BlueMilk.Codegen
 {
     public class MethodFrameArranger : IMethodVariables
     {
-        private readonly GeneratedMethod _method;
+        private readonly IGeneratedMethod _method;
         private readonly GeneratedClass _class;
         private readonly Dictionary<Type, Variable> _variables = new Dictionary<Type, Variable>();
         private readonly SingletonVariableSource _singletons;
         private readonly ServiceVariableSource _services;
 
-        public MethodFrameArranger(GeneratedMethod method, GeneratedClass @class)
+        public MethodFrameArranger(IGeneratedMethod method, GeneratedClass @class)
         {
             _method = method;
             _class = @class;
@@ -27,20 +27,22 @@ namespace BlueMilk.Codegen
 
         public IList<BuildStep> AllKnownBuildSteps { get; } = new List<BuildStep>();
 
-        public void Arrange()
+        public void Arrange(out AsyncMode asyncMode, out Frame topFrame)
         {
             var compiled = compileFrames(_method.Frames);
 
+            asyncMode = AsyncMode.ReturnCompletedTask;
+            
             if (compiled.All(x => !x.IsAsync))
             {
-                _method.AsyncMode = AsyncMode.ReturnCompletedTask;
+                asyncMode = AsyncMode.ReturnCompletedTask;
             }
             else if (compiled.Count(x => x.IsAsync) == 1 && compiled.Last().IsAsync && compiled.Last().CanReturnTask())
             {
-                _method.AsyncMode = compiled.Any(x => x.Wraps) ? AsyncMode.AsyncTask : AsyncMode.ReturnFromLastNode;
+                asyncMode = compiled.Any(x => x.Wraps) ? AsyncMode.AsyncTask : AsyncMode.ReturnFromLastNode;
             }
 
-            _method.Top = chainFrames(compiled);
+            topFrame = chainFrames(compiled);
         }
 
 
