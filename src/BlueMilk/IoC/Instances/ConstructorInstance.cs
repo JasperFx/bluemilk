@@ -47,7 +47,7 @@ namespace BlueMilk.IoC.Instances
 
         public override IResolver BuildResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         protected override IEnumerable<Instance> createPlan(NewServiceGraph services)

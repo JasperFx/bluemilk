@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using BlueMilk.Codegen;
+using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +22,7 @@ namespace BlueMilk.Testing.IoC
         public void finds_the_single_default()
         {
             theServices.AddTransient<IWidget, AWidget>();
-            var theGraph = new NewServiceGraph(theServices);
+            var theGraph = new NewServiceGraph(theServices, new Scope());
 
             theGraph.FindDefault(typeof(IWidget))
                 .ShouldBeOfType<ConstructorInstance>()
@@ -36,7 +37,7 @@ namespace BlueMilk.Testing.IoC
             theServices.AddTransient<IGeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
-            var theGraph = new NewServiceGraph(theServices);
+            var theGraph = new NewServiceGraph(theServices, new Scope());
 
             theGraph.FindDefault(typeof(IWidget))
                 .ShouldBeOfType<ConstructorInstance>()
@@ -52,7 +53,7 @@ namespace BlueMilk.Testing.IoC
             theServices.AddTransient<IGeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
-            var theGraph = new NewServiceGraph(theServices);
+            var theGraph = new NewServiceGraph(theServices, new Scope());
 
             theGraph.FindAll(typeof(IWidget))
                 .OfType<ConstructorInstance>()

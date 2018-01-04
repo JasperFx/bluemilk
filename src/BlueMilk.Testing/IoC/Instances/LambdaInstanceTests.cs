@@ -8,7 +8,7 @@ namespace BlueMilk.Testing.IoC.Instances
 {
     public class LambdaInstanceTests
     {
-        private readonly ResolverGraph theResolvers = new ResolverGraph(new ServiceGraph(new ServiceRegistry()));
+        private readonly ResolverGraph theResolvers = ResolverGraph.Empty();
         
         [Fact]
         public void derive_the_default_name()

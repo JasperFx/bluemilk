@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Resolvers;
 
@@ -10,14 +11,14 @@ namespace BlueMilk
     {
         public static ResolverGraph Empty()
         {
-            return new ResolverGraph(new ServiceGraph(new ServiceRegistry()));
+            return new ResolverGraph(new NewServiceGraph(new ServiceRegistry(), new Scope()));
         }
         
-        private readonly ServiceGraph _services;
+        private readonly NewServiceGraph _services;
         public readonly IDictionary<Type, IResolver> ByType = new ConcurrentDictionary<Type, IResolver>();
         public readonly IDictionary<Type, IDictionary<string, IResolver>> ByTypeAndName = new ConcurrentDictionary<Type, IDictionary<string, IResolver>>();
 
-        public ResolverGraph(ServiceGraph services)
+        public ResolverGraph(NewServiceGraph services)
         {
             _services = services;
         }

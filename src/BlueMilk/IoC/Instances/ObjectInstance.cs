@@ -6,21 +6,34 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
-    public class ObjectInstance : Instance
+    public class ObjectInstance : Instance, IResolver, IDisposable
     {
         public static ObjectInstance For<T>(T @object)
         {
             return new ObjectInstance(typeof(T), @object);
         }
         
-        public ObjectInstance(Type serviceType, object instance) : base(serviceType, ServiceLifetime.Singleton)
+        public ObjectInstance(Type serviceType, object service) : base(serviceType, ServiceLifetime.Singleton)
         {
-            Name = instance?.GetType().NameInCode() ?? serviceType.NameInCode();
+            Name = service?.GetType().NameInCode() ?? serviceType.NameInCode();
+            Service = service;
         }
+
+        public object Service { get; }
 
         public override IResolver BuildResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
         {
-            throw new NotImplementedException();
+            return this;
+        }
+
+        object IResolver.Resolve(Scope scope)
+        {
+            return Service;
+        }
+
+        public void Dispose()
+        {
+            (Service as IDisposable)?.Dispose();
         }
     }
 }

@@ -29,7 +29,10 @@ namespace BlueMilk.Testing
 
         public void Dispose()
         {
+            WasDisposed = true;
         }
+
+        public bool WasDisposed { get; set; }
     }
 
     public class MockedWorkItemProcessor

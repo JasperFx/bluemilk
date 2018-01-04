@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Scanning.Conventions
 {
     public static class ServiceCollectionExtensions
     {
+        public static void Add(this IServiceCollection services, Instance instance)
+        {
+            services.Add(new ServiceDescriptor(instance.ServiceType, instance));
+        }
+        
         public static void AddType(this IServiceCollection services, Type serviceType, Type implementationType)
         {
             var hasAlready = services.Any(x => x.ServiceType == serviceType && x.ImplementationType == implementationType);

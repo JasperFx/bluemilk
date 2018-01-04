@@ -1,12 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using BlueMilk.IoC.Instances;
 using BlueMilk.Scanning.Conventions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
 {
+    public static class InstanceExtensions
+    {
+        // TODO -- this should be temporary until we bring in more of the old StructureMap model
+        public static T Named<T>(this T instance, string name) where T : Instance
+        {
+            instance.Name = name;
+            return instance;
+        }
+    }
+    
     public class ServiceRegistry : List<ServiceDescriptor>, IServiceCollection
     {
+        public static ServiceRegistry For(Action<ServiceRegistry> configuration)
+        {
+            var registry = new ServiceRegistry();
+            configuration(registry);
+
+            return registry;
+        }
+        
+        public ServiceRegistry()
+        {
+        }
+        
+        
+
         public DescriptorExpression<T> For<T>() where T : class
         {
             return new DescriptorExpression<T>(this, ServiceLifetime.Transient);
@@ -16,7 +41,7 @@ namespace BlueMilk
         {
             private readonly ServiceRegistry _parent;
             private readonly ServiceLifetime _lifetime;
-            private ServiceDescriptor _descripter;
+            private Instance _instance;
 
             public DescriptorExpression(ServiceRegistry parent, ServiceLifetime lifetime)
             {
@@ -26,9 +51,10 @@ namespace BlueMilk
 
             public DescriptorExpression<T> Use<TConcrete>() where TConcrete : class, T
             {
-                _descripter = new ServiceDescriptor(typeof(T), typeof(TConcrete), _lifetime);
+                _instance = ConstructorInstance.For<T, TConcrete>();
+                _instance.Lifetime = _lifetime;
 
-                _parent.Add(_descripter);
+                _parent.Add(_instance);
 
                 return this;
             }
@@ -57,14 +83,17 @@ namespace BlueMilk
                 return Use<TConcrete>();
             }
 
-            public void Use(T instance)
+            public ObjectInstance Use(T service)
             {
-                _parent.AddSingleton(instance);
+                var instance = new ObjectInstance(typeof(T), service);
+                _parent.Add(instance);
+
+                return instance;
             }
 
-            public void Add(T instance)
+            public ObjectInstance Add(T instance)
             {
-                _parent.AddSingleton(instance);
+                return Use(instance);
             }
         }
 
