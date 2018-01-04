@@ -34,7 +34,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedMethod>();
+            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
             var theGraph = new NewServiceGraph(theServices, new Scope());
@@ -50,7 +50,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedMethod>();
+            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
             var theGraph = new NewServiceGraph(theServices, new Scope());

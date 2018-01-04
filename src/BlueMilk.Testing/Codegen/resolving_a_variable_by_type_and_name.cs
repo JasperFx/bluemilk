@@ -9,7 +9,7 @@ namespace BlueMilk.Testing.Codegen
 {
     public static class GeneratedMethodExtensions
     {
-        public static MethodFrameArranger ToArranger(this GeneratedMethod method)
+        public static MethodFrameArranger ToArranger(this GeneratedTaskMethod method)
         {
             return new MethodFrameArranger(method, new GeneratedClass(new GenerationRules("SomeNamespace"), "SomeClassName"));
 
@@ -26,7 +26,7 @@ namespace BlueMilk.Testing.Codegen
 
             var frame1 = new FrameThatBuildsVariable("aaa", typeof(string));
 
-            var method = new GeneratedMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1} );
+            var method = new GeneratedTaskMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1} );
 
             method.ToArranger().FindVariableByName(typeof(string), "foo")
                 .ShouldBeSameAs(arg1);
@@ -46,7 +46,7 @@ namespace BlueMilk.Testing.Codegen
             var frame1 = new FrameThatBuildsVariable("aaa", typeof(string));
             var frame2 = new FrameThatBuildsVariable("bbb", typeof(string));
 
-            var method = new GeneratedMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
+            var method = new GeneratedTaskMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
             method.ToArranger().FindVariableByName(typeof(string), "aaa")
                 .ShouldBeSameAs(frame1.Variable);
 
@@ -63,7 +63,7 @@ namespace BlueMilk.Testing.Codegen
             var frame1 = new FrameThatBuildsVariable("aaa", typeof(string));
             var frame2 = new FrameThatBuildsVariable("bbb", typeof(string));
 
-            var method = new GeneratedMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
+            var method = new GeneratedTaskMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
             var source1 = new StubbedSource(typeof(string), "ccc");
             var source2 = new StubbedSource(typeof(string), "ddd");
 
@@ -86,7 +86,7 @@ namespace BlueMilk.Testing.Codegen
             var frame1 = new FrameThatBuildsVariable("aaa", typeof(string));
             var frame2 = new FrameThatBuildsVariable("bbb", typeof(string));
 
-            var method = new GeneratedMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
+            var method = new GeneratedTaskMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
             var source1 = new StubbedSource(typeof(string), "ccc");
             var source2 = new StubbedSource(typeof(string), "ddd");
 
@@ -108,7 +108,7 @@ namespace BlueMilk.Testing.Codegen
             var frame1 = new FrameThatBuildsVariable("aaa", typeof(string));
             var frame2 = new FrameThatBuildsVariable("bbb", typeof(string));
 
-            var method = new GeneratedMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
+            var method = new GeneratedTaskMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
             var source1 = new StubbedSource(typeof(string), "ccc");
             var source2 = new StubbedSource(typeof(string), "ddd");
 

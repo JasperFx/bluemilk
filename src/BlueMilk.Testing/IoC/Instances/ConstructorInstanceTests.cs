@@ -25,7 +25,7 @@ namespace BlueMilk.Testing.IoC.Instances
             var theServices = new ServiceRegistry();
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedMethod>();
+            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
             var theGraph = new NewServiceGraph(theServices, new Scope());

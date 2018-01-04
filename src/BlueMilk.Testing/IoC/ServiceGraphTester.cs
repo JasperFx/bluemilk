@@ -31,7 +31,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedMethod>();
+            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
 
             theGraph.FindDefault(typeof(IWidget))
@@ -44,7 +44,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedMethod>();
+            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
 
             theGraph.FindAll(typeof(IWidget))
@@ -58,7 +58,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedMethod>();
+            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
 
             var ctor = theGraph.ChooseConstructor(typeof(DeepConstructorGuy));
