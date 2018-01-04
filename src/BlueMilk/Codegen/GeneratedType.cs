@@ -7,19 +7,19 @@ using BlueMilk.Compilation;
 
 namespace BlueMilk.Codegen
 {
-    public class GeneratedClass
+    public class GeneratedType
     {
         public GenerationRules Rules { get; }
 
-        public string ClassName { get; }
+        public string TypeName { get; }
         private Type _baseType;
         private readonly IList<Type> _interfaces = new List<Type>();
         private readonly IList<IGeneratedMethod> _methods = new List<IGeneratedMethod>();
 
-        public GeneratedClass(GenerationRules rules, string className)
+        public GeneratedType(GenerationRules rules, string typeName)
         {
             Rules = rules;
-            ClassName = className;
+            TypeName = typeName;
         }
 
         public Visibility Visibility { get; set; } = Visibility.Public;
@@ -35,15 +35,11 @@ namespace BlueMilk.Codegen
                     return;
                 }
 
-                if (value.GetTypeInfo().IsInterface)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(value), "Base type cannot be an interface");
-                }
-
                 _baseType = value;
             }
         }
 
+        // TODO -- need ut's
         public void AddInterface(Type type)
         {
             if (!type.GetTypeInfo().IsInterface)
@@ -54,6 +50,7 @@ namespace BlueMilk.Codegen
             _interfaces.Add(type);
         }
 
+        // TODO -- need ut's
         public void AddInterface<T>()
         {
             AddInterface(typeof(T));
@@ -64,11 +61,29 @@ namespace BlueMilk.Codegen
 
         public IEnumerable<IGeneratedMethod> Methods => _methods;
 
+        // TODO -- need ut's
         public void AddMethod(IGeneratedMethod method)
         {
-            method.ArrangeFrames(this);
             _methods.Add(method);
         }
+
+        public SyncVoidGeneratedMethod AddVoidMethod(string name, params Argument[] args)
+        {
+            var method = new SyncVoidGeneratedMethod(name, args);
+            AddMethod(method);
+
+            return method;
+        }
+
+        public SyncSingleReturnGeneratedMethod AddSyncMethodThatReturns<TReturn>(string name, params Argument[] args)
+        {
+            var method = new SyncSingleReturnGeneratedMethod(name, typeof(TReturn), args);
+            AddMethod(method);
+
+            return method;
+        }
+        
+        public string SourceCode { get; set; }
 
 
         public void Write(ISourceWriter writer)
@@ -99,7 +114,7 @@ namespace BlueMilk.Codegen
         private void writeConstructorMethod(ISourceWriter writer, InjectedField[] args)
         {
             var ctorArgs = args.Select(x => x.CtorArgDeclaration).Join(", ");
-            writer.Write($"BLOCK:public {ClassName}({ctorArgs})");
+            writer.Write($"BLOCK:public {TypeName}({ctorArgs})");
 
             foreach (var field in args)
             {
@@ -125,11 +140,11 @@ namespace BlueMilk.Codegen
 
             if (implemented.Any())
             {
-                writer.Write($"BLOCK:public class {ClassName} : {implemented.Select(x => x.FullName).Join(", ")}");
+                writer.Write($"BLOCK:public class {TypeName} : {implemented.Select(x => x.FullName).Join(", ")}");
             }
             else
             {
-                writer.Write($"BLOCK:public class {ClassName}");
+                writer.Write($"BLOCK:public class {TypeName}");
             }
         }
 
@@ -145,51 +160,30 @@ namespace BlueMilk.Codegen
                 yield return @interface;
             }
         }
-    }
+        
+        public Type CompiledType { get; private set; }
 
-    public enum Visibility
-    {
-        Public,
-        Protected,
-        Private,
-        Internal
-    }
-
-
-    public class Argument : Variable
-    {
-        public Argument(Type variableType, string usage) : base(variableType, usage)
+        public void FindType(Type[] generated)
         {
+            CompiledType = generated.Single(x => x.Name == TypeName);
         }
 
-        public string Declaration => $"{VariableType.FullName} {Usage}";
-
-        public new static Argument For<T>(string argName = null)
+        public void ArrangeFrames()
         {
-            return new Argument(typeof(T), argName ?? DefaultArgName(typeof(T)));
-        }
-
-        protected bool Equals(Argument other)
-        {
-            return VariableType == other.VariableType && string.Equals(Usage, other.Usage);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Argument)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
+            foreach (var method in _methods)
             {
-                return ((VariableType != null ? VariableType.GetHashCode() : 0) * 397) ^ (Usage != null ? Usage.GetHashCode() : 0);
+                method.ArrangeFrames(this);
+            }
+        }
+
+        public IEnumerable<Assembly> AssemblyReferences()
+        {
+            if (_baseType != null) yield return _baseType.Assembly;
+
+            foreach (var @interface in _interfaces)
+            {
+                yield return @interface.Assembly;
             }
         }
     }
-
-
 }

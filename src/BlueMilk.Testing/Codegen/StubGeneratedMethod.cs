@@ -27,7 +27,7 @@ namespace BlueMilk.Testing.Codegen
             
         }
 
-        public void ArrangeFrames(GeneratedClass @class)
+        public void ArrangeFrames(GeneratedType type)
         {
             
         }

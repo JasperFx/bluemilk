@@ -14,6 +14,6 @@ namespace BlueMilk.Codegen
         IList<IVariableSource> Sources { get; }
         IList<Variable> DerivedVariables { get; }
         void WriteMethod(ISourceWriter writer);
-        void ArrangeFrames(GeneratedClass @class);
+        void ArrangeFrames(GeneratedType type);
     }
 }

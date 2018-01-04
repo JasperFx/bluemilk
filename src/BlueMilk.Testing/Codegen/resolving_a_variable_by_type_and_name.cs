@@ -11,7 +11,7 @@ namespace BlueMilk.Testing.Codegen
     {
         public static MethodFrameArranger ToArranger(this GeneratedTaskMethod method)
         {
-            return new MethodFrameArranger(method, new GeneratedClass(new GenerationRules("SomeNamespace"), "SomeClassName"));
+            return new MethodFrameArranger(method, new GeneratedType(new GenerationRules("SomeNamespace"), "SomeClassName"));
 
         }
     }

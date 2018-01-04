@@ -11,18 +11,18 @@ namespace BlueMilk.Codegen
     public class MethodFrameArranger : IMethodVariables
     {
         private readonly IGeneratedMethod _method;
-        private readonly GeneratedClass _class;
+        private readonly GeneratedType _type;
         private readonly Dictionary<Type, Variable> _variables = new Dictionary<Type, Variable>();
         private readonly SingletonVariableSource _singletons;
         private readonly ServiceVariableSource _services;
 
-        public MethodFrameArranger(IGeneratedMethod method, GeneratedClass @class)
+        public MethodFrameArranger(IGeneratedMethod method, GeneratedType type)
         {
             _method = method;
-            _class = @class;
+            _type = type;
 
-            _singletons = new SingletonVariableSource(_class.Rules.Services);
-            _services = new ServiceVariableSource(this, _class.Rules.Services);
+            _singletons = new SingletonVariableSource(_type.Rules.Services);
+            _services = new ServiceVariableSource(this, _type.Rules.Services);
         }
 
         public IList<BuildStep> AllKnownBuildSteps { get; } = new List<BuildStep>();
@@ -121,7 +121,7 @@ namespace BlueMilk.Codegen
                 yield return source;
             }
 
-            foreach (var source in _class.Rules.Sources)
+            foreach (var source in _type.Rules.Sources)
             {
                 yield return source;
             }

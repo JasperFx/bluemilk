@@ -4,7 +4,7 @@ using BlueMilk.Compilation;
 
 namespace BlueMilk.Codegen
 {
-    public class GeneratedTaskMethod : GeneratedMethod
+    public class GeneratedTaskMethod : GeneratedMethod<GeneratedTaskMethod>
     {
         public GeneratedTaskMethod(string methodName, Argument[] arguments, IList<Frame> frames) : base(methodName, arguments, frames)
         {

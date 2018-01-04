@@ -6,7 +6,7 @@ using BlueMilk.Compilation;
 
 namespace BlueMilk.Codegen
 {
-    public abstract class GeneratedMethod : IGeneratedMethod
+    public abstract class GeneratedMethod<TThis> : IGeneratedMethod where TThis : IGeneratedMethod
     {
         private readonly Argument[] _arguments;
         private readonly Dictionary<Type, Variable> _variables = new Dictionary<Type, Variable>();
@@ -15,14 +15,9 @@ namespace BlueMilk.Codegen
 
         public GeneratedMethod(string methodName, Argument[] arguments, IList<Frame> frames)
         {
-            if (!frames.Any())
-            {
-                throw new ArgumentOutOfRangeException(nameof(frames), "Cannot be an empty list");
-            }
-
             _arguments = arguments;
             MethodName = methodName;
-            Frames = frames;
+            Frames = frames ?? new List<Frame>();
         }
 
         public string MethodName { get; }
@@ -32,6 +27,17 @@ namespace BlueMilk.Codegen
         public InjectedField[] Fields { get; set; } = new InjectedField[0];
         public IList<Frame> Frames { get; }
         public IEnumerable<Argument> Arguments => _arguments;
+
+        public TThis With<T>() where T : Frame, new()
+        {
+            return With(new T());
+        }
+
+        public TThis With(Frame frame)
+        {
+            Frames.Add(frame);
+            return this.As<TThis>();
+        }
         
         
         // TODO -- need a test here. It's used within Jasper, but still
@@ -69,9 +75,14 @@ namespace BlueMilk.Codegen
         protected abstract void writeReturnStatement(ISourceWriter writer);
         protected abstract string determineReturnExpression();
 
-        public void ArrangeFrames(GeneratedClass @class)
+        public void ArrangeFrames(GeneratedType type)
         {
-            var compiler = new MethodFrameArranger(this, @class);
+            if (!Frames.Any())
+            {
+                throw new ArgumentOutOfRangeException(nameof(Frames), "Cannot be an empty list");
+            }
+            
+            var compiler = new MethodFrameArranger(this, type);
             compiler.Arrange(out _asyncMode, out _top);
         }
 

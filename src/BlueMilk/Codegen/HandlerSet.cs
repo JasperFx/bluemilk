@@ -6,16 +6,7 @@ using BlueMilk.Compilation;
 
 namespace BlueMilk.Codegen
 {
-    public static class ServiceProviderExtensions
-    {
-        public static object Build(this IServiceProvider services, Type type)
-        {
-            var ctor = type.GetTypeInfo().GetConstructors().Single();
-            var inputs = ctor.GetParameters().Select(x => services.GetService(x.ParameterType)).ToArray();
-            return Activator.CreateInstance(type, inputs);
-        }
-    }
-
+    // TODO -- it's tested through Jasper, but we need something here too
     public abstract class HandlerSet<TChain, THandler>
         where TChain : class, IGenerates<THandler>
 
@@ -82,9 +73,9 @@ namespace BlueMilk.Codegen
 
             foreach (var @class in classes)
             {
-                writer.WriteLine($"// START: {@class.ClassName}");
+                writer.WriteLine($"// START: {@class.TypeName}");
                 @class.Write(writer);
-                writer.WriteLine($"// END: {@class.ClassName}");
+                writer.WriteLine($"// END: {@class.TypeName}");
 
                 writer.WriteLine("");
                 writer.WriteLine("");

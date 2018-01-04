@@ -2,9 +2,10 @@
 
 namespace BlueMilk.Codegen
 {
+    // TODO -- is this thing even used anymore?
     public interface IGenerates<T>
     {
-        GeneratedClass ToClass(GenerationRules rules);
+        GeneratedType ToClass(GenerationRules rules);
 
         string SourceCode { get; set; }
 
