@@ -61,7 +61,10 @@ namespace BlueMilk
             _services = new NewServiceGraph(services, _scope);
             _resolvers = _services.Resolvers;
 
+            // Yes Dorothy, this is some circular reference action going on here.
+            // We'll get it sorted out later
 
+            _scope.ServiceProvider = this;
         }
 
         public Container(Action<ServiceRegistry> configuration) : this(ServiceRegistry.For(configuration))
@@ -73,7 +76,7 @@ namespace BlueMilk
         // TODO -- really the same thing as TryGetInstance in StructureMap
         public object GetService(Type serviceType)
         {
-            throw new NotImplementedException();
+            return GetInstance(serviceType);
         }
 
         public IServiceScope CreateScope()

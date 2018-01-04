@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
 {
-    public class Scope : IServiceScope, IDisposable
+    public class Scope : IServiceScope
     {
         private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
 
@@ -41,9 +41,8 @@ namespace BlueMilk.IoC
             }
         }
 
-        public IServiceProvider ServiceProvider
-        {
-            get { throw new NotImplementedException(); }
-        }
+        // TODO -- not wild about this having to be externally set
+        // Reevaluate
+        public IServiceProvider ServiceProvider { get; set; }
     }
 }
