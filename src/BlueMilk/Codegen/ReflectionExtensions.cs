@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -8,6 +9,17 @@ namespace BlueMilk.Codegen
 {
     public static class ReflectionExtensions
     {
+        public static readonly Dictionary<Type, string> Aliases = new Dictionary<Type, string>
+        {
+            {typeof(int), "int"},
+            {typeof(void), "void"},
+            {typeof(string), "string"},
+            {typeof(long), "long"},
+            {typeof(double), "double"},
+            {typeof(bool), "bool"},
+            {typeof(Task), "Task"},
+        };
+        
         public static bool IsAsync(this MethodInfo method)
         {
             if (method.ReturnType == null)
@@ -21,6 +33,8 @@ namespace BlueMilk.Codegen
 
         public static string FullNameInCode(this Type type)
         {
+            if (Aliases.ContainsKey(type)) return Aliases[type];
+            
             if (type.IsGenericType && !type.IsGenericTypeDefinition)
             {
                 var cleanName = type.Name.Split('`').First().Replace("+", ".");
@@ -34,6 +48,8 @@ namespace BlueMilk.Codegen
 
         public static string NameInCode(this Type type)
         {
+            if (Aliases.ContainsKey(type)) return Aliases[type];
+            
             if (type.IsGenericType && !type.IsGenericTypeDefinition)
             {
                 var cleanName = type.Name.Split('`').First().Replace("+", ".");
