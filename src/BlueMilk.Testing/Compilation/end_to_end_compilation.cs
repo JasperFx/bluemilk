@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using Baseline;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Frames;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using Shouldly;
 using Xunit;
-using Argument = BlueMilk.Codegen.Argument;
+using Argument = BlueMilk.Codegen.Methods.Argument;
 
 namespace BlueMilk.Testing.Compilation
 {

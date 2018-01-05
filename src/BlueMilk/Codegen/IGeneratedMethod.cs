@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using BlueMilk.Codegen.Frames;
+using BlueMilk.Codegen.Methods;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 
 namespace BlueMilk.Codegen

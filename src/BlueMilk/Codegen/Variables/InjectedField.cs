@@ -1,7 +1,7 @@
 ﻿using System;
 using BlueMilk.Compilation;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Variables
 {
     public class InjectedField : Variable
     {

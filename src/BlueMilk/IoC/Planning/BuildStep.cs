@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Variables;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Planning

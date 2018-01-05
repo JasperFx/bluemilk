@@ -1,6 +1,6 @@
 ﻿using BlueMilk.Compilation;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Frames
 {
     public class ReturnFrame : Frame
     {

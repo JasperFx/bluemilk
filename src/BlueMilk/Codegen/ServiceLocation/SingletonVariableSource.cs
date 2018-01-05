@@ -1,7 +1,8 @@
 ﻿using System;
+using BlueMilk.Codegen.Variables;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.ServiceLocation
 {
     public class SingletonVariableSource : IVariableSource
     {

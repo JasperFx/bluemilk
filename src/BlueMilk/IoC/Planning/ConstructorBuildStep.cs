@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Frames;
 using Microsoft.Extensions.DependencyInjection;
 

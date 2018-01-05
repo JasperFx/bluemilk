@@ -1,4 +1,5 @@
 ﻿using BlueMilk.Codegen;
+using BlueMilk.Codegen.Variables;
 using Shouldly;
 using Xunit;
 

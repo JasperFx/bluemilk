@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Baseline;
+using BlueMilk.Codegen.Frames;
+using BlueMilk.Codegen.Methods;
 using BlueMilk.Codegen.ServiceLocation;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Planning;
 using BlueMilk.Util;
 

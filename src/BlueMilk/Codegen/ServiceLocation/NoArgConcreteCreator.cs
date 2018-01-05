@@ -1,5 +1,6 @@
 ﻿using System;
 using Baseline;
+using BlueMilk.Codegen.Variables;
 
 namespace BlueMilk.Codegen.ServiceLocation
 {

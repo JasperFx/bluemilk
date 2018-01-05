@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Methods;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.Testing.TargetTypes;

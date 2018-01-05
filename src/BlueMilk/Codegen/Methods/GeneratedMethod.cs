@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Baseline;
+using BlueMilk.Codegen.Frames;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Methods
 {
     public abstract class GeneratedMethod<TThis> : IGeneratedMethod where TThis : IGeneratedMethod
     {

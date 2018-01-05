@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using BlueMilk.Codegen.Frames;
 using BlueMilk.Compilation;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Methods
 {
     public class GeneratedTaskMethod : GeneratedMethod<GeneratedTaskMethod>
     {

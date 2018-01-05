@@ -1,4 +1,5 @@
 ﻿using BlueMilk.Codegen;
+using BlueMilk.Codegen.Frames;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Planning;
 using BlueMilk.Testing.TargetTypes;

@@ -1,9 +1,9 @@
 ﻿using System;
-using BlueMilk.Codegen.ServiceLocation;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Planning;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.ServiceLocation
 {
     public class ServiceVariableSource : IVariableSource
     {

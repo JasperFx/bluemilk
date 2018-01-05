@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using BlueMilk.Codegen.Frames;
 using BlueMilk.Compilation;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Methods
 {
     public class SyncVoidGeneratedMethod : GeneratedMethod<SyncVoidGeneratedMethod>
     {

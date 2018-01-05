@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Baseline;
+using BlueMilk.Codegen.Frames;
 using BlueMilk.IoC.Planning;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Variables
 {
     public class Variable
     {

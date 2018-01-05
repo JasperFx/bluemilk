@@ -6,9 +6,11 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Baseline;
 using Baseline.Reflection;
+using BlueMilk.Codegen.Methods;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Frames
 {
     public enum DisposalMode
     {

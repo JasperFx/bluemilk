@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Variables
 {
     public class StaticVariable : Variable, IVariableSource
     {

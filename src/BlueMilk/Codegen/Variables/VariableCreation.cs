@@ -1,4 +1,4 @@
-﻿namespace BlueMilk.Codegen
+﻿namespace BlueMilk.Codegen.Variables
 {
     public enum VariableCreation
     {

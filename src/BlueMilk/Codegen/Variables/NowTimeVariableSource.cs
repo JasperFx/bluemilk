@@ -1,7 +1,8 @@
 ﻿using System;
+using BlueMilk.Codegen.Frames;
 using BlueMilk.Compilation;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Variables
 {
     public class NowTimeVariableSource : IVariableSource
     {

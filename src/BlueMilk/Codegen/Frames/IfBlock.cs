@@ -1,6 +1,7 @@
-﻿using BlueMilk.Compilation;
+﻿using BlueMilk.Codegen.Variables;
+using BlueMilk.Compilation;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Frames
 {
     public class IfBlock : CompositeFrame
     {

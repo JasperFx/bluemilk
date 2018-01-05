@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using Baseline;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Methods;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using NSubstitute;
 using Shouldly;

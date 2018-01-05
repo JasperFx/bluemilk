@@ -1,6 +1,7 @@
 ﻿using System;
+using BlueMilk.Codegen.Variables;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.Methods
 {
     public class Argument : Variable
     {
