@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.IoC.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,30 +53,39 @@ namespace BlueMilk.IoC.Instances
 
         protected override IEnumerable<Instance> createPlan(NewServiceGraph services)
         {
-            var constructors = ImplementationType
-                .GetConstructors();
+            Constructor = DetermineConstructor(services, ImplementationType, out string message);
 
+            if (message.IsNotEmpty()) ErrorMessages.Add(message);
+
+            // TODO -- more here!
+            return base.createPlan(services);
+        }
+
+        public static ConstructorInfo DetermineConstructor(NewServiceGraph services, Type implementationType, out string message)
+        {
+            message = null;
+            
+            var constructors = implementationType
+                .GetConstructors();
+            
+           
             if (constructors.Any())
             {
-                Constructor = constructors
+                var ctor = constructors
                     .OrderByDescending(x => x.GetParameters().Length)
                     .FirstOrDefault(services.CouldBuild);
 
-                if (Constructor == null)
+                if (ctor == null)
                 {
-                    ErrorMessages.Add(NoPublicConstructorCanBeFilled);
+                    message = NoPublicConstructorCanBeFilled;
                 }
-            }
-            else
-            {
-                ErrorMessages.Add(NoPublicConstructors);
-            }
-            
 
-            
-            // TODO -- more here!
-            return base.createPlan(services);
+                return ctor;
+            }
 
+            message = NoPublicConstructors;
+            
+            return null;
         }
     }
 }

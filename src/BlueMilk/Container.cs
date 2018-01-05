@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
+using Baseline;
 using BlueMilk.IoC;
+using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
@@ -8,6 +11,15 @@ namespace BlueMilk
 
     public interface IContainer
     {
+        /// <summary>
+        /// Suitable for building concrete types that will be resolved only a few times
+        /// to avoid the cost of having to register or build out a pre-compiled "build plan"
+        /// internally
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        T QuickBuild<T>();
+        
         /// <summary>
         /// Creates or finds the default instance of <typeparamref name="T"/>.
         /// </summary>
@@ -82,6 +94,18 @@ namespace BlueMilk
         public IServiceScope CreateScope()
         {
             throw new NotImplementedException();
+        }
+
+        public T QuickBuild<T>()
+        {
+            if (!typeof(T).IsConcrete()) throw new InvalidOperationException("Type must be concrete");
+
+            var ctor = ConstructorInstance.DetermineConstructor(_services, typeof(T), out string message);
+            if (ctor == null) throw new InvalidOperationException(message);
+
+            var dependencies = ctor.GetParameters().Select(x => GetInstance(x.ParameterType)).ToArray();
+
+            return (T) Activator.CreateInstance(typeof(T), dependencies);
         }
 
         public T GetInstance<T>()
