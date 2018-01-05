@@ -2,7 +2,7 @@ using System.IO;
 using System.Linq;
 using Baseline;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Compilation
 {
     public class SourceCodeParser
     {

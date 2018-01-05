@@ -1,8 +1,7 @@
 ﻿using System;
-using BlueMilk.Codegen.ServiceLocation;
 using BlueMilk.Codegen.Variables;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.ServiceLocation
 {
     public class ServiceProviderVariableSource : IVariableSource
     {

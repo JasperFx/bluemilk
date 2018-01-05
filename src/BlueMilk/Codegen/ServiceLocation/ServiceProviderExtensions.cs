@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace BlueMilk.Codegen
+namespace BlueMilk.Codegen.ServiceLocation
 {
     public static class ServiceProviderExtensions
     {
