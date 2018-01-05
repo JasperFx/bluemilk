@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Reflection;
 using BlueMilk.Codegen.Variables;
 
-namespace BlueMilk.Codegen.Methods
+namespace BlueMilk.Codegen
 {
     public class Argument : Variable
     {
         public Argument(Type variableType, string usage) : base(variableType, usage)
+        {
+        }
+
+        public Argument(ParameterInfo parameter) : this(parameter.ParameterType, parameter.Name)
         {
         }
 

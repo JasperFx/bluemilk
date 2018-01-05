@@ -11,7 +11,7 @@ namespace BlueMilk.Testing.IoC
 {
     public class CommentFrame : SyncFrame
     {
-        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             writer.Write("// Kilroy was here.");
             Next?.GenerateCode(method, writer);

@@ -14,8 +14,8 @@ namespace BlueMilk.Codegen.Frames
             _inner = inner;
         }
 
-        public override IEnumerable<Variable> Creates => Enumerable.SelectMany<Frame, Variable>(_inner, x => x.Creates).ToArray();
-        public sealed override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
+        public override IEnumerable<Variable> Creates => _inner.SelectMany<Frame, Variable>(x => x.Creates).ToArray();
+        public sealed override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             if (_inner.Length > 1)
             {
@@ -30,7 +30,7 @@ namespace BlueMilk.Codegen.Frames
             Next?.GenerateCode(method, writer);
         }
 
-        protected abstract void generateCode(IGeneratedMethod method, ISourceWriter writer, Frame inner);
+        protected abstract void generateCode(GeneratedMethod method, ISourceWriter writer, Frame inner);
 
         public override IEnumerable<Variable> FindVariables(IMethodVariables chain)
         {

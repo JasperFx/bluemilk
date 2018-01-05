@@ -44,7 +44,7 @@ namespace BlueMilk.Codegen.Frames
 
         public virtual IEnumerable<Variable> Creates => creates;
 
-        public abstract void GenerateCode(IGeneratedMethod method, ISourceWriter writer);
+        public abstract void GenerateCode(GeneratedMethod method, ISourceWriter writer);
 
         public void ResolveVariables(IMethodVariables method)
         {

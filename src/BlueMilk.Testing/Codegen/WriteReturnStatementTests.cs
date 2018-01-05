@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Baseline;
 using BlueMilk.Codegen;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using NSubstitute;
@@ -13,13 +12,13 @@ namespace BlueMilk.Testing.Codegen
 {
     public class WriteReturnStatementTests
     {
-        private readonly IGeneratedMethod theMethod = Substitute.For<IGeneratedMethod>();
+        private readonly GeneratedMethod theMethod = GeneratedMethod.ForNoArg("Foo");
         private readonly SourceWriter theWriter = new SourceWriter();
         private readonly Variable aVariable = new Variable(typeof(string), "name");
 
         private AsyncMode ifTheAsyncMode
         {
-            set => theMethod.AsyncMode.Returns(value);
+            set => theMethod.AsyncMode = value;
         }
 
         [Fact]

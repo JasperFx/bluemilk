@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.Compilation;
 using Shouldly;
 using Xunit;
@@ -15,10 +14,10 @@ namespace BlueMilk.Testing.Codegen.Methods
         {
             var assembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
 
-            var method = AsyncSingleReturnGeneratedMethod.For<int>("GetNumber");
+            
             var generatedType = assembly.AddType("NumberGetter", typeof(INumberGetter));
-            generatedType.AddMethod(method);
-            method.Frames.Add(new ReturnFive());
+            
+            generatedType.MethodFor("GetNumber").Add(new ReturnFive());
             
             assembly.CompileAll();
 
@@ -32,7 +31,7 @@ namespace BlueMilk.Testing.Codegen.Methods
 
     public class ReturnFive : AsyncFrame
     {
-        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             writer.Write("return Task.FromResult(5);");
         }

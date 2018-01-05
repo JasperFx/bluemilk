@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Baseline;
 using Baseline.Reflection;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 
@@ -144,7 +143,7 @@ namespace BlueMilk.Codegen.Frames
         }
 
 
-        private bool shouldAssignVariableToReturnValue(IGeneratedMethod method)
+        private bool shouldAssignVariableToReturnValue(GeneratedMethod method)
         {
             if (ReturnVariable == null) return false;
 
@@ -156,7 +155,7 @@ namespace BlueMilk.Codegen.Frames
             return true;
         }
 
-        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             var invokeMethod = invocationCode();
 

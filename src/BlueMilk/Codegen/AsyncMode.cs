@@ -1,9 +1,11 @@
-﻿namespace BlueMilk.Codegen.Methods
+﻿namespace BlueMilk.Codegen
 {
     public enum AsyncMode
     {
         ReturnCompletedTask,
         AsyncTask,
-        ReturnFromLastNode
+        ReturnFromLastNode,
+        None
+        
     }
 }

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using Shouldly;
@@ -15,8 +14,7 @@ namespace BlueMilk.Testing.Codegen
 {
     public class MethodCall_generate_code
     {
-        public readonly StubGeneratedMethod theMethod = new StubGeneratedMethod();
-
+        public readonly GeneratedMethod theMethod = GeneratedMethod.ForNoArg("Foo");
         protected string[] WriteMethod(Expression<Action<MethodTarget>> expression, Action<MethodCall> configure = null)
         {
             var @call = MethodCall.For(expression);

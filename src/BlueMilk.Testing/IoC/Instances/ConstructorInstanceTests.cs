@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using BlueMilk.Codegen;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.Testing.TargetTypes;
@@ -26,7 +25,7 @@ namespace BlueMilk.Testing.IoC.Instances
             var theServices = new ServiceRegistry();
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
+            theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
             var theGraph = new NewServiceGraph(theServices, new Scope());
@@ -37,7 +36,7 @@ namespace BlueMilk.Testing.IoC.Instances
 
 
             instance.Constructor.GetParameters().Select(x => x.ParameterType)
-                .ShouldHaveTheSameElementsAs(typeof(IWidget), typeof(IGeneratedMethod));
+                .ShouldHaveTheSameElementsAs(typeof(IWidget), typeof(GeneratedMethod));
         }
         
         [Fact]

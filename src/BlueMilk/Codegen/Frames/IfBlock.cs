@@ -17,7 +17,7 @@ namespace BlueMilk.Codegen.Frames
 
         }
 
-        protected override void generateCode(IGeneratedMethod method, ISourceWriter writer, Frame inner)
+        protected override void generateCode(GeneratedMethod method, ISourceWriter writer, Frame inner)
         {
             writer.Write($"BLOCK:if ({Condition})");
             inner.GenerateCode(method, writer);

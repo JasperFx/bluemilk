@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Baseline;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 
@@ -14,9 +13,12 @@ namespace BlueMilk.Codegen
         public GenerationRules Rules { get; }
 
         public string TypeName { get; }
-        private Type _baseType;
         private readonly IList<Type> _interfaces = new List<Type>();
-        private readonly IList<IGeneratedMethod> _methods = new List<IGeneratedMethod>();
+        private readonly IList<GeneratedMethod> _methods = new List<GeneratedMethod>();
+
+        public GeneratedType(string typeName) : this(new GenerationRules("BlueMilk.Generated"), typeName)
+        {
+        }
 
         public GeneratedType(GenerationRules rules, string typeName)
         {
@@ -26,23 +28,27 @@ namespace BlueMilk.Codegen
 
         public Visibility Visibility { get; set; } = Visibility.Public;
 
-        public Type BaseType
-        {
-            get => _baseType;
-            set
-            {
-                if (value == null)
-                {
-                    _baseType = null;
-                    return;
-                }
+        public Type BaseType { get; private set; }
 
-                _baseType = value;
-            }
+        public GeneratedType InheritsFrom<T>()
+        {
+            return InheritsFrom(typeof(T));
         }
 
+        public GeneratedType InheritsFrom(Type baseType)
+        {
+            BaseType = baseType;
+            foreach (var methodInfo in baseType.GetMethods().Where(x => x.DeclaringType != typeof(object)).Where(x => x.IsAbstract || x.IsVirtual))
+            {
+                _methods.Add(new GeneratedMethod(methodInfo) {Overrides = true});
+            }
+
+            return this;
+        }
+
+
         // TODO -- need ut's
-        public void AddInterface(Type type)
+        public GeneratedType Implements(Type type)
         {
             if (!type.GetTypeInfo().IsInterface)
             {
@@ -50,36 +56,48 @@ namespace BlueMilk.Codegen
             }
 
             _interfaces.Add(type);
+
+            foreach (var methodInfo in type.GetMethods().Where(x => x.DeclaringType != typeof(object)))
+            {
+                _methods.Add(new GeneratedMethod(methodInfo));
+            }
+
+            return this;
         }
 
         // TODO -- need ut's
-        public void AddInterface<T>()
+        public GeneratedType Implements<T>()
         {
-            AddInterface(typeof(T));
+            return Implements(typeof(T));
         }
 
         public IEnumerable<Type> Interfaces => _interfaces;
 
 
-        public IEnumerable<IGeneratedMethod> Methods => _methods;
+        public IEnumerable<GeneratedMethod> Methods => _methods;
 
         // TODO -- need ut's
-        public void AddMethod(IGeneratedMethod method)
+        public void AddMethod(GeneratedMethod method)
         {
             _methods.Add(method);
         }
 
-        public SyncVoidGeneratedMethod AddVoidMethod(string name, params Argument[] args)
+        public GeneratedMethod MethodFor(string methodName)
         {
-            var method = new SyncVoidGeneratedMethod(name, args);
+            return _methods.FirstOrDefault(x => x.MethodName == methodName);
+        }
+
+        public GeneratedMethod AddVoidMethod(string name, params Argument[] args)
+        {
+            var method = new GeneratedMethod(name, typeof(void), args);
             AddMethod(method);
 
             return method;
         }
 
-        public SyncSingleReturnGeneratedMethod AddSyncMethodThatReturns<TReturn>(string name, params Argument[] args)
+        public GeneratedMethod AddMethodThatReturns<TReturn>(string name, params Argument[] args)
         {
-            var method = new SyncSingleReturnGeneratedMethod(name, typeof(TReturn), args);
+            var method = new GeneratedMethod(name, typeof(TReturn), args);
             AddMethod(method);
 
             return method;
@@ -152,9 +170,9 @@ namespace BlueMilk.Codegen
 
         private IEnumerable<Type> implements()
         {
-            if (_baseType != null)
+            if (BaseType != null)
             {
-                yield return _baseType;
+                yield return BaseType;
             }
 
             foreach (var @interface in Interfaces)
@@ -180,7 +198,7 @@ namespace BlueMilk.Codegen
 
         public IEnumerable<Assembly> AssemblyReferences()
         {
-            if (_baseType != null) yield return _baseType.Assembly;
+            if (BaseType != null) yield return BaseType.Assembly;
 
             foreach (var @interface in _interfaces)
             {

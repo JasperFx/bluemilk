@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using BlueMilk.Codegen;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +32,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
+            theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
 
             theGraph.FindDefault(typeof(IWidget))
@@ -46,7 +45,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
+            theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
 
             theGraph.FindAll(typeof(IWidget))
@@ -60,12 +59,12 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
+            theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
 
             var ctor = theGraph.ChooseConstructor(typeof(DeepConstructorGuy));
             ctor.GetParameters().Select(x => x.ParameterType)
-                .ShouldHaveTheSameElementsAs(typeof(IWidget), typeof(IGeneratedMethod));
+                .ShouldHaveTheSameElementsAs(typeof(IWidget), typeof(GeneratedMethod));
         }
 
         [Fact]
@@ -114,7 +113,7 @@ namespace BlueMilk.Testing.IoC
 
         }
 
-        public DeepConstructorGuy(IWidget widget, IGeneratedMethod method)
+        public DeepConstructorGuy(IWidget widget, GeneratedMethod method)
         {
 
         }
@@ -124,7 +123,7 @@ namespace BlueMilk.Testing.IoC
 
         }
 
-        public DeepConstructorGuy(IWidget widget, IGeneratedMethod method, IVariableSource source)
+        public DeepConstructorGuy(IWidget widget, GeneratedMethod method, IVariableSource source)
         {
 
         }

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using BlueMilk.Codegen;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.Testing.TargetTypes;
@@ -35,7 +34,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
+            theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
             var theGraph = new NewServiceGraph(theServices, new Scope());
@@ -51,7 +50,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<IGeneratedMethod, GeneratedTaskMethod>();
+            theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
             var theGraph = new NewServiceGraph(theServices, new Scope());

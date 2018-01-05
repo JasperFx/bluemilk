@@ -13,4 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BlueMilk\BlueMilk.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Codegen\StubGeneratedMethod.cs" />
+  </ItemGroup>
 </Project>

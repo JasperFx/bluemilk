@@ -7,7 +7,7 @@ using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using Shouldly;
 using Xunit;
-using Argument = BlueMilk.Codegen.Methods.Argument;
+using Argument = BlueMilk.Codegen.Argument;
 
 namespace BlueMilk.Testing.Compilation
 {
@@ -22,13 +22,11 @@ namespace BlueMilk.Testing.Compilation
 
 
             var adder = assembly.AddType("Adder", typeof(INumberGenerator));
-            adder.AddSyncMethodThatReturns<int>(nameof(INumberGenerator.Generate), Argument.For<int>("one"), Argument.For<int>("two"))
-                .With<AddFrame>();
+            adder.MethodFor("Generate").Add<AddFrame>();
 
             var multiplier = assembly.AddType("Multiplier", typeof(INumberGenerator));
-            multiplier.AddSyncMethodThatReturns<int>(nameof(INumberGenerator.Generate), Argument.For<int>("one"),
-                    Argument.For<int>("two"))
-                .With<MultiplyFrame>();
+            multiplier.MethodFor(nameof(INumberGenerator.Generate))
+                .Add<MultiplyFrame>();
             
             assembly.CompileAll();
             
@@ -50,7 +48,7 @@ namespace BlueMilk.Testing.Compilation
         private Variable _one;
         private Variable _two;
 
-        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             writer.WriteLine($"return {_one.Usage} + {_two.Usage};");
         }
@@ -70,7 +68,7 @@ namespace BlueMilk.Testing.Compilation
         private Variable _one;
         private Variable _two;
 
-        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             writer.WriteLine($"return {_one.Usage} * {_two.Usage};");
         }

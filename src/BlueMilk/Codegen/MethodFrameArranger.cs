@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Baseline;
 using BlueMilk.Codegen.Frames;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.Codegen.ServiceLocation;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Planning;
@@ -13,13 +12,13 @@ namespace BlueMilk.Codegen
 {
     public class MethodFrameArranger : IMethodVariables
     {
-        private readonly IGeneratedMethod _method;
+        private readonly GeneratedMethod _method;
         private readonly GeneratedType _type;
         private readonly Dictionary<Type, Variable> _variables = new Dictionary<Type, Variable>();
         private readonly SingletonVariableSource _singletons;
         private readonly ServiceVariableSource _services;
 
-        public MethodFrameArranger(IGeneratedMethod method, GeneratedType type)
+        public MethodFrameArranger(GeneratedMethod method, GeneratedType type)
         {
             _method = method;
             _type = type;
@@ -38,7 +37,7 @@ namespace BlueMilk.Codegen
             
             if (compiled.All(x => !x.IsAsync))
             {
-                asyncMode = AsyncMode.ReturnCompletedTask;
+                asyncMode = AsyncMode.None;
             }
             else if (compiled.Count(x => x.IsAsync) == 1 && compiled.Last().IsAsync && compiled.Last().CanReturnTask())
             {

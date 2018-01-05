@@ -28,9 +28,16 @@ namespace BlueMilk.Compilation
         public GeneratedType AddType(string typeName, Type baseType)
         {
             // TODO -- assert that it's been generated already?
-            
+
             var generatedType = new GeneratedType(_generation, typeName);
-            generatedType.BaseType = baseType;
+            if (baseType.IsInterface)
+            {
+                generatedType.Implements(baseType);
+            }
+            else
+            {
+                generatedType.InheritsFrom(baseType);
+            }
             
             GeneratedTypes.Add(generatedType);
 

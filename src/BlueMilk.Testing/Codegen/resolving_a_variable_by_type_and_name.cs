@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using Shouldly;
@@ -12,7 +12,7 @@ namespace BlueMilk.Testing.Codegen
 {
     public static class GeneratedMethodExtensions
     {
-        public static MethodFrameArranger ToArranger(this GeneratedTaskMethod method)
+        public static MethodFrameArranger ToArranger(this GeneratedMethod method)
         {
             return new MethodFrameArranger(method, new GeneratedType(new GenerationRules("SomeNamespace"), "SomeClassName"));
 
@@ -29,7 +29,7 @@ namespace BlueMilk.Testing.Codegen
 
             var frame1 = new FrameThatBuildsVariable("aaa", typeof(string));
 
-            var method = new GeneratedTaskMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1} );
+            var method = new GeneratedMethod("Something", typeof(Task), new Argument[]{arg1, arg2} );
 
             method.ToArranger().FindVariableByName(typeof(string), "foo")
                 .ShouldBeSameAs(arg1);
@@ -49,7 +49,10 @@ namespace BlueMilk.Testing.Codegen
             var frame1 = new FrameThatBuildsVariable("aaa", typeof(string));
             var frame2 = new FrameThatBuildsVariable("bbb", typeof(string));
 
-            var method = new GeneratedTaskMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
+            var method = new GeneratedMethod("Something", typeof(Task), arg1, arg2 )
+                .Add(frame1, frame2);
+            
+            
             method.ToArranger().FindVariableByName(typeof(string), "aaa")
                 .ShouldBeSameAs(frame1.Variable);
 
@@ -66,7 +69,7 @@ namespace BlueMilk.Testing.Codegen
             var frame1 = new FrameThatBuildsVariable("aaa", typeof(string));
             var frame2 = new FrameThatBuildsVariable("bbb", typeof(string));
 
-            var method = new GeneratedTaskMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
+            var method = new GeneratedMethod("Something", typeof(Task), new Argument[]{arg1, arg2} );
             var source1 = new StubbedSource(typeof(string), "ccc");
             var source2 = new StubbedSource(typeof(string), "ddd");
 
@@ -89,7 +92,7 @@ namespace BlueMilk.Testing.Codegen
             var frame1 = new FrameThatBuildsVariable("aaa", typeof(string));
             var frame2 = new FrameThatBuildsVariable("bbb", typeof(string));
 
-            var method = new GeneratedTaskMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
+            var method = new GeneratedMethod("Something", typeof(Task), new Argument[]{arg1, arg2} );
             var source1 = new StubbedSource(typeof(string), "ccc");
             var source2 = new StubbedSource(typeof(string), "ddd");
 
@@ -111,7 +114,7 @@ namespace BlueMilk.Testing.Codegen
             var frame1 = new FrameThatBuildsVariable("aaa", typeof(string));
             var frame2 = new FrameThatBuildsVariable("bbb", typeof(string));
 
-            var method = new GeneratedTaskMethod("Something", new Argument[]{arg1, arg2}, new List<Frame>{frame1, frame2} );
+            var method = new GeneratedMethod("Something", typeof(Task), new Argument[]{arg1, arg2} );
             var source1 = new StubbedSource(typeof(string), "ccc");
             var source2 = new StubbedSource(typeof(string), "ddd");
 
@@ -160,7 +163,7 @@ namespace BlueMilk.Testing.Codegen
             _dependency = dependency;
         }
 
-        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
 
         }
@@ -183,7 +186,7 @@ namespace BlueMilk.Testing.Codegen
             Variable = new Variable(dependency, name);
         }
 
-        public override void GenerateCode(IGeneratedMethod method, ISourceWriter writer)
+        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             writer.WriteLine("FrameThatBuildsVariable");
         }

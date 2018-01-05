@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Baseline;
 using BlueMilk.Codegen;
-using BlueMilk.Codegen.Methods;
 using BlueMilk.Codegen.Variables;
 
 namespace BlueMilk.Compilation
@@ -33,7 +32,7 @@ namespace BlueMilk.Compilation
             writer.FinishBlock();
         }
 
-        public static void WriteReturnStatement(this ISourceWriter writer, IGeneratedMethod method)
+        public static void WriteReturnStatement(this ISourceWriter writer, GeneratedMethod method)
         {
             if (method.AsyncMode == AsyncMode.AsyncTask)
             {
@@ -45,7 +44,7 @@ namespace BlueMilk.Compilation
             }
         }
 
-        public static void WriteReturnStatement(this ISourceWriter writer, IGeneratedMethod method, Variable variable)
+        public static void WriteReturnStatement(this ISourceWriter writer, GeneratedMethod method, Variable variable)
         {
             writer.WriteLine(method.AsyncMode == AsyncMode.AsyncTask
                 ? $"return {variable.Usage};"
