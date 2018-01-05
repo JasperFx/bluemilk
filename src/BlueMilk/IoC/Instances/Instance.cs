@@ -53,14 +53,9 @@ namespace BlueMilk.IoC.Instances
         
         public BuildStep BuildStep { get; protected set; }
 
-        public virtual void GenerateCode(ISourceWriter writer)
-        {
-            // Nothing
-        }
-        
         public Instance[] Dependencies { get; protected set; } = new Instance[0];
 
-        public abstract IResolver BuildResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope);
+        public abstract IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope);
 
         public bool IsDefault { get; set; } = false;
     }

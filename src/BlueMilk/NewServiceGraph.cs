@@ -51,7 +51,7 @@ namespace BlueMilk
 
             foreach (var instance in AllInstances())
             {
-                var resolver = instance.BuildResolver(null, Resolvers, _rootScope);
+                var resolver = instance.BuildResolver(Resolvers, _rootScope);
                 Resolvers.Register(instance, resolver);
             }
         }

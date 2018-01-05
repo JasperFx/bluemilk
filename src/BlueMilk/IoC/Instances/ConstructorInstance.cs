@@ -45,7 +45,7 @@ namespace BlueMilk.IoC.Instances
         
         public Type ResolverBaseType { get; private set; }
 
-        public override IResolver BuildResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
+        public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)
         {
             return null;
         }

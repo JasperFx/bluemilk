@@ -21,7 +21,7 @@ namespace BlueMilk.IoC.Instances
 
         public object Service { get; }
 
-        public override IResolver BuildResolver(Assembly dynamicAssembly, ResolverGraph resolvers, Scope rootScope)
+        public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)
         {
             return this;
         }
