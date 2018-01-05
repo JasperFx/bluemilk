@@ -187,5 +187,15 @@ namespace BlueMilk.Codegen
                 yield return @interface.Assembly;
             }
         }
+
+        public T CreateInstance<T>(params object[] arguments)
+        {
+            if (CompiledType == null)
+            {
+                throw new InvalidOperationException("This generated assembly has not yet been successfully compiled");
+            }
+
+            return (T) Activator.CreateInstance(CompiledType, arguments);
+        }
     }
 }
