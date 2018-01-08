@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using BlueMilk.Codegen.Variables;
+using BlueMilk.Codegen;
 using BlueMilk.Compilation;
+using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ namespace BlueMilk.IoC.Instances
     public abstract class Instance
     {
         public Type ServiceType { get; }
+        public Type ImplementationType { get; }
 
         public static Instance For(ServiceDescriptor service)
         {
@@ -26,10 +28,11 @@ namespace BlueMilk.IoC.Instances
             return new ConstructorInstance(service.ServiceType, service.ImplementationType, service.Lifetime);
         }
 
-        protected Instance(Type serviceType, ServiceLifetime lifetime)
+        protected Instance(Type serviceType, Type implementationType, ServiceLifetime lifetime)
         {
             ServiceType = serviceType;
             Lifetime = lifetime;
+            ImplementationType = implementationType;
         }
 
         public virtual bool RequiresServiceProvider => Dependencies.Any(x => x.RequiresServiceProvider);
@@ -52,6 +55,8 @@ namespace BlueMilk.IoC.Instances
             services.FinishedPlanning();
             HasPlanned = true;
         }
+
+        public abstract ServiceVariable CreateVariable(BuildMode mode, ResolverVariables variables);
 
         protected virtual IEnumerable<Instance> createPlan(NewServiceGraph services)
         {

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using Baseline;
 using BlueMilk.Codegen;
+using BlueMilk.IoC.Frames;
+using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +13,7 @@ namespace BlueMilk.IoC.Instances
 {
     public class ConstructorInstance : Instance
     {
-        public Type ImplementationType { get; }
+        
         public static readonly string NoPublicConstructors = "No public constructors";
         public static readonly string NoPublicConstructorCanBeFilled = "Cannot fill the dependencies of any of the public constructors";
         private Instance[] _arguments;
@@ -27,9 +29,9 @@ namespace BlueMilk.IoC.Instances
             return new ConstructorInstance(typeof(T), typeof(TConcrete), lifetime);
         } 
         
-        public ConstructorInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(serviceType, lifetime)
+        public ConstructorInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(serviceType, implementationType, lifetime)
         {
-            ImplementationType = implementationType;
+            
             Name = implementationType.NameInCode();
             
         }
@@ -55,6 +57,11 @@ namespace BlueMilk.IoC.Instances
 
 
             return null;
+        }
+
+        public override ServiceVariable CreateVariable(BuildMode mode, ResolverVariables variables)
+        {
+            throw new NotImplementedException();
         }
 
         protected override IEnumerable<Instance> createPlan(NewServiceGraph services)

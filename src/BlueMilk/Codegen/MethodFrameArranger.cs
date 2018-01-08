@@ -164,8 +164,7 @@ namespace BlueMilk.Codegen
 
         public Variable FindVariableByName(Type dependency, string name)
         {
-            Variable variable;
-            if (TryFindVariableByName(dependency, name, out variable)) return variable;
+            if (TryFindVariableByName(dependency, name, out var variable)) return variable;
 
             throw new ArgumentOutOfRangeException(nameof(dependency), $"Cannot find a matching variable {dependency.FullName} {name}");
         }
@@ -188,6 +187,7 @@ namespace BlueMilk.Codegen
 
             return variable;
         }
+
 
         public bool TryFindVariableByName(Type dependency, string name, out Variable variable)
         {

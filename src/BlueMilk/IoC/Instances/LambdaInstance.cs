@@ -2,6 +2,8 @@
 using System.Reflection;
 using Baseline;
 using BlueMilk.Codegen;
+using BlueMilk.IoC.Frames;
+using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +14,7 @@ namespace BlueMilk.IoC.Instances
         public Func<IServiceProvider, object> Factory { get; }
 
         public LambdaInstance(Type serviceType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime) :
-            base(serviceType, lifetime)
+            base(serviceType, serviceType, lifetime)
         {
             Factory = factory;
             Name = serviceType.NameInCode();
@@ -25,6 +27,11 @@ namespace BlueMilk.IoC.Instances
         }
 
         public override bool RequiresServiceProvider { get; } = true;
+
+        public override ServiceVariable CreateVariable(BuildMode mode, ResolverVariables variables)
+        {
+            throw new NotImplementedException();
+        }
 
         public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)
         {
