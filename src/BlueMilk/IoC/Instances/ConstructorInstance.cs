@@ -9,13 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
-    public enum CreationStyle
-    {
-        InlineSingleton,
-        Generated,
-        NoArg
-    }
-    
     public class ConstructorInstance : Instance
     {
         public Type ImplementationType { get; }
@@ -81,17 +74,53 @@ namespace BlueMilk.IoC.Instances
                     argument.CreatePlan(services);
                 }
 
-                if (!_arguments.Any())
+                if (_arguments.Any())
                 {
-                    CreationStyle = Lifetime == ServiceLifetime.Singleton
-                        ? CreationStyle.InlineSingleton
-                        : CreationStyle.NoArg;
+                    determineCreationStyleFromArguments();
                 }
+                else
+                {
+                    determineNoArgCreationStyle();
+                }
+                
             }
             
-            
-
+           
             return _arguments;
+        }
+
+        private void determineNoArgCreationStyle()
+        {
+            CreationStyle = Lifetime == ServiceLifetime.Singleton
+                ? CreationStyle.InlineSingleton
+                : CreationStyle.NoArg;
+        }
+
+        private void determineCreationStyleFromArguments()
+        {
+            if (Lifetime == ServiceLifetime.Singleton && !_arguments.Any(x => x.RequiresServiceProvider))
+            {
+                CreationStyle = CreationStyle.InlineSingleton;
+            }
+            else
+            {
+                CreationStyle = CreationStyle.Generated;
+
+                switch (Lifetime)
+                {
+                    case ServiceLifetime.Scoped:
+                        ResolverBaseType = typeof(ScopedResolver<>);
+                        break;
+
+                    case ServiceLifetime.Singleton:
+                        ResolverBaseType = typeof(SingletonResolver<>);
+                        break;
+
+                    case ServiceLifetime.Transient:
+                        ResolverBaseType = typeof(TransientResolver<>);
+                        break;
+                }
+            }
         }
 
         public static ConstructorInfo DetermineConstructor(NewServiceGraph services, Type implementationType, out string message)

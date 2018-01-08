@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Composition.Hosting.Core;
+using System.Linq;
 using BlueMilk.Codegen;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
@@ -110,6 +112,47 @@ namespace BlueMilk.Testing.IoC.Instances
                 .ShouldBe(new []{typeof(AWidget), typeof(BlueRule)});
         }
         
+        public class GuyWithGuys
+        {
+            public GuyWithGuys(GuyWithWidgetAndRule guy1, OtherGuy other)
+            {
+            }
+        }
+
+        public class OtherGuy
+        {
+        
+        }
+
+        [Fact]
+        public void find_dependencies_deep()
+        {
+            var theServices = new ServiceRegistry();
+            theServices.AddSingleton<IWidget, AWidget>();
+            theServices.AddTransient<Rule, BlueRule>();
+            theServices.AddTransient<OtherGuy>();
+            theServices.AddTransient<GuyWithWidgetAndRule>();
+
+            var theGraph = new NewServiceGraph(theServices, new Scope());
+            var instance = ConstructorInstance.For<GuyWithGuys>();
+
+            instance.CreatePlan(theGraph);
+
+            var expected = new[]
+            {
+                typeof(AWidget), 
+                typeof(BlueRule),
+                typeof(OtherGuy), 
+                typeof(GuyWithWidgetAndRule)
+            };
+
+
+        instance.Dependencies.OfType<ConstructorInstance>()
+                .Select(x => x.ImplementationType)
+                .ShouldBe(expected, true);
+
+        }
+        
         [Fact]
         public void creation_style_is_no_arg_for_transient()
         {
@@ -122,6 +165,7 @@ namespace BlueMilk.Testing.IoC.Instances
 
             instance.BuildResolver(null, null).ShouldBeOfType<NoArgTransientResolver<AWidget>>();
             instance.ResolverBaseType.ShouldBeNull();
+            instance.RequiresServiceProvider.ShouldBeFalse();
         }
         
         [Fact]
@@ -136,6 +180,7 @@ namespace BlueMilk.Testing.IoC.Instances
 
             instance.BuildResolver(null, null).ShouldBeOfType<NoArgScopedResolver<AWidget>>();
             instance.ResolverBaseType.ShouldBeNull();
+            instance.RequiresServiceProvider.ShouldBeFalse();
         }
         
         [Fact]
@@ -150,23 +195,93 @@ namespace BlueMilk.Testing.IoC.Instances
 
             instance.BuildResolver(null, null).ShouldBeNull();
             instance.ResolverBaseType.ShouldBeNull();
+            instance.RequiresServiceProvider.ShouldBeFalse();
         }
         
-
+        [Fact]
+        public void requires_service_provider_with_dependencies_negative()
+        {
+            var theServices = new ServiceRegistry();
+            theServices.AddSingleton<IWidget, AWidget>();
+            theServices.AddTransient<Rule, BlueRule>();
+            
+            var theGraph = new NewServiceGraph(theServices, new Scope());
+            var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
+            
+            instance.CreatePlan(theGraph);
+            
+            instance.RequiresServiceProvider.ShouldBeFalse();
+        }
         
-        /*
-         * TODO's
+        [Fact]
+        public void requires_service_provider_with_dependencies_positive()
+        {
+            var theServices = new ServiceRegistry();
+            theServices.AddSingleton<IWidget, AWidget>();
+            theServices.AddTransient<Rule>(x => new BlueRule());
+            
+            var theGraph = new NewServiceGraph(theServices, new Scope());
+            var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
+            
+            instance.CreatePlan(theGraph);
+            
+            instance.RequiresServiceProvider.ShouldBeTrue();
+        }
+        
+        [Fact]
+        public void singleton_can_be_inlined_if_no_service_provider_requirements()
+        {
+            var theServices = new ServiceRegistry();
+            theServices.AddSingleton<IWidget, AWidget>();
+            theServices.AddTransient<Rule, BlueRule>();
+            
+            var theGraph = new NewServiceGraph(theServices, new Scope());
+            var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
+            instance.Lifetime = ServiceLifetime.Singleton;
+            
+            instance.CreatePlan(theGraph);
+            
+            instance.CreationStyle.ShouldBe(CreationStyle.InlineSingleton);
+        }
+        
+        [Fact]
+        public void singleton_can_not_be_inlined_if_there_are_service_provider_requirements()
+        {
+            var theServices = new ServiceRegistry();
+            theServices.AddSingleton<IWidget, AWidget>();
+            theServices.AddTransient<Rule>(x => new BlueRule());
+            
+            var theGraph = new NewServiceGraph(theServices, new Scope());
+            var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
+            instance.Lifetime = ServiceLifetime.Singleton;
+            
+            instance.CreatePlan(theGraph);
+            
+            instance.CreationStyle.ShouldBe(CreationStyle.Generated);
+        }
+        
+        [Theory]
+        [InlineData(ServiceLifetime.Transient, typeof(TransientResolver<>))]
+        [InlineData(ServiceLifetime.Singleton, typeof(SingletonResolver<>))]
+        [InlineData(ServiceLifetime.Scoped, typeof(ScopedResolver<>))]
+        public void choose_base_type_of_resolver(ServiceLifetime lifetime, Type baseType)
+        {
+            var theServices = new ServiceRegistry();
+            theServices.AddSingleton<IWidget, AWidget>();
+            theServices.AddTransient<Rule>(x => new BlueRule());
+            
+            var theGraph = new NewServiceGraph(theServices, new Scope());
+            var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
+            instance.Lifetime = lifetime;
+            
+            instance.CreatePlan(theGraph);
+            
+            instance.ResolverBaseType.ShouldBe(baseType);
+        }
 
-
-         * 4. Select the creation style if not singleton
-         * 5. Select the creation style if singleton, and no dependencies on Lambdas
-         * 6. Select the creation style if singleton, but there's a dependency on a Lambda
-         * 7. Choose base type
-         *    d.) transient
-         *    e.) scoped
-         *    f.) singleton
-         */
     }
+
+
 
     public class GuyWithWidgetAndRule
     {
@@ -184,6 +299,21 @@ namespace BlueMilk.Testing.IoC.Instances
     {
         public GuyThatUsesIWidget(IWidget widget)
         {
+        }
+    }
+
+    public class WidgetWithRule : IWidget
+    {
+        public Rule Rule { get; }
+
+        public WidgetWithRule(Rule rule)
+        {
+            Rule = rule;
+        }
+
+        public void DoSomething()
+        {
+            
         }
     }
     
