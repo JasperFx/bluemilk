@@ -56,7 +56,7 @@ namespace BlueMilk.IoC.Instances
             HasPlanned = true;
         }
 
-        public abstract ServiceVariable CreateVariable(BuildMode mode, ResolverVariables variables);
+        public abstract ServiceVariable CreateVariable(BuildMode mode);
 
         protected virtual IEnumerable<Instance> createPlan(NewServiceGraph services)
         {

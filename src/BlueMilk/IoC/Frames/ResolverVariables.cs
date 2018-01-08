@@ -30,7 +30,7 @@ namespace BlueMilk.IoC.Frames
             var variable = AllFor(instance).SingleOrDefault();
             if (variable == null)
             {
-                variable = instance.CreateVariable(mode, this);
+                variable = instance.CreateVariable(mode);
                 _variables.Add(variable);
             }
 
@@ -39,6 +39,7 @@ namespace BlueMilk.IoC.Frames
 
         public void Add(ServiceVariable variable)
         {
+            // TODO -- have to do more on naming too
             var index = AllFor(variable.Instance).Length + 1;
             if (index > 1)
             {

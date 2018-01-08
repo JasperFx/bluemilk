@@ -28,9 +28,9 @@ namespace BlueMilk.IoC.Instances
 
         public override bool RequiresServiceProvider { get; } = true;
 
-        public override ServiceVariable CreateVariable(BuildMode mode, ResolverVariables variables)
+        public override ServiceVariable CreateVariable(BuildMode mode)
         {
-            throw new NotImplementedException();
+            return new GetInstanceFrame(this).Variable;
         }
 
         public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)

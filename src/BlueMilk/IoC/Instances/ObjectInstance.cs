@@ -23,7 +23,7 @@ namespace BlueMilk.IoC.Instances
 
         public object Service { get; }
 
-        public override ServiceVariable CreateVariable(BuildMode mode, ResolverVariables variables)
+        public override ServiceVariable CreateVariable(BuildMode mode)
         {
             throw new NotImplementedException();
         }

@@ -1,4 +1,6 @@
-﻿using BlueMilk.IoC.Instances;
+﻿using BlueMilk.IoC.Frames;
+using BlueMilk.IoC.Instances;
+using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -52,6 +54,14 @@ namespace BlueMilk.Testing.IoC.Instances
             
             instance.BuildResolver(theResolvers, null)
                 .ShouldBeOfType<SingletonLambdaResolver<IClock>>();
+        }
+        
+        [Fact]
+        public void build_a_variable_returns_a_get_instance_frame()
+        {
+            var instance = LambdaInstance.For<IClock>(s => new Clock(), ServiceLifetime.Singleton);
+            instance.CreateVariable(BuildMode.Inline)
+                .Creator.ShouldBeOfType<GetInstanceFrame>();
         }
     }
 }
