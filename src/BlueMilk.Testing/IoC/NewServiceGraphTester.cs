@@ -22,7 +22,7 @@ namespace BlueMilk.Testing.IoC
         public void finds_the_single_default()
         {
             theServices.AddTransient<IWidget, AWidget>();
-            var theGraph = new NewServiceGraph(theServices, new Scope());
+            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
 
             theGraph.FindDefault(typeof(IWidget))
                 .ShouldBeOfType<ConstructorInstance>()
@@ -37,7 +37,7 @@ namespace BlueMilk.Testing.IoC
             theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
-            var theGraph = new NewServiceGraph(theServices, new Scope());
+            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
 
             theGraph.FindDefault(typeof(IWidget))
                 .ShouldBeOfType<ConstructorInstance>()
@@ -53,7 +53,7 @@ namespace BlueMilk.Testing.IoC
             theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
-            var theGraph = new NewServiceGraph(theServices, new Scope());
+            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
 
             theGraph.FindAll(typeof(IWidget))
                 .OfType<ConstructorInstance>()

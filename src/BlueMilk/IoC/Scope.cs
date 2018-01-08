@@ -5,9 +5,31 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
 {
-    public class Scope : IServiceScope
+    public class Scope : IServiceScope, IServiceProvider
     {
-        private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
+        public static Scope Empty()
+        {
+            return new Scope(new ServiceRegistry());
+        }
+        
+        private readonly Dictionary<Type, object> _servicesByType = new Dictionary<Type, object>();
+
+        public Scope(IServiceCollection services)
+        {
+            ServiceGraph = new NewServiceGraph(services, this);
+            Resolvers = ServiceGraph.Resolvers;
+        }
+
+        public Scope(NewServiceGraph serviceGraph)
+        {
+            ServiceGraph = serviceGraph;
+            Resolvers = ServiceGraph.Resolvers;
+        }
+
+        public ResolverGraph Resolvers { get; }
+
+        public NewServiceGraph ServiceGraph { get; }
+
 
         public IList<IDisposable> Disposables { get; } = new List<IDisposable>();
 
@@ -19,14 +41,14 @@ namespace BlueMilk.IoC
         // TODO -- this will need to register the service by name later
         public void Register(Type serviceType, object service)
         {
-            _services.Add(serviceType, service);
+            _servicesByType.Add(serviceType, service);
         }
 
         public bool TryFind<T>(out T service)
         {
-            if (_services.ContainsKey(typeof(T)))
+            if (_servicesByType.ContainsKey(typeof(T)))
             {
-                service = (T) _services[typeof(T)];
+                service = (T) _servicesByType[typeof(T)];
                 return true;
             }
 
@@ -34,7 +56,7 @@ namespace BlueMilk.IoC
             return false;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             foreach (var disposable in Disposables)
             {
@@ -42,8 +64,38 @@ namespace BlueMilk.IoC
             }
         }
 
-        // TODO -- not wild about this having to be externally set
-        // Reevaluate
-        public IServiceProvider ServiceProvider { get; set; }
+        public IServiceProvider ServiceProvider => this;
+        
+        // TODO -- really the same thing as TryGetInstance in StructureMap
+        public object GetService(Type serviceType)
+        {
+            return GetInstance(serviceType);
+        }
+        
+        public T GetInstance<T>()
+        {
+            // TODO -- sad path, not found
+            // TODO -- validate object disposed
+            return (T) GetInstance(typeof(T));
+        }
+
+        public T GetInstance<T>(string name)
+        {
+            return (T) GetInstance(typeof(T), name);
+        }
+
+        public object GetInstance(Type serviceType)
+        {
+            var resolver = Resolvers.ByType[serviceType];
+            return resolver.Resolve(this);
+        }
+
+        public object GetInstance(Type serviceType, string name)
+        {
+            // TODO -- sad path, not found
+            // TODO -- validate object disposed
+            var resolver = Resolvers.ByTypeAndName[serviceType]?[name];
+            return resolver.Resolve(this);
+        }
     }
 }

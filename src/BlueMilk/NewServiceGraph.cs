@@ -148,7 +148,7 @@ namespace BlueMilk
 
         public static NewServiceGraph Empty()
         {
-            return new NewServiceGraph(new ServiceRegistry(), new Scope());
+            return Scope.Empty().ServiceGraph;
         }
     }
 }

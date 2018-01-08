@@ -11,7 +11,7 @@ namespace BlueMilk
     {
         public static ResolverGraph Empty()
         {
-            return new ResolverGraph(new NewServiceGraph(new ServiceRegistry(), new Scope()));
+            return Scope.Empty().Resolvers;
         }
         
         private readonly NewServiceGraph _services;

@@ -7,16 +7,16 @@ namespace BlueMilk.Testing.IoC
 {
     public class resolver_base_class_tests
     {
-        public readonly Scope theScope = new Scope();
+        public readonly Scope theScope = Scope.Empty();
         
         [Fact]
         public void non_disposable_singleton()
         {
             var singleton1 = new Singleton1(theScope);
 
-            var clock = singleton1.Resolve(new Scope());
+            var clock = singleton1.Resolve(Scope.Empty());
             clock
-                .ShouldBeSameAs(singleton1.Resolve(new Scope()));
+                .ShouldBeSameAs(singleton1.Resolve(Scope.Empty()));
             
             theScope.Disposables.ShouldNotContain(clock);
             theScope.TryFind(out IClock cachedClock).ShouldBeTrue();
@@ -30,9 +30,9 @@ namespace BlueMilk.Testing.IoC
         {
             var singleton1 = new DisposableSingleton(theScope);
 
-            var clock = singleton1.Resolve(new Scope());
+            var clock = singleton1.Resolve(Scope.Empty());
             clock
-                .ShouldBeSameAs(singleton1.Resolve(new Scope()));
+                .ShouldBeSameAs(singleton1.Resolve(Scope.Empty()));
             
             theScope.Disposables.ShouldContain(clock);
             theScope.TryFind(out IClock cachedClock).ShouldBeTrue();
@@ -49,7 +49,7 @@ namespace BlueMilk.Testing.IoC
             var clock = resolver.Resolve(theScope);
             clock.ShouldBeSameAs(resolver.Resolve(theScope));
 
-            clock.ShouldNotBeTheSameAs(resolver.Resolve(new Scope()));
+            clock.ShouldNotBeTheSameAs(resolver.Resolve(Scope.Empty()));
             
             theScope.TryFind(out IClock cachedClock).ShouldBeTrue();
             cachedClock.ShouldBeSameAs(clock);
