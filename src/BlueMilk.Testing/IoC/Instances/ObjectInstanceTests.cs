@@ -30,15 +30,15 @@ namespace BlueMilk.Testing.IoC.Instances
         }
         
         [Theory]
-        [InlineData(BuildMode.ContainerActivation)]
+        [InlineData(BuildMode.Dependency)]
         [InlineData(BuildMode.Inline)]
-        [InlineData(BuildMode.Resolver)]
+        [InlineData(BuildMode.Build)]
         public void service_variable_is_injected_service_Variable(BuildMode mode)
         {
             var clock = new Clock();
             var instance = ObjectInstance.For<IClock>(clock);
             
-            instance.CreateVariable(mode).ShouldBeOfType<InjectedServiceField>().Instance.ShouldBe(instance);
+            instance.CreateVariable(mode, null, false).ShouldBeOfType<InjectedServiceField>().Instance.ShouldBe(instance);
         }
     }
 }

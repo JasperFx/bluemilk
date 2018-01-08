@@ -6,15 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Planning
 {
-    public enum BuildMode
-    {
-        Inline,               // using blocks for disposables
-        ContainerActivation,  // register with the scope for disposables. If singleton, register
-        Resolver              // register with the scope for disposables
-    }
-
-
-    
+    [Obsolete("Think we'll eliminate this one later")]
     public abstract class BuildStep
     {
         public Type ServiceType { get; }

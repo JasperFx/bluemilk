@@ -59,12 +59,12 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
+            theServices.AddTransient<IThing, Thing>();
             theServices.AddTransient<IWidget, MoneyWidget>();
 
             var ctor = theGraph.ChooseConstructor(typeof(DeepConstructorGuy));
             ctor.GetParameters().Select(x => x.ParameterType)
-                .ShouldHaveTheSameElementsAs(typeof(IWidget), typeof(GeneratedMethod));
+                .ShouldHaveTheSameElementsAs(typeof(IWidget), typeof(IThing));
         }
 
         [Fact]
@@ -105,6 +105,17 @@ namespace BlueMilk.Testing.IoC
     {
 
     }
+    
+    public interface IThing
+    {
+            
+    }
+
+    public class Thing : IThing
+    {
+            
+    }
+        
 
     public class DeepConstructorGuy
     {
@@ -113,7 +124,7 @@ namespace BlueMilk.Testing.IoC
 
         }
 
-        public DeepConstructorGuy(IWidget widget, GeneratedMethod method)
+        public DeepConstructorGuy(IWidget widget, IThing method)
         {
 
         }

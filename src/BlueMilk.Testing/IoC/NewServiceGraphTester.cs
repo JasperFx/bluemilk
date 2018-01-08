@@ -11,6 +11,9 @@ namespace BlueMilk.Testing.IoC
 {
     public class NewServiceGraphTester
     {
+        public interface IThing{}
+        public class Thing : IThing{}
+        
         public readonly ServiceRegistry theServices = new ServiceRegistry();
 
         public NewServiceGraphTester()
@@ -34,7 +37,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
+            theServices.AddTransient<IThing, Thing>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
@@ -50,7 +53,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
+            theServices.AddTransient<IThing, Thing>();
             theServices.AddTransient<IWidget, MoneyWidget>();
             
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());

@@ -2,8 +2,12 @@
 using System.Composition.Hosting.Core;
 using System.Linq;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Frames;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC;
+using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
+using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
 using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,15 +25,16 @@ namespace BlueMilk.Testing.IoC.Instances
                 .Name.ShouldBe(nameof(DisposableClock));
 
         }
-        
+
+
         [Fact]
         public void select_greediest_constructor_that_can_be_filled()
         {
             var theServices = new ServiceRegistry();
             theServices.AddTransient<IWidget, AWidget>();
             theServices.AddSingleton(this);
-            theServices.AddTransient<GeneratedMethod, GeneratedMethod>();
             theServices.AddTransient<IWidget, MoneyWidget>();
+            theServices.AddTransient<IThing, Thing>();
             
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
 
@@ -39,7 +44,7 @@ namespace BlueMilk.Testing.IoC.Instances
 
 
             instance.Constructor.GetParameters().Select(x => x.ParameterType)
-                .ShouldHaveTheSameElementsAs(typeof(IWidget), typeof(GeneratedMethod));
+                .ShouldHaveTheSameElementsAs(typeof(IWidget), typeof(IThing));
         }
         
         [Fact]
@@ -277,6 +282,68 @@ namespace BlueMilk.Testing.IoC.Instances
             instance.CreatePlan(theGraph);
             
             instance.ResolverBaseType.ShouldBe(baseType);
+        }
+
+        [Theory]
+        [InlineData(ServiceLifetime.Singleton, BuildMode.Inline, true)]
+        [InlineData(ServiceLifetime.Singleton, BuildMode.Dependency, true)]
+        [InlineData(ServiceLifetime.Singleton, BuildMode.Build, false)]
+        public void should_be_an_injected_field(ServiceLifetime lifetime, BuildMode mode, bool isInjected)
+        {
+            var instance = ConstructorInstance.For<AWidget>(lifetime);
+            
+            var variable = instance.CreateVariable(mode, null, false);
+
+            if (isInjected)
+            {
+                var argType = variable.ShouldBeOfType<InjectedServiceField>()
+                    .ArgType;
+            
+                argType.ShouldBe(typeof(AWidget));
+            }
+            else
+            {
+                variable.ShouldNotBeOfType<InjectedServiceField>();
+            }
+
+        }
+        
+        public class NotDisposableGuy{}
+
+        public class DisposableGuy : IDisposable
+        {
+            public void Dispose()
+            {
+                
+            }
+        }
+
+        [Theory]
+        [InlineData(typeof(NotDisposableGuy), ServiceLifetime.Singleton, BuildMode.Build, DisposeTracking.None)]
+        [InlineData(typeof(DisposableGuy), ServiceLifetime.Singleton, BuildMode.Build, DisposeTracking.None)]
+        [InlineData(typeof(DisposableGuy), ServiceLifetime.Scoped, BuildMode.Build, DisposeTracking.None)]
+        [InlineData(typeof(DisposableGuy), ServiceLifetime.Transient, BuildMode.Build, DisposeTracking.None)]
+        [InlineData(typeof(DisposableGuy), ServiceLifetime.Transient, BuildMode.Inline, DisposeTracking.WithUsing)]
+        [InlineData(typeof(NotDisposableGuy), ServiceLifetime.Transient, BuildMode.Inline, DisposeTracking.None)]
+        [InlineData(typeof(DisposableGuy), ServiceLifetime.Scoped, BuildMode.Inline, DisposeTracking.WithUsing)]
+        [InlineData(typeof(NotDisposableGuy), ServiceLifetime.Scoped, BuildMode.Inline, DisposeTracking.None)]
+        [InlineData(typeof(DisposableGuy), ServiceLifetime.Transient, BuildMode.Dependency, DisposeTracking.RegisterWithScope)]
+        [InlineData(typeof(NotDisposableGuy), ServiceLifetime.Transient, BuildMode.Dependency, DisposeTracking.None)]
+
+        public void create_variable_should_be_through_constructor(Type concreteType, ServiceLifetime lifetime, BuildMode build, DisposeTracking disposal)
+        {
+            var instance = new ConstructorInstance(concreteType, concreteType, lifetime);
+            instance.CreateVariable(build, new ResolverVariables(), false).Creator
+                .ShouldBeOfType<NewConstructorFrame>()
+                .Disposal.ShouldBe(disposal);
+        }
+        
+        [Fact]
+        public void resolve_from_scope_when_scoped_and_used_as_a_dependency()
+        {
+            ConstructorInstance.For<NotDisposableGuy>(ServiceLifetime.Scoped)
+                .CreateVariable(BuildMode.Dependency, new ResolverVariables(), false).Creator
+                .ShouldBeOfType<GetInstanceFrame>();
         }
 
     }

@@ -36,15 +36,20 @@ namespace BlueMilk
                 .GroupBy(x => x.ServiceType)
                 .Select(x => new ServiceFamily(x.Key, x.ToArray()))
                 .Each(family => _families.Add(family.ServiceType, family));
-            
-            // 2. Do planning on each instance
-            foreach (var instance in AllInstances())
+
+            // 2. Do planning on each instance -- this might need to be recursive later
+            // if new instances are discovered during construction
+            while (AllInstances().Any(x => !x.HasPlanned))
             {
-                if (@instance.HasPlanned)
+                foreach (var instance in AllInstances().Where(x => !x.HasPlanned).ToArray())
                 {
                     instance.CreatePlan(this);
                 }
             }
+            
+            
+
+
             
             // TODO -- any validations
             // TODO -- generate the dynamic assembly

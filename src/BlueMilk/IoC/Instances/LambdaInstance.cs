@@ -29,7 +29,7 @@ namespace BlueMilk.IoC.Instances
 
         public override bool RequiresServiceProvider { get; } = true;
 
-        public override Variable CreateVariable(BuildMode mode)
+        public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
         {
             return new GetInstanceFrame(this).Variable;
         }

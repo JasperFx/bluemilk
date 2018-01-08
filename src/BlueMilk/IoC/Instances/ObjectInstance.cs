@@ -24,7 +24,7 @@ namespace BlueMilk.IoC.Instances
 
         public object Service { get; }
 
-        public override Variable CreateVariable(BuildMode mode)
+        public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
         {
             return new InjectedServiceField(this);
         }

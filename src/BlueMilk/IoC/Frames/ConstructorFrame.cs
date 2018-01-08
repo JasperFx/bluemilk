@@ -9,8 +9,7 @@ using BlueMilk.Compilation;
 
 namespace BlueMilk.IoC.Frames
 {
-    // TODO -- make this smart enough to also register objects
-    // as disposables
+    [Obsolete("Either move this up to a more general frame, or eliminate")]
     public class ConstructorFrame : SyncFrame
     {
         private readonly Variable[] _arguments;
@@ -18,6 +17,8 @@ namespace BlueMilk.IoC.Frames
         public Type ImplementationType { get; }
         public Variable Variable { get; }
 
+        
+        
         public ConstructorFrame(Type serviceType, Type implementationType, string variableName, Variable[] arguments)
         {
             _arguments = arguments;

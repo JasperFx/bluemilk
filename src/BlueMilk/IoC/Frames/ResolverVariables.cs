@@ -4,6 +4,7 @@ using Baseline;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Planning;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Frames
 {
@@ -33,12 +34,14 @@ namespace BlueMilk.IoC.Frames
             return _variables.Where(x => x.RefersTo(instance)).ToArray();
         }
 
-        public Variable For(Instance instance, BuildMode mode)
+        public Variable Resolve(Instance instance, BuildMode mode)
         {
+            if (instance.Lifetime == ServiceLifetime.Transient) return instance.CreateVariable(mode, this, false);
+            
             var variable = AllFor(instance).SingleOrDefault();
             if (variable == null)
             {
-                variable = instance.CreateVariable(mode);
+                variable = instance.CreateVariable(mode, this, false);
                 _variables.Add(variable);
             }
 

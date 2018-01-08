@@ -22,4 +22,7 @@
   <ItemGroup>
     <None Remove="Codegen\Methods\**" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="IoC\Frames\ScopedCreationFrame.cs" />
+  </ItemGroup>
 </Project>

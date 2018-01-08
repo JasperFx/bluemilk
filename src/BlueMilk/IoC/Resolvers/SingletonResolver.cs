@@ -20,7 +20,7 @@ namespace BlueMilk.IoC.Resolvers
         public object Resolve(Scope scope)
         {
             if (_service != null) return _service;
-            
+
             lock (_locker)
             {
                 if (_service == null)
