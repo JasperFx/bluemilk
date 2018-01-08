@@ -21,7 +21,8 @@ namespace BlueMilk.IoC.Instances
         public Type ImplementationType { get; }
         public static readonly string NoPublicConstructors = "No public constructors";
         public static readonly string NoPublicConstructorCanBeFilled = "Cannot fill the dependencies of any of the public constructors";
-        
+        private Instance[] _arguments;
+
         public static ConstructorInstance For<T>(ServiceLifetime lifetime = ServiceLifetime.Transient)
         {
             return For<T, T>(lifetime);
@@ -48,6 +49,18 @@ namespace BlueMilk.IoC.Instances
 
         public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)
         {
+            if (CreationStyle == CreationStyle.InlineSingleton) return null;
+
+            if (CreationStyle == CreationStyle.NoArg)
+            {
+                var resolverType = Lifetime == ServiceLifetime.Scoped
+                    ? typeof(NoArgScopedResolver<>)
+                    : typeof(NoArgTransientResolver<>);
+
+                return resolverType.CloseAndBuildAs<IResolver>(ImplementationType);
+            }
+
+
             return null;
         }
 
@@ -57,8 +70,28 @@ namespace BlueMilk.IoC.Instances
 
             if (message.IsNotEmpty()) ErrorMessages.Add(message);
 
-            // TODO -- more here!
-            return base.createPlan(services);
+
+            if (Constructor != null)
+            {
+                // TODO -- this will need to get smarter when we have inline dependencies and named stuff
+                _arguments = Constructor.GetParameters().Select(x => services.FindDefault(x.ParameterType)).ToArray();
+
+                foreach (var argument in _arguments)
+                {
+                    argument.CreatePlan(services);
+                }
+
+                if (!_arguments.Any())
+                {
+                    CreationStyle = Lifetime == ServiceLifetime.Singleton
+                        ? CreationStyle.InlineSingleton
+                        : CreationStyle.NoArg;
+                }
+            }
+            
+            
+
+            return _arguments;
         }
 
         public static ConstructorInfo DetermineConstructor(NewServiceGraph services, Type implementationType, out string message)

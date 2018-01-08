@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
+
 
 namespace BlueMilk.IoC.Instances
 {
@@ -30,6 +32,8 @@ namespace BlueMilk.IoC.Instances
             Lifetime = lifetime;
         }
 
+        public virtual bool RequiresServiceProvider => Dependencies.Any(x => x.RequiresServiceProvider);
+
         public ServiceLifetime Lifetime { get; set; } = ServiceLifetime.Transient;
         public string Name { get; set; }
         
@@ -37,10 +41,15 @@ namespace BlueMilk.IoC.Instances
 
         public void CreatePlan(NewServiceGraph services)
         {
-            var dependencies = createPlan(services);
+            if (HasPlanned) return;
+
+            services.StartingToPlan(this);
+            
+            var dependencies = createPlan(services) ?? Enumerable.Empty<Instance>();
 
             Dependencies = dependencies.Concat(dependencies.SelectMany(x => x.Dependencies)).Distinct().ToArray();
 
+            services.FinishedPlanning();
             HasPlanned = true;
         }
 
@@ -50,9 +59,8 @@ namespace BlueMilk.IoC.Instances
         }
 
         public readonly IList<string> ErrorMessages = new List<string>();
-        
-        public BuildStep BuildStep { get; protected set; }
 
+        
         public Instance[] Dependencies { get; protected set; } = new Instance[0];
 
         public abstract IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope);

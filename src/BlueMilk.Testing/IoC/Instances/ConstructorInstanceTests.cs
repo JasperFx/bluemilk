@@ -2,6 +2,7 @@
 using BlueMilk.Codegen;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
+using BlueMilk.IoC.Resolvers;
 using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -92,10 +93,71 @@ namespace BlueMilk.Testing.IoC.Instances
             instance.ErrorMessages.ShouldContain(ConstructorInstance.NoPublicConstructorCanBeFilled);
         }
         
+        [Fact]
+        public void find_dependencies()
+        {
+            var theServices = new ServiceRegistry();
+            theServices.AddSingleton<IWidget, AWidget>();
+            theServices.AddTransient<Rule, BlueRule>();
+            
+            var theGraph = new NewServiceGraph(theServices, new Scope());
+            var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
+            
+            instance.CreatePlan(theGraph);
+            
+            instance.Dependencies.OfType<ConstructorInstance>()
+                .Select(x => x.ImplementationType)
+                .ShouldBe(new []{typeof(AWidget), typeof(BlueRule)});
+        }
+        
+        [Fact]
+        public void creation_style_is_no_arg_for_transient()
+        {
+            var instance = ConstructorInstance.For<AWidget>();
+            instance.Lifetime = ServiceLifetime.Transient;
+            
+            instance.CreatePlan(NewServiceGraph.Empty());
+            
+            instance.CreationStyle.ShouldBe(CreationStyle.NoArg);
+
+            instance.BuildResolver(null, null).ShouldBeOfType<NoArgTransientResolver<AWidget>>();
+            instance.ResolverBaseType.ShouldBeNull();
+        }
+        
+        [Fact]
+        public void creation_style_is_no_arg_for_scoped()
+        {
+            var instance = ConstructorInstance.For<AWidget>();
+            instance.Lifetime = ServiceLifetime.Scoped;
+            
+            instance.CreatePlan(NewServiceGraph.Empty());
+            
+            instance.CreationStyle.ShouldBe(CreationStyle.NoArg);
+
+            instance.BuildResolver(null, null).ShouldBeOfType<NoArgScopedResolver<AWidget>>();
+            instance.ResolverBaseType.ShouldBeNull();
+        }
+        
+        [Fact]
+        public void creation_style_is_no_arg_for_singleton()
+        {
+            var instance = ConstructorInstance.For<AWidget>();
+            instance.Lifetime = ServiceLifetime.Singleton;
+            
+            instance.CreatePlan(NewServiceGraph.Empty());
+            
+            instance.CreationStyle.ShouldBe(CreationStyle.InlineSingleton);
+
+            instance.BuildResolver(null, null).ShouldBeNull();
+            instance.ResolverBaseType.ShouldBeNull();
+        }
+        
+
+        
         /*
          * TODO's
 
-         * 3. Find all dependent instances
+
          * 4. Select the creation style if not singleton
          * 5. Select the creation style if singleton, and no dependencies on Lambdas
          * 6. Select the creation style if singleton, but there's a dependency on a Lambda
@@ -107,6 +169,18 @@ namespace BlueMilk.Testing.IoC.Instances
          *    e.) scoped
          *    f.) singleton
          */
+    }
+
+    public class GuyWithWidgetAndRule
+    {
+        public IWidget Widget { get; }
+        public Rule Rule { get; }
+
+        public GuyWithWidgetAndRule(IWidget widget, Rule rule)
+        {
+            Widget = widget;
+            Rule = rule;
+        }
     }
 
     public class GuyThatUsesIWidget

@@ -16,6 +16,7 @@ namespace BlueMilk.IoC
             Disposables.Add(disposable);
         }
 
+        // TODO -- this will need to register the service by name later
         public void Register(Type serviceType, object service)
         {
             _services.Add(serviceType, service);

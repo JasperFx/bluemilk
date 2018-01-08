@@ -42,4 +42,5 @@ namespace BlueMilk.IoC.Resolvers
         
         public abstract T Build(Scope scope);
     }
+
 }

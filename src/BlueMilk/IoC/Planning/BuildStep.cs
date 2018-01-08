@@ -8,9 +8,9 @@ namespace BlueMilk.IoC.Planning
 {
     public enum BuildMode
     {
-        Inline,
-        ContainerActivation,
-        Resolver
+        Inline,               // using blocks for disposables
+        ContainerActivation,  // register with the scope for disposables. If singleton, register
+        Resolver              // register with the scope for disposables
     }
 
 

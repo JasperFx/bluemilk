@@ -52,7 +52,7 @@ namespace BlueMilk
             foreach (var instance in AllInstances())
             {
                 var resolver = instance.BuildResolver(Resolvers, _rootScope);
-                Resolvers.Register(instance, resolver);
+                if (resolver != null) Resolvers.Register(instance, resolver);
             }
         }
         
@@ -128,6 +128,27 @@ namespace BlueMilk
             {
                 instance.SafeDispose();
             }
+        }
+
+        private readonly Stack<Instance> _chain = new Stack<Instance>();
+        public void StartingToPlan(Instance instance)
+        {
+            if (_chain.Contains(instance))
+            {
+                throw new InvalidOperationException("Bi-directional dependencies detected:" + Environment.NewLine + _chain.Select(x => x.ToString()).Join(Environment.NewLine));
+            }
+            
+            _chain.Push(instance);
+        }
+
+        public void FinishedPlanning()
+        {
+            _chain.Pop();
+        }
+
+        public static NewServiceGraph Empty()
+        {
+            return new NewServiceGraph(new ServiceRegistry(), new Scope());
         }
     }
 }

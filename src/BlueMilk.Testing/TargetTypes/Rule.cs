@@ -57,6 +57,11 @@ namespace BlueMilk.Testing.TargetTypes
 
     }
 
+    public class BlueRule : Rule
+    {
+        
+    }
+
 
     // SAMPLE: ColorRule
     public class ColorRule : Rule
