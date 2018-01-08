@@ -7,6 +7,14 @@ using BlueMilk.IoC.Planning;
 
 namespace BlueMilk.IoC.Frames
 {
+    public static class VariableExtensions
+    {
+        public static bool RefersTo(this Variable variable, Instance instance)
+        {
+            return instance == (variable as IServiceVariable)?.Instance;
+        }
+    }
+    
     public class ResolverVariables
     {
         private readonly IList<Variable> _variables = new List<Variable>();
@@ -20,12 +28,12 @@ namespace BlueMilk.IoC.Frames
             _variables.AddRange(existing);
         }
 
-        public ServiceVariable[] AllFor(Instance instance)
+        public Variable[] AllFor(Instance instance)
         {
-            return _variables.OfType<ServiceVariable>().Where(x => x.Instance == instance).ToArray();
+            return _variables.Where(x => x.RefersTo(instance)).ToArray();
         }
 
-        public ServiceVariable For(Instance instance, BuildMode mode)
+        public Variable For(Instance instance, BuildMode mode)
         {
             var variable = AllFor(instance).SingleOrDefault();
             if (variable == null)

@@ -94,9 +94,12 @@ namespace BlueMilk.Codegen.Variables
 
         public Variable(Type variableType, string usage, Frame creator) : this(variableType, usage)
         {
-            Creator = creator;
+            if (creator != null)
+            {
+                Creator = creator;
 
-            Creator.creates.Fill(this);
+                Creator.creates.Fill(this);
+            }
         }
 
         public Variable(Type variableType, Frame creator) : this(variableType, DefaultArgName(variableType), creator)

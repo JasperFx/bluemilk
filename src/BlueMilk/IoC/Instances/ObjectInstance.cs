@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
@@ -23,9 +24,9 @@ namespace BlueMilk.IoC.Instances
 
         public object Service { get; }
 
-        public override ServiceVariable CreateVariable(BuildMode mode)
+        public override Variable CreateVariable(BuildMode mode)
         {
-            throw new NotImplementedException();
+            return new InjectedServiceField(this);
         }
 
         public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)

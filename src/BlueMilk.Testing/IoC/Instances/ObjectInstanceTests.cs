@@ -1,5 +1,7 @@
 ﻿using Baseline;
+using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
+using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
 using Shouldly;
 using Xunit;
@@ -25,6 +27,18 @@ namespace BlueMilk.Testing.IoC.Instances
                 .ShouldBeSameAs(instance);
             
             instance.As<IResolver>().Resolve(null).ShouldBeSameAs(clock);
+        }
+        
+        [Theory]
+        [InlineData(BuildMode.ContainerActivation)]
+        [InlineData(BuildMode.Inline)]
+        [InlineData(BuildMode.Resolver)]
+        public void service_variable_is_injected_service_Variable(BuildMode mode)
+        {
+            var clock = new Clock();
+            var instance = ObjectInstance.For<IClock>(clock);
+            
+            instance.CreateVariable(mode).ShouldBeOfType<InjectedServiceField>().Instance.ShouldBe(instance);
         }
     }
 }

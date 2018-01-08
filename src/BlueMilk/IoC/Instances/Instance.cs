@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Planning;
@@ -56,7 +57,7 @@ namespace BlueMilk.IoC.Instances
             HasPlanned = true;
         }
 
-        public abstract ServiceVariable CreateVariable(BuildMode mode);
+        public abstract Variable CreateVariable(BuildMode mode);
 
         protected virtual IEnumerable<Instance> createPlan(NewServiceGraph services)
         {
