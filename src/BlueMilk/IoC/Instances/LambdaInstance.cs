@@ -24,6 +24,8 @@ namespace BlueMilk.IoC.Instances
             return new LambdaInstance(typeof(T), s => factory(s), lifetime);
         }
 
+        public override bool RequiresServiceProvider { get; } = true;
+
         public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)
         {
             switch (Lifetime)

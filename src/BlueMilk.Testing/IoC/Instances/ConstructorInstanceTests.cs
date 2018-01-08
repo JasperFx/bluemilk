@@ -162,9 +162,6 @@ namespace BlueMilk.Testing.IoC.Instances
          * 5. Select the creation style if singleton, and no dependencies on Lambdas
          * 6. Select the creation style if singleton, but there's a dependency on a Lambda
          * 7. Choose base type
-         *    a.) no arg transient
-         *    b.) no arg scoped
-         *    c.) no arg singleton
          *    d.) transient
          *    e.) scoped
          *    f.) singleton

@@ -18,6 +18,13 @@ namespace BlueMilk.Testing.IoC.Instances
         }
         
         [Fact]
+        public void requires_service_provider()
+        {
+            LambdaInstance.For(s => new Clock())
+                .RequiresServiceProvider.ShouldBeTrue();
+        }
+        
+        [Fact]
         public void register_resolver_for_transient_as_default()
         {
             var instance = LambdaInstance.For<IClock>(s => new Clock(), ServiceLifetime.Transient);
