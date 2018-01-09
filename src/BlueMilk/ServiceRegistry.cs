@@ -95,6 +95,12 @@ namespace BlueMilk
             {
                 return Use(instance);
             }
+
+            public DescriptorExpression<T> Scoped()
+            {
+                
+                return this;
+            }
         }
 
         public DescriptorExpression<T> ForSingletonOf<T>() where T : class

@@ -120,5 +120,10 @@ namespace BlueMilk.IoC
 
             return Activator.CreateInstance(objectType, dependencies);
         }
+
+        public IContainer GetNestedContainer()
+        {
+            return new Scope(ServiceGraph);
+        }
     }
 }

@@ -57,11 +57,19 @@ namespace BlueMilk.IoC.Instances
 
             if (CreationStyle == CreationStyle.NoArg)
             {
-                var resolverType = Lifetime == ServiceLifetime.Scoped
-                    ? typeof(NoArgScopedResolver<>)
-                    : typeof(NoArgTransientResolver<>);
+                switch (Lifetime)
+                {
+                        case ServiceLifetime.Transient:
+                            return typeof(NoArgTransientResolver<>).CloseAndBuildAs<IResolver>(ImplementationType);
+                            
+                        case ServiceLifetime.Scoped:
+                            return typeof(NoArgScopedResolver<>).CloseAndBuildAs<IResolver>(ImplementationType);
+                            
+                        case ServiceLifetime.Singleton:
+                            return typeof(NoArgSingletonResolver<>).CloseAndBuildAs<IResolver>(rootScope, ImplementationType);
+                }
 
-                return resolverType.CloseAndBuildAs<IResolver>(ImplementationType);
+                return null;
             }
 
 

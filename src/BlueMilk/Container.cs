@@ -10,6 +10,11 @@ namespace BlueMilk
 {
     public class Container : Scope, IServiceScopeFactory
     {
+        public static Container Empty()
+        {
+            return For(_ => { });
+        }
+        
         public static Container For(Action<ServiceRegistry> configuration)
         {
             var registry = new ServiceRegistry();

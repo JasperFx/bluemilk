@@ -2,7 +2,7 @@
 
 namespace BlueMilk
 {
-    public interface IContainer
+    public interface IContainer : IDisposable
     {
         /// <summary>
         /// Suitable for building concrete types that will be resolved only a few times
@@ -42,6 +42,13 @@ namespace BlueMilk
         /// <param name="name">The name of the instance.</param>
         /// <returns>The named instance of <paramref name="serviceType"/>.</returns>
         object GetInstance(Type serviceType, string name);
+        
+        /// <summary>
+        /// Starts a "Nested" Container for atomic, isolated access.
+        /// </summary>
+        /// <returns>The created nested container.</returns>
+        IContainer GetNestedContainer();
+
 
     }
 }
