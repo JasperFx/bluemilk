@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <AssemblyName>StructureMap.Testing.Widget</AssemblyName>
+    <PackageId>StructureMap.Testing.Widget</PackageId>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BlueMilk\BlueMilk.csproj" />
+  </ItemGroup>
+</Project>
