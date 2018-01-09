@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
 {
-    public class Container : Scope, IContainer, IServiceScopeFactory, IDisposable
+    public class Container : Scope, IServiceScopeFactory
     {
         public static Container For(Action<ServiceRegistry> configuration)
         {

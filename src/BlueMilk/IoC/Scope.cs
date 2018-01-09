@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
 {
-    public class Scope : IServiceScope, IServiceProvider
+    public class Scope : IContainer, IServiceScope, IServiceProvider
     {
         public static Scope Empty()
         {
