@@ -22,6 +22,15 @@ namespace BlueMilk
         public ResolverGraph(NewServiceGraph services)
         {
             _services = services;
+            
+            addScopeResolver<Scope>();
+            addScopeResolver<IServiceProvider>();
+            addScopeResolver<IContainer>();
+        }
+
+        private void addScopeResolver<T>()
+        {
+            ByType[typeof(T)] = new ScopeResolver<T>();
         }
 
         public void Register(Instance instance, IResolver resolver)

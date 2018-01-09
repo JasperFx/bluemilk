@@ -199,6 +199,8 @@ namespace BlueMilk.IoC.Instances
 
             return null;
         }
+        
+        
 
         public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {

@@ -16,12 +16,12 @@ namespace BlueMilk.IoC
         
         private readonly Dictionary<Type, object> _servicesByType = new Dictionary<Type, object>();
 
+
         public Scope(IServiceCollection services)
         {
             ServiceGraph = new NewServiceGraph(services, this);
-            
-            ServiceGraph.Initialize();
             Resolvers = ServiceGraph.Resolvers;
+            ServiceGraph.Initialize();
         }
 
         public Scope(NewServiceGraph serviceGraph)
@@ -30,11 +30,12 @@ namespace BlueMilk.IoC
             Resolvers = ServiceGraph.Resolvers;
         }
 
-        public ResolverGraph Resolvers { get; }
+        internal ResolverGraph Resolvers { get; }
 
-        public NewServiceGraph ServiceGraph { get; }
+        internal NewServiceGraph ServiceGraph { get; }
 
 
+        // TODO -- hide this from the public class?
         public IList<IDisposable> Disposables { get; } = new List<IDisposable>();
 
         public void RegisterDisposable(IDisposable disposable)

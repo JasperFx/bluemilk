@@ -26,6 +26,7 @@ namespace BlueMilk
         {
             _rootScope = rootScope;
             Services = services;
+            Resolvers = new ResolverGraph(this);
         }
 
         public void Initialize()
@@ -34,7 +35,7 @@ namespace BlueMilk
 
 
             
-            Resolvers = new ResolverGraph(this);
+            
 
 
             organizeIntoFamilies(Services);
@@ -100,8 +101,8 @@ namespace BlueMilk
                 .Each(family => _families.Add(family.ServiceType, family));
         }
 
-        public IServiceCollection Services { get; private set; }
-        public ResolverGraph Resolvers { get; private set; }
+        public IServiceCollection Services { get; }
+        public ResolverGraph Resolvers { get; }
 
         public IEnumerable<Instance> AllInstances()
         {
@@ -137,7 +138,7 @@ namespace BlueMilk
         
         public bool CouldBuild(ConstructorInfo ctor)
         {
-            return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null);
+            return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null || Resolvers.ByType.ContainsKey(x.ParameterType));
         }
 
         public void Dispose()

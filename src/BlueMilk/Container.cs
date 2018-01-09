@@ -32,7 +32,7 @@ namespace BlueMilk
 
         public IServiceScope CreateScope()
         {
-            throw new NotImplementedException();
+            return new Scope(ServiceGraph);
         }
 
 
