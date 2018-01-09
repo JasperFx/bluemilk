@@ -62,7 +62,6 @@ namespace BlueMilk.IoC.Instances
                 return (IResolver) rootScope.QuickBuild(_resolverType.CompiledType);
             }
             
-            if (CreationStyle == CreationStyle.InlineSingleton) return null;
 
             if (CreationStyle == CreationStyle.NoArg)
             {
@@ -143,32 +142,22 @@ namespace BlueMilk.IoC.Instances
                 // TODO -- this will need to get smarter when we have inline dependencies and named stuff
                 _arguments = Constructor.GetParameters().Select(x => services.FindDefault(x.ParameterType)).ToArray();
 
-                foreach (var argument in _arguments) argument.CreatePlan(services);
+                foreach (var argument in _arguments)
+                {
+                    argument.CreatePlan(services);
+                }
 
-                if (_arguments.Any())
-                    determineCreationStyleFromArguments();
-                else
-                    determineNoArgCreationStyle();
+                determineCreationStyleFromArguments();
             }
 
 
             return _arguments;
         }
 
-        private void determineNoArgCreationStyle()
-        {
-            CreationStyle = Lifetime == ServiceLifetime.Singleton
-                ? CreationStyle.InlineSingleton
-                : CreationStyle.NoArg;
-        }
 
         private void determineCreationStyleFromArguments()
         {
-            if (Lifetime == ServiceLifetime.Singleton && !_arguments.Any(x => x.RequiresServiceProvider))
-            {
-                CreationStyle = CreationStyle.InlineSingleton;
-            }
-            else
+            if (_arguments.Any())
             {
                 CreationStyle = CreationStyle.Generated;
 
@@ -187,6 +176,11 @@ namespace BlueMilk.IoC.Instances
                         break;
                 }
             }
+            else
+            {
+                CreationStyle = CreationStyle.NoArg;
+            }
+
         }
 
         public static ConstructorInfo DetermineConstructor(NewServiceGraph services, Type implementationType,

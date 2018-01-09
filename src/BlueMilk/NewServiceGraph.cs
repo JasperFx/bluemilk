@@ -81,14 +81,6 @@ namespace BlueMilk
 
         public void generateDynamicAssembly()
         {
-            // Ignore this for now
-            var inlineSingletons = AllInstances()
-                .OfType<ConstructorInstance>()
-                .Where(x => x.CreationStyle == CreationStyle.InlineSingleton)
-                .ToArray();
-            
-            
-
             // Just worry about this one
             var generatedResolvers = AllInstances()
                 .OfType<ConstructorInstance>()

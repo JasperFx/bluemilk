@@ -197,21 +197,7 @@ namespace BlueMilk.Testing.IoC.Instances
             instance.RequiresServiceProvider.ShouldBeFalse();
         }
         
-        [Fact]
-        public void creation_style_is_no_arg_for_singleton()
-        {
-            var instance = ConstructorInstance.For<AWidget>();
-            instance.Lifetime = ServiceLifetime.Singleton;
-            
-            instance.CreatePlan(NewServiceGraph.Empty());
-            
-            instance.CreationStyle.ShouldBe(CreationStyle.InlineSingleton);
 
-            instance.BuildResolver(null, null).ShouldBeNull();
-            instance.ResolverBaseType.ShouldBeNull();
-            instance.RequiresServiceProvider.ShouldBeFalse();
-        }
-        
         [Fact]
         public void requires_service_provider_with_dependencies_negative()
         {
@@ -244,22 +230,7 @@ namespace BlueMilk.Testing.IoC.Instances
             instance.RequiresServiceProvider.ShouldBeTrue();
         }
         
-        [Fact]
-        public void singleton_can_be_inlined_if_no_service_provider_requirements()
-        {
-            var theServices = new ServiceRegistry();
-            theServices.AddSingleton<IWidget, AWidget>();
-            theServices.AddTransient<Rule, BlueRule>();
-            
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
-            var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
-            instance.Lifetime = ServiceLifetime.Singleton;
-            
-            instance.CreatePlan(theGraph);
-            
-            instance.CreationStyle.ShouldBe(CreationStyle.InlineSingleton);
-        }
-        
+
         [Fact]
         public void singleton_can_not_be_inlined_if_there_are_service_provider_requirements()
         {
