@@ -78,6 +78,8 @@ namespace BlueMilk.Codegen
         
         public IList<IVariableSource> Sources { get; } = new List<IVariableSource>();
 
+        public Variable ReturnVariable { get; set; }
+
         public void WriteMethod(ISourceWriter writer)
         {
             if (_top == null) throw new InvalidOperationException($"You must call {nameof(ArrangeFrames)}() before writing out the source code");
@@ -103,7 +105,11 @@ namespace BlueMilk.Codegen
 
         protected void writeReturnStatement(ISourceWriter writer)
         {
-            if ((AsyncMode == AsyncMode.ReturnCompletedTask || AsyncMode == AsyncMode.None) && ReturnType == typeof(Task))
+            if (ReturnVariable != null)
+            {
+                writer.Write($"return {ReturnVariable};");
+            }
+            else if ((AsyncMode == AsyncMode.ReturnCompletedTask || AsyncMode == AsyncMode.None) && ReturnType == typeof(Task))
             {
                 writer.Write("return Task.CompletedTask;");
             }

@@ -2,12 +2,8 @@
 
 namespace BlueMilk.Codegen.Frames
 {
-    public class ReturnFrame : Frame
+    public class ReturnFrame : SyncFrame
     {
-        public ReturnFrame() : base(false)
-        {
-        }
-
         public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             writer.WriteReturnStatement(method);

@@ -5,9 +5,11 @@ using System.Reflection;
 using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
+using BlueMilk.Compilation;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
+using Microsoft.CodeAnalysis.Classification;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -28,6 +30,7 @@ namespace BlueMilk.IoC.Instances
             "Cannot fill the dependencies of any of the public constructors";
 
         private Instance[] _arguments = new Instance[0];
+        private GeneratedType _resolverType;
 
         public ConstructorInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(
             serviceType, implementationType, lifetime)
@@ -204,6 +207,21 @@ namespace BlueMilk.IoC.Instances
             message = NoPublicConstructors;
 
             return null;
+        }
+
+        public void GenerateResolver(GeneratedAssembly generatedAssembly)
+        {
+            var typeName = (ImplementationType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
+                .Replace(',', '_');
+            
+            _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType);
+
+            var method = _resolverType.MethodFor("Build");
+
+            var variable = CreateVariable(BuildMode.Build, new ResolverVariables(), true);
+
+            method.ReturnVariable = variable;
+            method.Frames.Add(variable.Creator);
         }
     }
 }

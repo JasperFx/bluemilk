@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Baseline;
+using BlueMilk.Codegen;
+using BlueMilk.Compilation;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,30 +31,18 @@ namespace BlueMilk
             Resolvers = new ResolverGraph(this);
             
 
-            // 1. Organize closed type services into ServiceFamily objects
-            services
-                .Where(x => !x.ServiceType.IsGenericType && !x.ServiceType.CanBeCastTo<Instance>())
-                .Select(Instance.For)
-                .GroupBy(x => x.ServiceType)
-                .Select(x => new ServiceFamily(x.Key, x.ToArray()))
-                .Each(family => _families.Add(family.ServiceType, family));
+            organizeIntoFamilies(services);
 
-            // 2. Do planning on each instance -- this might need to be recursive later
-            // if new instances are discovered during construction
-            while (AllInstances().Any(x => !x.HasPlanned))
-            {
-                foreach (var instance in AllInstances().Where(x => !x.HasPlanned).ToArray())
-                {
-                    instance.CreatePlan(this);
-                }
-            }
+            planResolutionStrategies();
             
             
-
+            
 
             
             // TODO -- any validations
-            // TODO -- generate the dynamic assembly
+            
+            
+            generateDynamicAssembly();
 
             foreach (var instance in AllInstances())
             {
@@ -60,34 +50,54 @@ namespace BlueMilk
                 if (resolver != null) Resolvers.Register(instance, resolver);
             }
         }
-        
+
+        private void planResolutionStrategies()
+        {
+            while (AllInstances().Any(x => !x.HasPlanned))
+            {
+                foreach (var instance in AllInstances().Where(x => !x.HasPlanned).ToArray())
+                {
+                    instance.CreatePlan(this);
+                }
+            }
+        }
+
+        private void organizeIntoFamilies(IServiceCollection services)
+        {
+            services
+                .Where(x => !x.ServiceType.IsGenericType && !x.ServiceType.CanBeCastTo<Instance>())
+                .Select(Instance.For)
+                .GroupBy(x => x.ServiceType)
+                .Select(x => new ServiceFamily(x.Key, x.ToArray()))
+                .Each(family => _families.Add(family.ServiceType, family));
+        }
+
         public IServiceCollection Services { get; }
         public ResolverGraph Resolvers { get; }
 
-        public void CreatePlans()
+        public void generateDynamicAssembly()
         {
-
-
-            // 3. TODO -- validate there are no errors? Maybe make that optional?
-
-
-            // 4. Generate the code for the singleton initializer and generated resolvers
+            // Ignore this for now
             var inlineSingletons = AllInstances()
                 .OfType<ConstructorInstance>()
                 .Where(x => x.CreationStyle == CreationStyle.InlineSingleton)
                 .ToArray();
+            
+            
 
+            // Just worry about this one
             var generatedResolvers = AllInstances()
                 .OfType<ConstructorInstance>()
                 .Where(x => x.CreationStyle == CreationStyle.Generated)
                 .ToArray();
 
-            var assembly = generateDynamicResolverAssembly(inlineSingletons, generatedResolvers);
-        }
-
-        private Assembly generateDynamicResolverAssembly(ConstructorInstance[] inlineSingletons, ConstructorInstance[] generatedResolvers)
-        {
-            return null;
+            // TODO -- will need to get at the GenerationRules from somewhere
+            var generatedAssembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
+            
+            foreach (var instance in generatedResolvers)
+            {
+                instance.GenerateResolver(generatedAssembly);
+            }
         }
 
         public IEnumerable<Instance> AllInstances()
