@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Resolvers;
+using BlueMilk.Util;
 
 namespace BlueMilk
 {
@@ -48,6 +49,15 @@ namespace BlueMilk
         {
             // TODO -- what if it's not already there?
             return ByTypeAndName[serviceType][name];
+        }
+
+        public void Register(Scope rootScope, IEnumerable<Instance> instances)
+        {
+            foreach (var instance in instances.TopologicalSort(x => x.Dependencies, false))
+            {
+                var resolver = instance.BuildResolver(this, rootScope);
+                Register(instance, resolver);
+            }
         }
         
 

@@ -45,15 +45,39 @@ namespace BlueMilk
             // TODO -- any validations
 
 
-            generateDynamicAssembly();
+            var requiresGenerated = generateDynamicAssembly();
 
+            var noGeneration = AllInstances().Where(x => !requiresGenerated.Contains(x));
             
-            foreach (var instance in AllInstances().TopologicalSort(x => x.Dependencies, false))
-            {
-                var resolver = instance.BuildResolver(Resolvers, _rootScope);
-                if (resolver != null) Resolvers.Register(instance, resolver);
-            }
+            Resolvers.Register(_rootScope, noGeneration);
+            Resolvers.Register(_rootScope, requiresGenerated);
         }
+
+        private Instance[] generateDynamicAssembly()
+        {
+            var generatedResolvers = AllInstances()
+                .OfType<IInstanceThatGeneratesResolver>()
+                .Where(x => x.CreationStyle == CreationStyle.Generated)
+                .ToArray();
+
+
+            // TODO -- will need to get at the GenerationRules from somewhere
+            var generatedAssembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
+            AllInstances().Select(x => x.ImplementationType.Assembly)
+                .Concat(AllInstances().Select(x => x.ServiceType.Assembly))
+                .Distinct()
+                .Each(a => generatedAssembly.Generation.Assemblies.Fill(a));
+
+            foreach (var instance in generatedResolvers)
+            {
+                instance.GenerateResolver(generatedAssembly);
+            }
+
+            generatedAssembly.CompileAll();
+
+            return generatedResolvers.OfType<Instance>().ToArray();
+        }
+
 
         private void planResolutionStrategies()
         {
@@ -78,29 +102,6 @@ namespace BlueMilk
 
         public IServiceCollection Services { get; private set; }
         public ResolverGraph Resolvers { get; private set; }
-
-        public void generateDynamicAssembly()
-        {
-            // Just worry about this one
-            var generatedResolvers = AllInstances()
-                .OfType<ConstructorInstance>()
-                .Where(x => x.CreationStyle == CreationStyle.Generated)
-                .ToArray();
-
-            // TODO -- will need to get at the GenerationRules from somewhere
-            var generatedAssembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
-            AllInstances().Select(x => x.ImplementationType.Assembly)
-                .Concat(AllInstances().Select(x => x.ServiceType.Assembly))
-                .Distinct()
-                .Each(a => generatedAssembly.Generation.Assemblies.Fill(a));
-            
-            foreach (var instance in generatedResolvers)
-            {
-                instance.GenerateResolver(generatedAssembly);
-            }
-            
-            generatedAssembly.CompileAll();
-        }
 
         public IEnumerable<Instance> AllInstances()
         {

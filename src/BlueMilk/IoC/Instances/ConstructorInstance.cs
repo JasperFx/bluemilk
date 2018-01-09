@@ -14,15 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
-    public enum DisposeTracking
-    {
-        WithUsing,
-        RegisterWithScope,
-        None
-    }
-
-
-    public class ConstructorInstance : Instance
+    public class ConstructorInstance : Instance, IInstanceThatGeneratesResolver
     {
         public static readonly string NoPublicConstructors = "No public constructors";
 
