@@ -11,9 +11,7 @@ namespace BlueMilk.Testing.IoC
 {
     public class NewServiceGraphTester
     {
-        public interface IThing{}
-        public class Thing : IThing{}
-        
+
         public readonly ServiceRegistry theServices = new ServiceRegistry();
 
         public NewServiceGraphTester()

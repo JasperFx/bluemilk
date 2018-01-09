@@ -36,6 +36,58 @@ namespace BlueMilk.Testing.IoC.Acceptance
                 .Widget.ShouldBeOfType<WidgetWithThing>()
                 .Thing.ShouldBeOfType<Thing>();
         }
+        
+        [Fact]
+        public void resolve_singletons_via_constructor_with_object_dependency()
+        {
+            var thing = new Thing();
+            
+            var container = Container.For(_ =>
+            {
+                _.For<IWidget>().Use<WidgetWithThing>();
+                _.For<IThing>().Use(thing);
+                _.AddSingleton<GuyWithWidget>();
+            });
+
+            container.GetInstance<GuyWithWidget>()
+                .Widget.ShouldBeOfType<WidgetWithThing>()
+                .Thing.ShouldBe(thing);
+        }
+
+        public class ThingFactory
+        {
+            private readonly IThing _thing;
+
+            public ThingFactory(IThing thing)
+            {
+                _thing = thing;
+            }
+
+            public IThing Build()
+            {
+                return _thing;
+            }
+        }
+        
+        [Fact]
+        public void resolve_singletons_via_constructor_with_lambda_dependency()
+        {
+            var thing = new Thing();
+            
+            var container = Container.For(_ =>
+            {
+                _.For<IWidget>().Use<WidgetWithThing>();
+                _.AddSingleton(new ThingFactory(thing));
+                _.AddTransient<IThing>(s => s.GetService<ThingFactory>().Build());
+                _.AddSingleton<GuyWithWidget>();
+            });
+
+            container.GetInstance<GuyWithWidget>()
+                .Widget.ShouldBeOfType<WidgetWithThing>()
+                .Thing.ShouldBe(thing);
+        }
+        
+        
 
         public class GuyWithWidget
         {
@@ -46,9 +98,6 @@ namespace BlueMilk.Testing.IoC.Acceptance
                 Widget = widget;
             }
         }
-        
-        public interface IThing{}
-        public class Thing : IThing{}
 
         public class WidgetWithThing : IWidget
         {
