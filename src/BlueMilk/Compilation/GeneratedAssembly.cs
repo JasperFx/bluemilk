@@ -7,14 +7,6 @@ using BlueMilk.Codegen;
 
 namespace BlueMilk.Compilation
 {
-    
-    /*
-     * TODO -- try to use this class. Make it simpler if need be.
-     *
-     *
-     *
-     * 
-     */
     public class GeneratedAssembly
     {
         public readonly List<GeneratedType> GeneratedTypes = new List<GeneratedType>();

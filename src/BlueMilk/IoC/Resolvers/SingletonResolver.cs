@@ -12,7 +12,7 @@ namespace BlueMilk.IoC.Resolvers
 
         private T _service;
         
-        protected SingletonResolver(Scope topLevelScope)
+        public SingletonResolver(Scope topLevelScope)
         {
             _topLevelScope = topLevelScope;
         }

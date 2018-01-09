@@ -21,6 +21,21 @@ namespace BlueMilk.Testing.IoC.Acceptance
                 .Widget.ShouldBeOfType<WidgetWithThing>()
                 .Thing.ShouldBeOfType<Thing>();
         }
+        
+        [Fact]
+        public void resolve_singletons_via_constructor()
+        {
+            var container = Container.For(_ =>
+            {
+                _.For<IWidget>().Use<WidgetWithThing>();
+                _.For<IThing>().Use<Thing>();
+                _.AddSingleton<GuyWithWidget>();
+            });
+
+            container.GetInstance<GuyWithWidget>()
+                .Widget.ShouldBeOfType<WidgetWithThing>()
+                .Thing.ShouldBeOfType<Thing>();
+        }
 
         public class GuyWithWidget
         {

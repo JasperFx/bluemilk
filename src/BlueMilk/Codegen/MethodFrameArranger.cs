@@ -15,6 +15,8 @@ namespace BlueMilk.Codegen
         private readonly GeneratedMethod _method;
         private readonly GeneratedType _type;
         private readonly Dictionary<Type, Variable> _variables = new Dictionary<Type, Variable>();
+        
+        // TODO -- reevaluate if this is a good idea. Probably not now
         private readonly SingletonVariableSource _singletons;
         private readonly ServiceVariableSource _services;
 
@@ -130,6 +132,10 @@ namespace BlueMilk.Codegen
 
             yield return _singletons;
 
+            // To get injected fields
+            yield return _type;
+
+            // TODO -- reevaluate if this is a good idea
             yield return ServiceProviderVariableSource.Instance;
 
             //yield return new NoArgConcreteCreator();

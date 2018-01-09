@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Baseline;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 
 namespace BlueMilk.Codegen
 {
-    public class GeneratedType
+    public class GeneratedType : IVariableSource
     {
         public GenerationRules Rules { get; }
 
@@ -35,16 +36,33 @@ namespace BlueMilk.Codegen
             return InheritsFrom(typeof(T));
         }
 
+        // TODO -- need ut's
         public GeneratedType InheritsFrom(Type baseType)
         {
+            var ctors = baseType.GetConstructors();
+            if (ctors.Length > 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(baseType), $"The base type for the code generation must only have one public constructor. {baseType.FullNameInCode()} has {ctors.Length}");
+            }
+
+            if (ctors.Length == 1)
+            {
+                BaseConstructorArguments = ctors.Single().GetParameters().Select(x => new InjectedField(x.ParameterType, x.Name)).ToArray();
+            }
+            
+
             BaseType = baseType;
             foreach (var methodInfo in baseType.GetMethods().Where(x => x.DeclaringType != typeof(object)).Where(x => x.CanBeOverridden()))
             {
                 _methods.Add(new GeneratedMethod(methodInfo) {Overrides = true});
             }
+            
+            
 
             return this;
         }
+
+        public InjectedField[] BaseConstructorArguments { get; private set; } = new InjectedField[0];
 
 
         // TODO -- need ut's
@@ -127,14 +145,19 @@ namespace BlueMilk.Codegen
 
         public InjectedField[] Args()
         {
-            var args = _methods.SelectMany(x => x.Fields).Distinct().ToArray();
-            return args;
+            return _methods.SelectMany(x => x.Fields).Concat(BaseConstructorArguments).Distinct().ToArray();
         }
 
         private void writeConstructorMethod(ISourceWriter writer, InjectedField[] args)
         {
             var ctorArgs = args.Select(x => x.CtorArgDeclaration).Join(", ");
-            writer.Write($"BLOCK:public {TypeName}({ctorArgs})");
+            var declaration = $"BLOCK:public {TypeName}({ctorArgs})";
+            if (BaseConstructorArguments.Any())
+            {
+                declaration = $"{declaration} : base({BaseConstructorArguments.Select(x => x.CtorArg).Join(", ")})";
+            }
+            
+            writer.Write(declaration);
 
             foreach (var field in args)
             {
@@ -214,6 +237,16 @@ namespace BlueMilk.Codegen
             }
 
             return (T) Activator.CreateInstance(CompiledType, arguments);
+        }
+
+        bool IVariableSource.Matches(Type type)
+        {
+            return BaseConstructorArguments.Any(x => x.ArgType == type);
+        }
+
+        Variable IVariableSource.Create(Type type)
+        {
+            return BaseConstructorArguments.FirstOrDefault(x => x.ArgType == type);
         }
     }
 }
