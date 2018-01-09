@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Baseline;
+using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
@@ -17,6 +19,8 @@ namespace BlueMilk.IoC
         public Scope(IServiceCollection services)
         {
             ServiceGraph = new NewServiceGraph(services, this);
+            
+            ServiceGraph.Initialize();
             Resolvers = ServiceGraph.Resolvers;
         }
 
@@ -96,6 +100,24 @@ namespace BlueMilk.IoC
             // TODO -- validate object disposed
             var resolver = Resolvers.ByTypeAndName[serviceType]?[name];
             return resolver.Resolve(this);
+        }
+
+        public T QuickBuild<T>()
+        {
+            return (T) QuickBuild(typeof(T));
+
+        }
+
+        public object QuickBuild(Type objectType)
+        {
+            if (!objectType.IsConcrete()) throw new InvalidOperationException("Type must be concrete");
+
+            var ctor = ConstructorInstance.DetermineConstructor(ServiceGraph, objectType, out var message);
+            if (ctor == null) throw new InvalidOperationException(message);
+
+            var dependencies = ctor.GetParameters().Select(x => GetInstance(x.ParameterType)).ToArray();
+
+            return Activator.CreateInstance(objectType, dependencies);
         }
     }
 }

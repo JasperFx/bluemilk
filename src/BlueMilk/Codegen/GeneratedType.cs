@@ -38,7 +38,7 @@ namespace BlueMilk.Codegen
         public GeneratedType InheritsFrom(Type baseType)
         {
             BaseType = baseType;
-            foreach (var methodInfo in baseType.GetMethods().Where(x => x.DeclaringType != typeof(object)).Where(x => x.IsAbstract || x.IsVirtual))
+            foreach (var methodInfo in baseType.GetMethods().Where(x => x.DeclaringType != typeof(object)).Where(x => x.CanBeOverridden()))
             {
                 _methods.Add(new GeneratedMethod(methodInfo) {Overrides = true});
             }
@@ -160,7 +160,7 @@ namespace BlueMilk.Codegen
 
             if (implemented.Any())
             {
-                writer.Write($"BLOCK:public class {TypeName} : {implemented.Select(x => x.FullName).Join(", ")}");
+                writer.Write($"BLOCK:public class {TypeName} : {implemented.Select(x => x.FullNameInCode()).Join(", ")}");
             }
             else
             {

@@ -37,6 +37,7 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddTransient<IThing, Thing>();
             
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
 
             var instance = ConstructorInstance.For<DeepConstructorGuy>();
             
@@ -52,6 +53,7 @@ namespace BlueMilk.Testing.IoC.Instances
         {
             var theServices = new ServiceRegistry();
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
 
             var instance = ConstructorInstance.For<NoArgGuy>();
             instance.CreatePlan(theGraph);
@@ -65,6 +67,7 @@ namespace BlueMilk.Testing.IoC.Instances
         {
             var theServices = new ServiceRegistry();
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
 
             var instance = ConstructorInstance.For<NoArgGuy>();
             instance.CreatePlan(theGraph);
@@ -77,6 +80,7 @@ namespace BlueMilk.Testing.IoC.Instances
         {
             var theServices = new ServiceRegistry();
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
 
             var instance = ConstructorInstance.For<GuyWithNoPublicConstructors>();
             instance.CreatePlan(theGraph);
@@ -91,6 +95,7 @@ namespace BlueMilk.Testing.IoC.Instances
             var theServices = new ServiceRegistry();
 
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
 
             var instance = ConstructorInstance.For<GuyThatUsesIWidget>();
             
@@ -108,6 +113,8 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddTransient<Rule, BlueRule>();
             
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
+            
             var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
             
             instance.CreatePlan(theGraph);
@@ -133,12 +140,14 @@ namespace BlueMilk.Testing.IoC.Instances
         public void find_dependencies_deep()
         {
             var theServices = new ServiceRegistry();
-            theServices.AddSingleton<IWidget, AWidget>();
+            theServices.AddTransient<IWidget, AWidget>();
             theServices.AddTransient<Rule, BlueRule>();
             theServices.AddTransient<OtherGuy>();
             theServices.AddTransient<GuyWithWidgetAndRule>();
 
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
+            
             var instance = ConstructorInstance.For<GuyWithGuys>();
 
             instance.CreatePlan(theGraph);
@@ -226,6 +235,8 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddTransient<Rule>(x => new BlueRule());
             
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
+            
             var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
             
             instance.CreatePlan(theGraph);
@@ -257,6 +268,8 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddTransient<Rule>(x => new BlueRule());
             
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
+            
             var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
             instance.Lifetime = ServiceLifetime.Singleton;
             
@@ -276,6 +289,8 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddTransient<Rule>(x => new BlueRule());
             
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
+            
             var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
             instance.Lifetime = lifetime;
             

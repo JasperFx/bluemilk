@@ -57,6 +57,11 @@ namespace BlueMilk.IoC.Instances
 
         public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)
         {
+            if (_resolverType != null)
+            {
+                return (IResolver) rootScope.QuickBuild(_resolverType.CompiledType);
+            }
+            
             if (CreationStyle == CreationStyle.InlineSingleton) return null;
 
             if (CreationStyle == CreationStyle.NoArg)
@@ -190,7 +195,7 @@ namespace BlueMilk.IoC.Instances
             message = null;
 
             var constructors = implementationType
-                .GetConstructors();
+                .GetConstructors() ?? new ConstructorInfo[0];
 
 
             if (constructors.Any())
@@ -212,9 +217,9 @@ namespace BlueMilk.IoC.Instances
         public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {
             var typeName = (ImplementationType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
-                .Replace(',', '_');
+                .Replace(',', '_').Replace('.', '_');
             
-            _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType);
+            _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType));
 
             var method = _resolverType.MethodFor("Build");
 

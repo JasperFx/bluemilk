@@ -31,6 +31,15 @@ namespace BlueMilk.Codegen
 
         }
 
+        public static bool CanBeOverridden(this MethodInfo method)
+        {
+            if (method.IsAbstract) return true;
+
+            if (method.IsVirtual && !method.IsFinal) return true;
+
+            return false;
+        }
+
         public static string FullNameInCode(this Type type)
         {
             if (Aliases.ContainsKey(type)) return Aliases[type];

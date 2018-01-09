@@ -20,7 +20,7 @@ namespace BlueMilk.IoC.Frames
 
         public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
-            writer.Write($"var {Variable.Usage} = {_scope}.{nameof(Scope.GetInstance)}({Variable.VariableType.FullNameInCode()});");
+            writer.Write($"var {Variable.Usage} = {_scope}.{nameof(Scope.GetInstance)}<{Variable.VariableType.FullNameInCode()}>();");
         }
 
         public override IEnumerable<Variable> FindVariables(IMethodVariables chain)

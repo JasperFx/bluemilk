@@ -16,4 +16,7 @@
   <ItemGroup>
     <Compile Remove="Codegen\StubGeneratedMethod.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="IoC\Acceptance\generated_code.cs" />
+  </ItemGroup>
 </Project>

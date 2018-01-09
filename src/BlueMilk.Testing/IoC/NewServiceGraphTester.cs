@@ -26,6 +26,7 @@ namespace BlueMilk.Testing.IoC
         {
             theServices.AddTransient<IWidget, AWidget>();
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
 
             theGraph.FindDefault(typeof(IWidget))
                 .ShouldBeOfType<ConstructorInstance>()
@@ -41,6 +42,7 @@ namespace BlueMilk.Testing.IoC
             theServices.AddTransient<IWidget, MoneyWidget>();
             
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
 
             theGraph.FindDefault(typeof(IWidget))
                 .ShouldBeOfType<ConstructorInstance>()
@@ -57,6 +59,7 @@ namespace BlueMilk.Testing.IoC
             theServices.AddTransient<IWidget, MoneyWidget>();
             
             var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
 
             theGraph.FindAll(typeof(IWidget))
                 .OfType<ConstructorInstance>()

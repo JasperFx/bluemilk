@@ -107,7 +107,7 @@ namespace BlueMilk.Codegen
         {
             if (ReturnVariable != null)
             {
-                writer.Write($"return {ReturnVariable};");
+                writer.Write($"return {ReturnVariable.Usage};");
             }
             else if ((AsyncMode == AsyncMode.ReturnCompletedTask || AsyncMode == AsyncMode.None) && ReturnType == typeof(Task))
             {

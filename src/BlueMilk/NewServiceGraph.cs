@@ -8,6 +8,7 @@ using BlueMilk.Codegen;
 using BlueMilk.Compilation;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
+using BlueMilk.Util;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
@@ -24,27 +25,30 @@ namespace BlueMilk
         public NewServiceGraph(IServiceCollection services, Scope rootScope)
         {
             _rootScope = rootScope;
-            // TODO -- will need to be able to use custom family policies
-            
-            
             Services = services;
-            Resolvers = new ResolverGraph(this);
-            
+        }
 
-            organizeIntoFamilies(services);
+        public void Initialize()
+        {
+            // TODO -- will need to be able to use custom family policies
+
+
+            
+            Resolvers = new ResolverGraph(this);
+
+
+            organizeIntoFamilies(Services);
 
             planResolutionStrategies();
-            
-            
-            
 
-            
+
             // TODO -- any validations
-            
-            
+
+
             generateDynamicAssembly();
 
-            foreach (var instance in AllInstances())
+            
+            foreach (var instance in AllInstances().TopologicalSort(x => x.Dependencies, false))
             {
                 var resolver = instance.BuildResolver(Resolvers, _rootScope);
                 if (resolver != null) Resolvers.Register(instance, resolver);
@@ -72,8 +76,8 @@ namespace BlueMilk
                 .Each(family => _families.Add(family.ServiceType, family));
         }
 
-        public IServiceCollection Services { get; }
-        public ResolverGraph Resolvers { get; }
+        public IServiceCollection Services { get; private set; }
+        public ResolverGraph Resolvers { get; private set; }
 
         public void generateDynamicAssembly()
         {
@@ -93,11 +97,17 @@ namespace BlueMilk
 
             // TODO -- will need to get at the GenerationRules from somewhere
             var generatedAssembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
+            AllInstances().Select(x => x.ImplementationType.Assembly)
+                .Concat(AllInstances().Select(x => x.ServiceType.Assembly))
+                .Distinct()
+                .Each(a => generatedAssembly.Generation.Assemblies.Fill(a));
             
             foreach (var instance in generatedResolvers)
             {
                 instance.GenerateResolver(generatedAssembly);
             }
+            
+            generatedAssembly.CompileAll();
         }
 
         public IEnumerable<Instance> AllInstances()

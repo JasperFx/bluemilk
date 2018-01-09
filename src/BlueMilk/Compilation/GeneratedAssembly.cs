@@ -17,19 +17,20 @@ namespace BlueMilk.Compilation
      */
     public class GeneratedAssembly
     {
-        private readonly GenerationRules _generation;
         public readonly List<GeneratedType> GeneratedTypes = new List<GeneratedType>();
 
         public GeneratedAssembly(GenerationRules generation)
         {
-            _generation = generation;
+            Generation = generation;
         }
+
+        public GenerationRules Generation { get; }
 
         public GeneratedType AddType(string typeName, Type baseType)
         {
             // TODO -- assert that it's been generated already?
 
-            var generatedType = new GeneratedType(_generation, typeName);
+            var generatedType = new GeneratedType(Generation, typeName);
             if (baseType.IsInterface)
             {
                 generatedType.Implements(baseType);
@@ -46,9 +47,9 @@ namespace BlueMilk.Compilation
 
         public void CompileAll()
         {
-            var code = GenerateCode(_generation);
+            var code = GenerateCode(Generation);
 
-            var generator = buildGenerator(_generation);
+            var generator = buildGenerator(Generation);
 
             var assembly = generator.Generate(code);
 
