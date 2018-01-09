@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Composition.Hosting.Core;
 using System.Linq;
-using BlueMilk.Codegen;
-using BlueMilk.Codegen.Frames;
-using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
-using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using StructureMap.Testing.Widget;
 using Xunit;
 
 namespace BlueMilk.Testing.IoC.Instances

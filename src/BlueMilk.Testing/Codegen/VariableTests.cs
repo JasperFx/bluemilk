@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
-using BlueMilk.Testing.TargetTypes;
 using Shouldly;
+using StructureMap.Testing.Widget;
 using Xunit;
 
 namespace BlueMilk.Testing.Codegen

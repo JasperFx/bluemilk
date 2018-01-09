@@ -11,6 +11,11 @@ namespace StructureMap.Testing.Widget
         }
     }
 
+    public class BlueRule : Rule
+    {
+        
+    }
+
     public class ComplexRule : Rule
     {
         [DefaultConstructor]

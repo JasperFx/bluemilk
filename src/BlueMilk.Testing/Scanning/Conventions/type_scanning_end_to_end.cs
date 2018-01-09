@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using BlueMilk.Scanning.Conventions;
-using BlueMilk.Testing.TargetTypes;
 using Shouldly;
+using StructureMap.Testing.Widget;
 using Xunit;
 
 namespace BlueMilk.Testing.Scanning.Conventions
@@ -49,6 +49,7 @@ namespace BlueMilk.Testing.Scanning.Conventions
             services.Scan(x =>
             {
                 x.AssemblyContainingType<IShoes>();
+                x.AssemblyContainingType<IWidget>();
                 x.AddAllTypesOf<IWidget>();
             });
 

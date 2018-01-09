@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using BlueMilk.Scanning.Conventions;
-using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using StructureMap.Testing.Widget;
 using Xunit;
 
 namespace BlueMilk.Testing.Scanning.Conventions

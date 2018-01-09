@@ -1,8 +1,8 @@
 ﻿using System;
 using BlueMilk.IoC;
-using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using StructureMap.Testing.Widget;
 using Xunit;
 
 namespace BlueMilk.Testing.IoC.Acceptance

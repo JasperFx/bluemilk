@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
-using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using StructureMap.Testing.Widget;
 using Xunit;
 
 namespace BlueMilk.Testing.IoC

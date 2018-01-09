@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BlueMilk\BlueMilk.csproj" />
+    <ProjectReference Include="..\StructureMap.Testing.Widget\StructureMap.Testing.Widget.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Codegen\StubGeneratedMethod.cs" />

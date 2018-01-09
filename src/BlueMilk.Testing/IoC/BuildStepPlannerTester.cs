@@ -2,9 +2,9 @@
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Planning;
-using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using StructureMap.Testing.Widget;
 using Xunit;
 
 namespace BlueMilk.Testing.IoC

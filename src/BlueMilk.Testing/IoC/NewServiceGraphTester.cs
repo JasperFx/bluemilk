@@ -2,9 +2,9 @@
 using BlueMilk.Codegen;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
-using BlueMilk.Testing.TargetTypes;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using StructureMap.Testing.Widget;
 using Xunit;
 
 namespace BlueMilk.Testing.IoC
