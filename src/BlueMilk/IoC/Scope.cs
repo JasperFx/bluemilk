@@ -14,7 +14,6 @@ namespace BlueMilk.IoC
             return new Scope(new ServiceRegistry());
         }
         
-        private readonly Dictionary<Type, object> _servicesByType = new Dictionary<Type, object>();
 
 
         public Scope(IServiceCollection services)
@@ -42,24 +41,9 @@ namespace BlueMilk.IoC
         {
             Disposables.Add(disposable);
         }
+        
+        internal readonly Dictionary<int, object> Services = new Dictionary<int, object>();
 
-        // TODO -- this will need to register the service by name later
-        public void Register(Type serviceType, object service)
-        {
-            _servicesByType.Add(serviceType, service);
-        }
-
-        public bool TryFind<T>(out T service)
-        {
-            if (_servicesByType.ContainsKey(typeof(T)))
-            {
-                service = (T) _servicesByType[typeof(T)];
-                return true;
-            }
-
-            service = default(T);
-            return false;
-        }
 
         public virtual void Dispose()
         {

@@ -31,9 +31,7 @@ namespace BlueMilk.IoC.Resolvers
                         _topLevelScope.Disposables.Add((IDisposable) _service);
                     }
                     
-                    // TODO -- will need to also do this by name.
-                    // May not do this by default in some cases
-                    _topLevelScope.Register(typeof(T), _service);
+                    _topLevelScope.Services.Add(Hash, _service);
                 }
             }
 

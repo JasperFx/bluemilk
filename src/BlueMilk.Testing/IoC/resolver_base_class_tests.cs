@@ -19,10 +19,7 @@ namespace BlueMilk.Testing.IoC
                 .ShouldBeSameAs(singleton1.Resolve(Scope.Empty()));
             
             theScope.Disposables.ShouldNotContain(clock);
-            theScope.TryFind(out IClock cachedClock).ShouldBeTrue();
-            
-            cachedClock.ShouldBeSameAs(clock);
-                
+
         }
         
         [Fact]
@@ -35,9 +32,7 @@ namespace BlueMilk.Testing.IoC
                 .ShouldBeSameAs(singleton1.Resolve(Scope.Empty()));
             
             theScope.Disposables.ShouldContain(clock);
-            theScope.TryFind(out IClock cachedClock).ShouldBeTrue();
-            
-            cachedClock.ShouldBeSameAs(clock);
+
                 
         }
         
@@ -51,8 +46,6 @@ namespace BlueMilk.Testing.IoC
 
             clock.ShouldNotBeTheSameAs(resolver.Resolve(Scope.Empty()));
             
-            theScope.TryFind(out IClock cachedClock).ShouldBeTrue();
-            cachedClock.ShouldBeSameAs(clock);
         }
         
         [Fact]
