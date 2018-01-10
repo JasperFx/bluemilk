@@ -10,6 +10,7 @@ using BlueMilk.Compilation;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Resolvers;
+using BlueMilk.Scanning.Conventions;
 using BlueMilk.Util;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,6 +27,9 @@ namespace BlueMilk
         
         public ServiceGraph(IServiceCollection services, Scope rootScope)
         {
+            // This should blow up pretty fast if it's no good
+            services.ApplyScannedTypes().Wait();
+            
             _rootScope = rootScope;
             Services = services;
 
