@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,6 +9,7 @@ using BlueMilk.Codegen;
 using BlueMilk.Compilation;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
+using BlueMilk.IoC.Resolvers;
 using BlueMilk.Util;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,12 +23,22 @@ namespace BlueMilk
         
         private readonly Dictionary<Type, ServiceFamily> _families = new Dictionary<Type, ServiceFamily>();
         private readonly IList<IFamilyPolicy> _familyPolicies = new List<IFamilyPolicy>();
+        public readonly IDictionary<Type, IResolver> ByType = new ConcurrentDictionary<Type, IResolver>();
         
         public ServiceGraph(IServiceCollection services, Scope rootScope)
         {
             _rootScope = rootScope;
             Services = services;
-            Resolvers = new ResolverGraph(this);
+            
+            addScopeResolver<Scope>();
+            addScopeResolver<IServiceProvider>();
+            addScopeResolver<IContainer>();
+        }
+        
+        private void addScopeResolver<T>()
+        {
+            // TODO -- will have to register by name as well?
+            ByType[typeof(T)] = new ScopeResolver<T>();
         }
 
         public void Initialize()
@@ -44,6 +56,65 @@ namespace BlueMilk
 
             buildOutMissingResolvers();
         }
+        
+        
+        
+        public void Register(Instance instance, IResolver resolver)
+        {
+            if (instance.IsDefault)
+            {
+                ByType[instance.ServiceType] = resolver;
+            }
+        }
+        
+        public void Register(Scope rootScope, IEnumerable<Instance> instances)
+        {
+            foreach (var instance in instances.Where(x => x.Resolver == null).TopologicalSort(x => x.Dependencies, false))
+            {
+                instance.Initialize(rootScope);
+                
+                Register(instance, instance.Resolver);
+            }
+        }
+        
+        private readonly object _locker = new object();
+
+        
+        public IResolver FindResolver(Type serviceType)
+        {
+            if (ByType.TryGetValue(serviceType, out var resolver))
+            {
+                return resolver;
+            }
+
+            lock (_locker)
+            {
+                if (_families.ContainsKey(serviceType)) return _families[serviceType].Default.Resolver;
+
+                var family = TryToCreateMissingFamily(serviceType);
+
+                return family.Default?.Resolver;
+            }
+
+        }
+        
+        public IResolver FindResolver(Type serviceType, string name)
+        {
+            if (_families.TryGetValue(serviceType, out var family))
+            {
+                return family.ResolverFor(name);
+            }
+
+            lock (_locker)
+            {
+                if (_families.ContainsKey(serviceType)) return _families[serviceType].ResolverFor(name);
+                
+                family = TryToCreateMissingFamily(serviceType);
+                
+                return family.ResolverFor(name);
+            }
+        }
+        
 
         private void buildOutMissingResolvers()
         {
@@ -53,8 +124,8 @@ namespace BlueMilk
 
             var noGeneration = instancesWithoutResolver().Where(x => !requiresGenerated.Contains(x));
 
-            Resolvers.Register(_rootScope, noGeneration);
-            Resolvers.Register(_rootScope, requiresGenerated);
+            Register(_rootScope, noGeneration);
+            Register(_rootScope, requiresGenerated);
         }
 
         private IEnumerable<Instance> instancesWithoutResolver()
@@ -110,7 +181,6 @@ namespace BlueMilk
         }
 
         public IServiceCollection Services { get; }
-        public ResolverGraph Resolvers { get; }
 
         public IEnumerable<Instance> AllInstances()
         {
@@ -146,7 +216,7 @@ namespace BlueMilk
         
         public bool CouldBuild(ConstructorInfo ctor)
         {
-            return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null || Resolvers.ByType.ContainsKey(x.ParameterType));
+            return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null || ByType.ContainsKey(x.ParameterType));
         }
 
         public void Dispose()
@@ -158,7 +228,7 @@ namespace BlueMilk
         }
 
         private readonly Stack<Instance> _chain = new Stack<Instance>();
-        public void StartingToPlan(Instance instance)
+        internal void StartingToPlan(Instance instance)
         {
             if (_chain.Contains(instance))
             {
@@ -168,7 +238,7 @@ namespace BlueMilk
             _chain.Push(instance);
         }
 
-        public void FinishedPlanning()
+        internal void FinishedPlanning()
         {
             _chain.Pop();
         }
@@ -178,9 +248,18 @@ namespace BlueMilk
             return Scope.Empty().ServiceGraph;
         }
 
-        public bool TryToFindMissingFamily(Type serviceType)
+        public static ServiceGraph For(Action<ServiceRegistry> configure)
         {
-            return false;
+            var registry = new ServiceRegistry();
+            configure(registry);
+            
+            return new Scope(registry).ServiceGraph;
+        }
+
+        public ServiceFamily TryToCreateMissingFamily(Type serviceType)
+        {
+            throw new NotImplementedException();
+            //return false;
         }
     }
 }

@@ -19,17 +19,13 @@ namespace BlueMilk.IoC
         public Scope(IServiceCollection services)
         {
             ServiceGraph = new ServiceGraph(services, this);
-            Resolvers = ServiceGraph.Resolvers;
             ServiceGraph.Initialize();
         }
 
         public Scope(ServiceGraph serviceGraph)
         {
             ServiceGraph = serviceGraph;
-            Resolvers = ServiceGraph.Resolvers;
         }
-
-        internal ResolverGraph Resolvers { get; }
 
         internal ServiceGraph ServiceGraph { get; }
 
@@ -75,7 +71,7 @@ namespace BlueMilk.IoC
 
         public object GetInstance(Type serviceType)
         {
-            var resolver = Resolvers.Find(serviceType);
+            var resolver = ServiceGraph.FindResolver(serviceType);
             
             // TODO -- validate the existence of the resolver first
             return resolver.Resolve(this);
@@ -85,7 +81,7 @@ namespace BlueMilk.IoC
         {
             // TODO -- sad path, not found
             // TODO -- validate object disposed
-            var resolver = Resolvers.Find(serviceType, name);
+            var resolver = ServiceGraph.FindResolver(serviceType, name);
             
             
             return resolver.Resolve(this);

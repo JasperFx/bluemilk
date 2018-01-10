@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Baseline;
 using BlueMilk.IoC.Instances;
+using BlueMilk.IoC.Resolvers;
 
 namespace BlueMilk
 {
@@ -42,6 +43,11 @@ namespace BlueMilk
 
         // Has to be in order here
         public Instance[] All { get; }
+
+        public IResolver ResolverFor(string name)
+        {
+            return Instances.ContainsKey(name) ? Instances[name].Resolver : null;
+        }
 
         private void makeNamesUnique(IEnumerable<Instance> instances)
         {

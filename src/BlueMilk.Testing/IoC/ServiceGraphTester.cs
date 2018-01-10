@@ -2,7 +2,10 @@
 using BlueMilk.Codegen;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
+using BlueMilk.IoC.Resolvers;
+using BlueMilk.Scanning.Conventions;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using Shouldly;
 using StructureMap.Testing.Widget;
 using Xunit;
@@ -63,6 +66,42 @@ namespace BlueMilk.Testing.IoC
                 .OfType<ConstructorInstance>()
                 .Select(x => x.ImplementationType)
                 .ShouldHaveTheSameElementsAs(typeof(AWidget), typeof(MoneyWidget));
+
+        }
+        
+        [Fact]
+        public void register_an_instance_that_is_not_the_default()
+        {
+            var instance = ObjectInstance.For(new Clock());
+            var graph = ServiceGraph.For(_ =>
+            {
+                _.Add(instance);
+                _.AddSingleton(new Clock());
+            });
+
+            graph.ByType[instance.ServiceType].ShouldNotBe(instance);
+            
+            graph.FindResolver(instance.ServiceType, instance.Name)
+                .ShouldBeSameAs(instance);
+
+
+        }
+        
+        [Fact]
+        public void register_an_instance_that_is_the_default()
+        {
+            var instance = ObjectInstance.For(new Clock());
+            var graph = ServiceGraph.For(_ =>
+            {
+                _.Add(instance);
+            });
+            
+
+            graph.ByType[instance.ServiceType].ShouldBeSameAs(instance);
+            
+            graph.FindResolver(instance.ServiceType, instance.Name)
+                .ShouldBeSameAs(instance);
+
 
         }
 
