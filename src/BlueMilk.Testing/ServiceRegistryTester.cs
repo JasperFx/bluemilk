@@ -17,7 +17,7 @@ namespace BlueMilk.Testing
 
             var descriptor = registry.Single();
             
-            var instance = descriptor.ImplementationInstance.ShouldBeOfType<ConstructorInstance>();
+            var instance = descriptor.ImplementationInstance.ShouldBeOfType<ConstructorInstance<AWidget>>();
             instance.ImplementationType.ShouldBe(typeof(AWidget));
 
             descriptor.ServiceType.ShouldBe(typeof(IWidget));
@@ -32,7 +32,7 @@ namespace BlueMilk.Testing
 
             var descriptor = registry.Single();
 
-            var instance = descriptor.ImplementationInstance.ShouldBeOfType<ConstructorInstance>();
+            var instance = descriptor.ImplementationInstance.ShouldBeOfType<ConstructorInstance<AWidget>>();
             instance.ImplementationType.ShouldBe(typeof(AWidget));
             instance.Lifetime.ShouldBe(ServiceLifetime.Singleton);
                 

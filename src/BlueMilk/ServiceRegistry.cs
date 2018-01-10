@@ -8,10 +8,27 @@ namespace BlueMilk
 {
     public static class InstanceExtensions
     {
-        // TODO -- this should be temporary until we bring in more of the old StructureMap model
         public static T Named<T>(this T instance, string name) where T : Instance
         {
             instance.Name = name;
+            return instance;
+        }
+
+        public static T Scoped<T>(this T instance) where T : Instance
+        {
+            instance.Lifetime = ServiceLifetime.Scoped;
+            return instance;
+        }
+        
+        public static T Singleton<T>(this T instance) where T : Instance
+        {
+            instance.Lifetime = ServiceLifetime.Singleton;
+            return instance;
+        }
+        
+        public static T Transient<T>(this T instance) where T : Instance
+        {
+            instance.Lifetime = ServiceLifetime.Transient;
             return instance;
         }
     }
@@ -41,7 +58,6 @@ namespace BlueMilk
         {
             private readonly ServiceRegistry _parent;
             private readonly ServiceLifetime _lifetime;
-            private Instance _instance;
 
             public DescriptorExpression(ServiceRegistry parent, ServiceLifetime lifetime)
             {
@@ -49,14 +65,14 @@ namespace BlueMilk
                 _lifetime = lifetime;
             }
 
-            public DescriptorExpression<T> Use<TConcrete>() where TConcrete : class, T
+            public ConstructorInstance<TConcrete> Use<TConcrete>() where TConcrete : class, T
             {
-                _instance = ConstructorInstance.For<T, TConcrete>();
-                _instance.Lifetime = _lifetime;
+                var instance = ConstructorInstance.For<T, TConcrete>();
+                instance.Lifetime = _lifetime;
 
-                _parent.Add(_instance);
+                _parent.Add(instance);
 
-                return this;
+                return instance;
             }
 
             /// <summary>
@@ -78,7 +94,7 @@ namespace BlueMilk
             /// </summary>
             /// <typeparam name="TConcrete"></typeparam>
             /// <exception cref="NotImplementedException"></exception>
-            public DescriptorExpression<T> Add<TConcrete>() where TConcrete : class, T
+            public ConstructorInstance<TConcrete> Add<TConcrete>() where TConcrete : class, T
             {
                 return Use<TConcrete>();
             }

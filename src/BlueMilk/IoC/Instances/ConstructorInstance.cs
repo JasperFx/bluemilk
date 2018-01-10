@@ -14,6 +14,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
+    public class ConstructorInstance<T> : ConstructorInstance
+    {
+        public ConstructorInstance(Type serviceType, ServiceLifetime lifetime) : base(serviceType, typeof(T), lifetime)
+        {
+        }
+    }
+     
     public class ConstructorInstance : Instance, IInstanceThatGeneratesResolver
     {
         public static readonly string NoPublicConstructors = "No public constructors";
@@ -41,10 +48,10 @@ namespace BlueMilk.IoC.Instances
             return For<T, T>(lifetime);
         }
 
-        public static ConstructorInstance For<T, TConcrete>(ServiceLifetime lifetime = ServiceLifetime.Transient)
+        public static ConstructorInstance<TConcrete> For<T, TConcrete>(ServiceLifetime lifetime = ServiceLifetime.Transient)
             where TConcrete : T
         {
-            return new ConstructorInstance(typeof(T), typeof(TConcrete), lifetime);
+            return new ConstructorInstance<TConcrete>(typeof(T), lifetime);
         }
 
         public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)
