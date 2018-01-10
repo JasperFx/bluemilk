@@ -26,7 +26,7 @@ namespace BlueMilk
         {
             _rootScope = rootScope;
             Services = services;
-            Resolvers = new ResolverGraph();
+            Resolvers = new ResolverGraph(this);
         }
 
         public void Initialize()
@@ -176,6 +176,11 @@ namespace BlueMilk
         public static ServiceGraph Empty()
         {
             return Scope.Empty().ServiceGraph;
+        }
+
+        public bool TryToFindMissingFamily(Type serviceType)
+        {
+            return false;
         }
     }
 }

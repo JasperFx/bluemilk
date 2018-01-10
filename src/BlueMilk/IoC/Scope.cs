@@ -75,7 +75,9 @@ namespace BlueMilk.IoC
 
         public object GetInstance(Type serviceType)
         {
-            var resolver = Resolvers.ByType[serviceType];
+            var resolver = Resolvers.Find(serviceType);
+            
+            // TODO -- validate the existence of the resolver first
             return resolver.Resolve(this);
         }
 
@@ -83,7 +85,9 @@ namespace BlueMilk.IoC
         {
             // TODO -- sad path, not found
             // TODO -- validate object disposed
-            var resolver = Resolvers.ByTypeAndName[serviceType]?[name];
+            var resolver = Resolvers.Find(serviceType, name);
+            
+            
             return resolver.Resolve(this);
         }
 
