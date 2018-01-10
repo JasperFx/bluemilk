@@ -33,30 +33,38 @@ namespace BlueMilk
         {
             // TODO -- will need to be able to use custom family policies
 
-
-            
-            
-
-
             organizeIntoFamilies(Services);
 
-            planResolutionStrategies();
+            
+            
 
 
             // TODO -- any validations
 
 
+            buildOutMissingResolvers();
+        }
+
+        private void buildOutMissingResolvers()
+        {
+            planResolutionStrategies();
+
             var requiresGenerated = generateDynamicAssembly();
 
-            var noGeneration = AllInstances().Where(x => !requiresGenerated.Contains(x));
-            
+            var noGeneration = instancesWithoutResolver().Where(x => !requiresGenerated.Contains(x));
+
             Resolvers.Register(_rootScope, noGeneration);
             Resolvers.Register(_rootScope, requiresGenerated);
         }
 
+        private IEnumerable<Instance> instancesWithoutResolver()
+        {
+            return AllInstances().Where(x => !x.HasCreatedResolver);
+        }
+
         private Instance[] generateDynamicAssembly()
         {
-            var generatedResolvers = AllInstances()
+            var generatedResolvers = instancesWithoutResolver()
                 .OfType<IInstanceThatGeneratesResolver>()
                 .Where(x => x.CreationStyle == CreationStyle.Generated)
                 .ToArray();

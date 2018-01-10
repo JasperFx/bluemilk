@@ -34,6 +34,8 @@ namespace BlueMilk
         {
             resolver.Hash = instance.GetHashCode();
             resolver.Name = instance.Name;
+
+            instance.HasCreatedResolver = true;
             
             if (!ByTypeAndName.ContainsKey(instance.ServiceType))
             {

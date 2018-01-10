@@ -73,6 +73,11 @@ namespace BlueMilk.IoC.Instances
         public abstract IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope);
 
         public bool IsDefault { get; set; } = false;
+        
+        /// <summary>
+        /// Internal tracking only
+        /// </summary>
+        internal bool HasCreatedResolver { get; set; }
 
 
         public sealed override int GetHashCode()
