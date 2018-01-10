@@ -73,5 +73,14 @@ namespace BlueMilk.IoC.Instances
         public abstract IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope);
 
         public bool IsDefault { get; set; } = false;
+
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((ServiceType != null ? ServiceType.GetHashCode() : 0) * 397) ^ (Name != null ? Name.GetHashCode() : 0);
+            }
+        }
     }
 }

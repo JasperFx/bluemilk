@@ -1,12 +1,43 @@
 ﻿using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using StructureMap.Testing.Widget;
 using Xunit;
 
 namespace BlueMilk.Testing.IoC.Instances
 {
     public class basic_instance_behavior
     {
+        [Fact]
+        public void hashcode_logic()
+        {
+            var instance1 = new ConstructorInstance(typeof(IWidget), typeof(AWidget), ServiceLifetime.Transient)
+            {
+                Name = "One"
+            };
+            
+            var instance2 = new ConstructorInstance(typeof(IWidget), typeof(AWidget), ServiceLifetime.Transient)
+            {
+                Name = "Two"
+            };
+            
+            var instance3 = new ConstructorInstance(typeof(AWidget), typeof(AWidget), ServiceLifetime.Transient)
+            {
+                Name = "One"
+            };
+            
+            var instance4 = new ConstructorInstance(typeof(IWidget), typeof(AWidget), ServiceLifetime.Transient)
+            {
+                Name = "One"
+            };
+            
+            instance1.GetHashCode().ShouldBe(instance4.GetHashCode());
+            
+            instance1.GetHashCode().ShouldNotBe(instance2.GetHashCode());
+            instance1.GetHashCode().ShouldNotBe(instance3.GetHashCode());
+            instance2.GetHashCode().ShouldNotBe(instance3.GetHashCode());
+        }
+        
         [Fact]
         public void for_returns_the_instance()
         {
