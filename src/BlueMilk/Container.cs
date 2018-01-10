@@ -14,6 +14,11 @@ namespace BlueMilk
         {
             return For(_ => { });
         }
+
+        public static Container For<T>() where T : ServiceRegistry, new()
+        {
+            return new Container(new T());
+        }
         
         public static Container For(Action<ServiceRegistry> configuration)
         {

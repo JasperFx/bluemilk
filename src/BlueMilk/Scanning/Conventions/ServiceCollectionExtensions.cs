@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BlueMilk.IoC.Instances;
@@ -6,8 +7,28 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Scanning.Conventions
 {
+    public class ConnectedConcretions : List<Type>
+    {
+        
+    }
+    
     public static class ServiceCollectionExtensions
     {
+        public static ConnectedConcretions ConnectedConcretions(this IServiceCollection services)
+        {
+            var concretions = services
+                .FirstOrDefault(x => x.ImplementationInstance == typeof(ConnectedConcretions))
+                ?.ImplementationInstance as ConnectedConcretions;
+
+            if (concretions == null)
+            {
+                concretions = new ConnectedConcretions();
+                services.AddSingleton(concretions);
+            }
+
+            return concretions;
+        }
+        
         public static void Add(this IServiceCollection services, Instance instance)
         {
             services.Add(new ServiceDescriptor(instance.ServiceType, instance));

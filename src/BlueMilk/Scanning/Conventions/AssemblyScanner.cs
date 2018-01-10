@@ -113,6 +113,12 @@ namespace BlueMilk.Scanning.Conventions
             var convention = new DefaultConventionScanner();
             With(convention);
         }
+        
+        public void ConnectImplementationsToTypesClosing(Type openGenericType)
+        {
+            var convention = new GenericConnectionScanner(openGenericType);
+            With(convention);
+        }
 
 
         public void RegisterConcreteTypesAgainstTheFirstInterface()

@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
 {
-    public class ServiceGraph : IDisposable
+    public class ServiceGraph : IDisposable, IModel
     {
         private readonly Scope _rootScope;
         private readonly object _familyLock = new object();
@@ -288,6 +288,16 @@ namespace BlueMilk
             buildOutMissingResolvers();
 
             return family;
+        }
+
+        IServiceFamilyConfiguration IModel.For<T>()
+        {
+            return FindFamily(typeof(T));
+        }
+
+        IServiceFamilyConfiguration IModel.For(Type type)
+        {
+            return FindFamily(type);
         }
     }
 }

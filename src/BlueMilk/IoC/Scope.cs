@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Baseline;
@@ -26,6 +27,8 @@ namespace BlueMilk.IoC
         {
             ServiceGraph = serviceGraph;
         }
+
+        public IModel Model => ServiceGraph;
 
         internal ServiceGraph ServiceGraph { get; }
 
@@ -109,5 +112,20 @@ namespace BlueMilk.IoC
         {
             return new Scope(ServiceGraph);
         }
+
+        public IReadOnlyList<T> GetAllInstances<T>()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable GetAllInstances(Type serviceType)
+        {
+            throw new NotImplementedException();
+        }
     }
+    
+    
+    
+    
+    
 }

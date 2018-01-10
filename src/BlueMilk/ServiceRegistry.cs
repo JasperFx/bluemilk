@@ -54,6 +54,31 @@ namespace BlueMilk
             return new DescriptorExpression<T>(this, ServiceLifetime.Transient);
         }
 
+        public DescriptorExpression For(Type serviceType)
+        {
+             return new DescriptorExpression(serviceType, this);   
+        }
+
+        public class DescriptorExpression
+        {
+            private readonly Type _serviceType;
+            private readonly ServiceRegistry _parent;
+
+            public DescriptorExpression(Type serviceType, ServiceRegistry parent)
+            {
+                _serviceType = serviceType;
+                _parent = parent;
+            }
+
+            public ConstructorInstance Use(Type concreteType)
+            {
+                var instance = new ConstructorInstance(_serviceType, concreteType, ServiceLifetime.Transient);
+                _parent.Add(instance);
+
+                return instance;
+            }
+        }
+
         public class DescriptorExpression<T> where T : class
         {
             private readonly ServiceRegistry _parent;
@@ -64,6 +89,8 @@ namespace BlueMilk
                 _parent = parent;
                 _lifetime = lifetime;
             }
+
+
 
             public ConstructorInstance<TConcrete> Use<TConcrete>() where TConcrete : class, T
             {

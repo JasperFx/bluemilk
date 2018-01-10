@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Baseline;
+using BlueMilk.Codegen;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Scanning.Conventions
@@ -9,6 +10,7 @@ namespace BlueMilk.Scanning.Conventions
     public class FindAllTypesFilter : IRegistrationConvention
     {
         private readonly Type _pluginType;
+        private Func<Type, string> _namePolicy = type => type.NameInCode();
 
         public FindAllTypesFilter(Type pluginType)
         {
@@ -39,6 +41,12 @@ namespace BlueMilk.Scanning.Conventions
         public override string ToString()
         {
             return "Find and register all types implementing " + _pluginType.FullName;
+        }
+
+        public FindAllTypesFilter NameBy(Func<Type, string> namePolicy)
+        {
+            _namePolicy = namePolicy;
+            return this;
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BlueMilk
 {
@@ -49,6 +51,24 @@ namespace BlueMilk
         /// <returns>The created nested container.</returns>
         IContainer GetNestedContainer();
 
+        /// <summary>
+        /// Creates or resolves all registered instances of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type which instances are to be created or resolved.</typeparam>
+        /// <returns>All created or resolved instances of type <typeparamref name="T"/>.</returns>
+        IReadOnlyList<T> GetAllInstances<T>();
+
+        /// <summary>
+        /// Creates or resolves all registered instances of the <paramref name="serviceType"/>.
+        /// </summary>
+        /// <param name="serviceType">The type which instances are to be created or resolved.</param>
+        /// <returns>All created or resolved instances of type <paramref name="serviceType"/>.</returns>
+        IEnumerable GetAllInstances(Type serviceType);
+        
+        /// <summary>
+        /// Provides queryable access to the configured PluginType's and Instances of this Container.
+        /// </summary>
+        IModel Model { get; }
 
     }
 }

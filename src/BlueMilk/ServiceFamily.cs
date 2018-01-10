@@ -7,7 +7,7 @@ using BlueMilk.IoC.Resolvers;
 
 namespace BlueMilk
 {
-    public class ServiceFamily
+    public class ServiceFamily : IServiceFamilyConfiguration
     {
         private readonly Dictionary<string, Instance> _instances = new Dictionary<string, Instance>();
 
@@ -65,6 +65,13 @@ namespace BlueMilk
         }
 
         public Instance Default { get; }
+
+        IEnumerable<Instance> IServiceFamilyConfiguration.Instances => _instances.Values;
+
+        bool IServiceFamilyConfiguration.HasImplementations()
+        {
+            return _instances.Any();
+        }
 
         public IReadOnlyDictionary<string, Instance> Instances => _instances;
     }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using BlueMilk.Scanning.Conventions;
 using Shouldly;
 using StructureMap.Testing.Widget;
@@ -8,37 +9,69 @@ namespace BlueMilk.Testing.Scanning.Conventions
 {
     public class type_scanning_end_to_end
     {
-        [Fact]
-        public async Task use_default_scanning()
+        public interface IFinder<T>
         {
-            var services = new ServiceRegistry();
+        }
 
-            services.Scan(x =>
-            {
-                x.AssemblyContainingType<IShoes>();
-                x.WithDefaultConventions();
-            });
+        public class StringFinder : IFinder<string>
+        {
+        }
 
-            await services.ApplyScannedTypes();
+        public class IntFinder : IFinder<int>
+        {
+        }
 
-            services.FindDefault<IShoes>().ImplementationType.ShouldBe(typeof(Shoes));
-            services.FindDefault<IShorts>().ImplementationType.ShouldBe(typeof(Shorts));
+        public class DoubleFinder : IFinder<double>
+        {
+        }
+
+        public interface IFindHandler<T>
+        {
+        }
+
+        public class SrpViolation : IFinder<decimal>, IFindHandler<DateTime>
+        {
+        }
+
+        public class SuperFinder : IFinder<byte>, IFinder<char>, IFinder<uint>
+        {
         }
 
         [Fact]
-        public async Task single_implementation()
+        public void can_configure_plugin_families_via_dsl()
         {
-            var services = new ServiceRegistry();
-
-            services.Scan(x =>
+            var container = new Container(registry => registry.Scan(x =>
             {
-                x.AssemblyContainingType<IShoes>();
-                x.SingleImplementationsOfInterface();
-            });
+                x.TheCallingAssembly();
+                x.ConnectImplementationsToTypesClosing(typeof(IFinder<>));
+            }));
 
-            await services.ApplyScannedTypes();
 
-            services.FindDefault<Muppet>().ImplementationType.ShouldBe(typeof(Grover));
+            var firstStringFinder = container.GetInstance<IFinder<string>>().ShouldBeOfType<StringFinder>();
+            var secondStringFinder = container.GetInstance<IFinder<string>>().ShouldBeOfType<StringFinder>();
+
+            var firstIntFinder = container.GetInstance<IFinder<int>>().ShouldBeOfType<IntFinder>();
+            var secondIntFinder = container.GetInstance<IFinder<int>>().ShouldBeOfType<IntFinder>();
+        }
+
+        [Fact]
+        public void can_find_the_closed_finders()
+        {
+            var container = new Container(x => x.Scan(o =>
+            {
+                o.TheCallingAssembly();
+                o.ConnectImplementationsToTypesClosing(typeof(IFinder<>));
+            }));
+            container.GetInstance<IFinder<string>>().ShouldBeOfType<StringFinder>();
+            container.GetInstance<IFinder<int>>().ShouldBeOfType<IntFinder>();
+            container.GetInstance<IFinder<double>>().ShouldBeOfType<DoubleFinder>();
+        }
+
+        [Fact]
+        public void fails_on_closed_type()
+        {
+            Exception<InvalidOperationException>.ShouldBeThrownBy(
+                () => { new GenericConnectionScanner(typeof(double)); });
         }
 
         [Fact]
@@ -59,30 +92,277 @@ namespace BlueMilk.Testing.Scanning.Conventions
             widgetTypes.ShouldContain(typeof(MoneyWidget));
             widgetTypes.ShouldContain(typeof(AWidget));
         }
-    }
 
+        [Fact]
+        public void single_class_can_close_multiple_open_interfaces()
+        {
+            var container = new Container(x => x.Scan(o =>
+            {
+                o.TheCallingAssembly();
+                o.ConnectImplementationsToTypesClosing(typeof(IFinder<>));
+                o.ConnectImplementationsToTypesClosing(typeof(IFindHandler<>));
+            }));
+            container.GetInstance<IFinder<decimal>>().ShouldBeOfType<SrpViolation>();
+            container.GetInstance<IFindHandler<DateTime>>().ShouldBeOfType<SrpViolation>();
+        }
+
+        [Fact]
+        public void single_class_can_close_the_same_open_interface_multiple_times()
+        {
+            var container = new Container(x => x.Scan(o =>
+            {
+                o.TheCallingAssembly();
+                o.ConnectImplementationsToTypesClosing(typeof(IFinder<>));
+            }));
+            container.GetInstance<IFinder<byte>>().ShouldBeOfType<SuperFinder>();
+            container.GetInstance<IFinder<char>>().ShouldBeOfType<SuperFinder>();
+            container.GetInstance<IFinder<uint>>().ShouldBeOfType<SuperFinder>();
+        }
+
+        [Fact]
+        public async Task single_implementation()
+        {
+            var services = new ServiceRegistry();
+
+            services.Scan(x =>
+            {
+                x.AssemblyContainingType<IShoes>();
+                x.SingleImplementationsOfInterface();
+            });
+
+            await services.ApplyScannedTypes();
+
+            services.FindDefault<Muppet>().ImplementationType.ShouldBe(typeof(Grover));
+        }
+
+
+        [Fact]
+        public async Task use_default_scanning()
+        {
+            var services = new ServiceRegistry();
+
+            services.Scan(x =>
+            {
+                x.AssemblyContainingType<IShoes>();
+                x.WithDefaultConventions();
+            });
+
+            await services.ApplyScannedTypes();
+
+            services.FindDefault<IShoes>().ImplementationType.ShouldBe(typeof(Shoes));
+            services.FindDefault<IShorts>().ImplementationType.ShouldBe(typeof(Shorts));
+        }
+    }
 
 
     public interface Muppet
     {
-
     }
 
     public class Grover : Muppet
     {
-
     }
 
     public interface IShoes
     {
-
     }
 
     public class Shoes : IShoes
     {
+    }
+
+    public interface IShorts
+    {
+    }
+
+    public class Shorts : IShorts
+    {
+    }
+    
+        public class SingleImplementationScannerTester
+    {
+        private readonly Container container;
+
+        public SingleImplementationScannerTester()
+        {
+            container = new Container(registry => registry.Scan(x =>
+            {
+                x.TheCallingAssembly();
+                x.IncludeNamespaceContainingType<SingleImplementationScannerTester>();
+                x.SingleImplementationsOfInterface();
+            }));
+        }
+
+        [Fact]
+        public void registers_plugins_that_only_have_a_single_implementation()
+        {
+            container.GetInstance<IOnlyHaveASingleConcreteImplementation>()
+                .ShouldBeOfType<MyNameIsNotConventionallyRelatedToMyInterface>();
+        }
+
+
 
     }
 
-    public interface IShorts{}
-    public class Shorts : IShorts{}
+    public interface IOnlyHaveASingleConcreteImplementation
+    {
+    }
+
+    public class MyNameIsNotConventionallyRelatedToMyInterface : IOnlyHaveASingleConcreteImplementation
+    {
+    }
+
+    public interface IHaveMultipleConcreteImplementations
+    {
+    }
+
+    public class FirstConcreteImplementation : IHaveMultipleConcreteImplementations
+    {
+    }
+
+    public class SecondConcreteImplementation : IHaveMultipleConcreteImplementations
+    {
+    }
+    
+    
+    
+        public class TypeFindingTester
+    {
+        public TypeFindingTester()
+        {
+            container = new Container(registry =>
+            {
+                registry.For<INormalType>();
+                registry.Scan(x =>
+                {
+                    x.TheCallingAssembly();
+                    x.AddAllTypesOf<TypeIWantToFind>();
+                    x.AddAllTypesOf<OtherType>();
+                });
+            });
+        }
+
+        private readonly IContainer container;
+
+        [Fact]
+        public void FoundTheRightNumberOfInstancesForATypeWithNoPlugins()
+        {
+            container.GetAllInstances<TypeIWantToFind>().Count
+                .ShouldBe(3);
+        }
+
+        [Fact]
+        public void FoundTheRightNumberOfInstancesForATypeWithNoPlugins2()
+        {
+            container.GetAllInstances<OtherType>().Count.ShouldBe(2);
+        }
+        
+        public interface IOpenGeneric<T>
+        {
+            void Nop();
+        }
+
+        public interface IAnotherOpenGeneric<T>
+        {
+        }
+
+        public class ConcreteOpenGeneric<T> : IOpenGeneric<T>
+        {
+            public void Nop()
+            {
+            }
+        }
+
+        public class StringOpenGeneric : ConcreteOpenGeneric<string>
+        {
+        }
+
+        public class when_finding_all_types_implementing_and_open_generic_interface
+        {
+            [Fact]
+            public void it_can_find_all_implementations()
+            {
+                using (var container = new Container(c => c.Scan(s =>
+                {
+                    s.AddAllTypesOf(typeof(IOpenGeneric<>));
+                    s.TheCallingAssembly();
+                })))
+                {
+                    var redTypes = container.GetAllInstances<IOpenGeneric<string>>();
+
+                    redTypes.Count.ShouldBe(1);
+                }
+            }
+
+            [Fact]
+            public void it_can_override_generic_implementation_with_specific()
+            {
+                var container = new Container(c => c.Scan(s =>
+                {
+                    s.AddAllTypesOf(typeof(IOpenGeneric<>));
+                    s.TheCallingAssembly();
+                }));
+
+                using (container)
+                {
+                    var redType = container.GetInstance<IOpenGeneric<string>>();
+                    redType.ShouldBeOfType<StringOpenGeneric>();
+                }
+            }
+        }
+    }
+
+    public interface TypeIWantToFind
+    {
+    }
+
+    public class RedType
+    {
+    }
+
+    public class BlueType : TypeIWantToFind
+    {
+    }
+
+    public class PurpleType : TypeIWantToFind
+    {
+    }
+
+    public class YellowType : TypeIWantToFind
+    {
+    }
+
+    public class GreenType : TypeIWantToFind
+    {
+        private GreenType()
+        {
+        }
+    }
+
+    public abstract class OrangeType : TypeIWantToFind
+    {
+    }
+
+    public class OtherType
+    {
+    }
+
+    public class DifferentOtherType : OtherType
+    {
+    }
+
+    public interface INormalType
+    {
+    }
+
+    //[Pluggable("First")]
+    public class NormalTypeWithPluggableAttribute : INormalType
+    {
+    }
+
+    public class SecondNormalType : INormalType
+    {
+    }
+    
+    
 }

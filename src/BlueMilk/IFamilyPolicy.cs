@@ -83,6 +83,8 @@ namespace BlueMilk
         */
         public ServiceFamily Build(Type type, ServiceGraph serviceGraph)
         {
+            if (!type.IsGenericType) return null;
+            
             return null;
         }
     }
