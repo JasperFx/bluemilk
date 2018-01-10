@@ -1,110 +1,173 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Baseline;
-using BlueMilk.IoC.Planning;
+using BlueMilk.Codegen;
+using BlueMilk.Compilation;
+using BlueMilk.IoC;
+using BlueMilk.IoC.Instances;
+using BlueMilk.Util;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
 {
-    public class ServiceGraph
+    public class ServiceGraph : IDisposable
     {
-        private readonly IServiceCollection _services;
-        private readonly Dictionary<Type, ConstructorInfo> _constructors = new Dictionary<Type, ConstructorInfo>();
-
-        public ServiceGraph(IServiceCollection services)
+        private readonly Scope _rootScope;
+        private readonly object _familyLock = new object();
+        
+        
+        private readonly Dictionary<Type, ServiceFamily> _families = new Dictionary<Type, ServiceFamily>();
+        private readonly IList<IFamilyPolicy> _familyPolicies = new List<IFamilyPolicy>();
+        
+        public ServiceGraph(IServiceCollection services, Scope rootScope)
         {
-            _services = services;
+            _rootScope = rootScope;
+            Services = services;
+            Resolvers = new ResolverGraph();
         }
 
-        public ConstructorInfo ChooseConstructor(Type type)
+        public void Initialize()
         {
-            if (_constructors.ContainsKey(type)) return _constructors[type];
+            // TODO -- will need to be able to use custom family policies
 
-            var constructor = type.GetTypeInfo()
-                .GetConstructors()
-                .OrderByDescending(x => x.GetParameters().Length)
-                .FirstOrDefault(CouldBuild);
 
-            _constructors[type] = constructor;
+            
+            
 
-            return constructor;
+
+            organizeIntoFamilies(Services);
+
+            planResolutionStrategies();
+
+
+            // TODO -- any validations
+
+
+            var requiresGenerated = generateDynamicAssembly();
+
+            var noGeneration = AllInstances().Where(x => !requiresGenerated.Contains(x));
+            
+            Resolvers.Register(_rootScope, noGeneration);
+            Resolvers.Register(_rootScope, requiresGenerated);
         }
 
-        public bool CouldBuild(ConstructorInfo ctor)
+        private Instance[] generateDynamicAssembly()
         {
-            return ctor.GetParameters().Length == 1 || ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null);
-        }
+            var generatedResolvers = AllInstances()
+                .OfType<IInstanceThatGeneratesResolver>()
+                .Where(x => x.CreationStyle == CreationStyle.Generated)
+                .ToArray();
 
-        public bool CouldBuild(Type type)
-        {
-            if (!type.IsConcrete()) return false;
 
-            var ctor = ChooseConstructor(type);
-            return ctor != null && CouldBuild(ctor);
-        }
+            // TODO -- will need to get at the GenerationRules from somewhere
+            var generatedAssembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
+            AllInstances().Select(x => x.ImplementationType.Assembly)
+                .Concat(AllInstances().Select(x => x.ServiceType.Assembly))
+                .Distinct()
+                .Each(a => generatedAssembly.Generation.Assemblies.Fill(a));
 
-        public ServiceDescriptor FindDefault(Type serviceType)
-        {
-            var candidate = _services.LastOrDefault(x => x.ServiceType == serviceType);
-
-            if (candidate == null)
+            foreach (var instance in generatedResolvers)
             {
-                candidate = TryToDiscover(serviceType);
-                if (candidate != null)
+                instance.GenerateResolver(generatedAssembly);
+            }
+
+            generatedAssembly.CompileAll();
+
+            return generatedResolvers.OfType<Instance>().ToArray();
+        }
+
+
+        private void planResolutionStrategies()
+        {
+            while (AllInstances().Any(x => !x.HasPlanned))
+            {
+                foreach (var instance in AllInstances().Where(x => !x.HasPlanned).ToArray())
                 {
-                    _services.Add(candidate);
+                    instance.CreatePlan(this);
                 }
             }
-
-            return candidate;
         }
 
-        public bool CanResolve(ServiceDescriptor descriptor)
+        private void organizeIntoFamilies(IServiceCollection services)
         {
-            // TODO -- will deal w/ stuff pulled from IServiceProvider as a lambda
-            // much later
-            if (descriptor.ImplementationType == null) return false;
-
-            return CouldBuild(descriptor.ImplementationType);
+            services
+                .Where(x => !x.ServiceType.IsGenericType && !x.ServiceType.CanBeCastTo<Instance>())
+                .Select(Instance.For)
+                .GroupBy(x => x.ServiceType)
+                .Select(x => new ServiceFamily(x.Key, x.ToArray()))
+                .Each(family => _families.Add(family.ServiceType, family));
         }
 
-        private ServiceDescriptor TryToDiscover(Type serviceType)
-        {
-            if (EnumerableStep.IsEnumerable(serviceType)) return null;
+        public IServiceCollection Services { get; }
+        public ResolverGraph Resolvers { get; }
 
-            if (serviceType.IsGenericType)
+        public IEnumerable<Instance> AllInstances()
+        {
+            return _families.Values.SelectMany(x => x.All);
+        }
+
+        public IReadOnlyDictionary<Type, ServiceFamily> Families => _families;
+
+        public ServiceFamily FindFamily(Type serviceType)
+        {
+            if (_families.ContainsKey(serviceType)) return _families[serviceType];
+
+            lock (_familyLock)
             {
-                var basicType = serviceType.GetGenericTypeDefinition();
+                if (_families.ContainsKey(serviceType)) return null;
+                
+                var family = _familyPolicies.FirstValue(x => x.Build(serviceType, this));
+                _families.Add(serviceType, family); // Legal to be null here
 
-
-
-
-                var templatedParameterTypes = serviceType.GetGenericArguments();
-                var candidates = _services.Where(x => x.ServiceType == basicType && x.ImplementationType != null).Select(x =>
-                {
-                    return new ServiceDescriptor(serviceType, x.ImplementationType.MakeGenericType(templatedParameterTypes), x.Lifetime);
-                }).ToArray();
-
-                _services.AddRange(candidates);
-
-                if (candidates.Any()) return candidates.LastOrDefault();
+                return family;
             }
-
-            if (serviceType.IsConcrete() && !serviceType.IsGenericTypeDefinition && ChooseConstructor(serviceType) != null)
-            {
-                return new ServiceDescriptor(serviceType, serviceType, ServiceLifetime.Transient);
-            }
-
-            return null;
         }
-
-        public ServiceDescriptor[] FindAll(Type serviceType)
+        
+        public Instance FindDefault(Type serviceType)
         {
-            return _services.Where(x => x.ServiceType == serviceType).ToArray();
+            return FindFamily(serviceType)?.Default;
         }
 
+        public Instance[] FindAll(Type serviceType)
+        {
+            return FindFamily(serviceType)?.Instances.Values.ToArray() ?? new Instance[0];
+        }
+        
+        public bool CouldBuild(ConstructorInfo ctor)
+        {
+            return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null || Resolvers.ByType.ContainsKey(x.ParameterType));
+        }
 
+        public void Dispose()
+        {
+            foreach (var instance in AllInstances().OfType<IDisposable>())
+            {
+                instance.SafeDispose();
+            }
+        }
+
+        private readonly Stack<Instance> _chain = new Stack<Instance>();
+        public void StartingToPlan(Instance instance)
+        {
+            if (_chain.Contains(instance))
+            {
+                throw new InvalidOperationException("Bi-directional dependencies detected:" + Environment.NewLine + _chain.Select(x => x.ToString()).Join(Environment.NewLine));
+            }
+            
+            _chain.Push(instance);
+        }
+
+        public void FinishedPlanning()
+        {
+            _chain.Pop();
+        }
+
+        public static ServiceGraph Empty()
+        {
+            return Scope.Empty().ServiceGraph;
+        }
     }
 }

@@ -32,7 +32,7 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddTransient<IWidget, MoneyWidget>();
             theServices.AddTransient<IThing, Thing>();
             
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             theGraph.Initialize();
 
             var instance = ConstructorInstance.For<DeepConstructorGuy>();
@@ -48,7 +48,7 @@ namespace BlueMilk.Testing.IoC.Instances
         public void will_choose_a_no_arg_ctor_if_that_is_all_there_is()
         {
             var theServices = new ServiceRegistry();
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             theGraph.Initialize();
 
             var instance = ConstructorInstance.For<NoArgGuy>();
@@ -62,7 +62,7 @@ namespace BlueMilk.Testing.IoC.Instances
         public void happy_path_can_find_ctor_no_error_messages()
         {
             var theServices = new ServiceRegistry();
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             theGraph.Initialize();
 
             var instance = ConstructorInstance.For<NoArgGuy>();
@@ -75,7 +75,7 @@ namespace BlueMilk.Testing.IoC.Instances
         public void add_error_message_if_no_public_constructors()
         {
             var theServices = new ServiceRegistry();
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             theGraph.Initialize();
 
             var instance = ConstructorInstance.For<GuyWithNoPublicConstructors>();
@@ -90,7 +90,7 @@ namespace BlueMilk.Testing.IoC.Instances
         {
             var theServices = new ServiceRegistry();
 
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             theGraph.Initialize();
 
             var instance = ConstructorInstance.For<GuyThatUsesIWidget>();
@@ -108,7 +108,7 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddSingleton<IWidget, AWidget>();
             theServices.AddTransient<Rule, BlueRule>();
             
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             theGraph.Initialize();
             
             var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
@@ -141,7 +141,7 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddTransient<OtherGuy>();
             theServices.AddTransient<GuyWithWidgetAndRule>();
 
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             theGraph.Initialize();
             
             var instance = ConstructorInstance.For<GuyWithGuys>();
@@ -169,7 +169,7 @@ namespace BlueMilk.Testing.IoC.Instances
             var instance = ConstructorInstance.For<AWidget>();
             instance.Lifetime = ServiceLifetime.Transient;
             
-            instance.CreatePlan(NewServiceGraph.Empty());
+            instance.CreatePlan(ServiceGraph.Empty());
             
             instance.CreationStyle.ShouldBe(CreationStyle.NoArg);
 
@@ -184,7 +184,7 @@ namespace BlueMilk.Testing.IoC.Instances
             var instance = ConstructorInstance.For<AWidget>();
             instance.Lifetime = ServiceLifetime.Scoped;
             
-            instance.CreatePlan(NewServiceGraph.Empty());
+            instance.CreatePlan(ServiceGraph.Empty());
             
             instance.CreationStyle.ShouldBe(CreationStyle.NoArg);
 
@@ -201,7 +201,7 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddSingleton<IWidget, AWidget>();
             theServices.AddTransient<Rule, BlueRule>();
             
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
             
             instance.CreatePlan(theGraph);
@@ -216,7 +216,7 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddSingleton<IWidget, AWidget>();
             theServices.AddTransient<Rule>(x => new BlueRule());
             
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             theGraph.Initialize();
             
             var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
@@ -234,7 +234,7 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddSingleton<IWidget, AWidget>();
             theServices.AddTransient<Rule>(x => new BlueRule());
             
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             theGraph.Initialize();
             
             var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
@@ -255,7 +255,7 @@ namespace BlueMilk.Testing.IoC.Instances
             theServices.AddSingleton<IWidget, AWidget>();
             theServices.AddTransient<Rule>(x => new BlueRule());
             
-            var theGraph = new NewServiceGraph(theServices, Scope.Empty());
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
             theGraph.Initialize();
             
             var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();

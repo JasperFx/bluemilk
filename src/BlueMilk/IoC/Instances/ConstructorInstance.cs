@@ -137,7 +137,7 @@ namespace BlueMilk.IoC.Instances
             return new NewConstructorFrame(this, disposalTracking, ctorParameters).Variable;
         }
 
-        protected override IEnumerable<Instance> createPlan(NewServiceGraph services)
+        protected override IEnumerable<Instance> createPlan(ServiceGraph services)
         {
             Constructor = DetermineConstructor(services, ImplementationType, out var message);
 
@@ -190,7 +190,7 @@ namespace BlueMilk.IoC.Instances
 
         }
 
-        public static ConstructorInfo DetermineConstructor(NewServiceGraph services, Type implementationType,
+        public static ConstructorInfo DetermineConstructor(ServiceGraph services, Type implementationType,
             out string message)
         {
             message = null;

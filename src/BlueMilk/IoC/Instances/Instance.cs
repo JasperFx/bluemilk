@@ -43,7 +43,7 @@ namespace BlueMilk.IoC.Instances
         
         public bool HasPlanned { get; protected internal set; }
 
-        public void CreatePlan(NewServiceGraph services)
+        public void CreatePlan(ServiceGraph services)
         {
             if (HasPlanned) return;
 
@@ -60,7 +60,7 @@ namespace BlueMilk.IoC.Instances
 
         public abstract Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot);
 
-        protected virtual IEnumerable<Instance> createPlan(NewServiceGraph services)
+        protected virtual IEnumerable<Instance> createPlan(ServiceGraph services)
         {
             return Enumerable.Empty<Instance>();
         }

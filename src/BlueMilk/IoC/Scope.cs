@@ -18,12 +18,12 @@ namespace BlueMilk.IoC
 
         public Scope(IServiceCollection services)
         {
-            ServiceGraph = new NewServiceGraph(services, this);
+            ServiceGraph = new ServiceGraph(services, this);
             Resolvers = ServiceGraph.Resolvers;
             ServiceGraph.Initialize();
         }
 
-        public Scope(NewServiceGraph serviceGraph)
+        public Scope(ServiceGraph serviceGraph)
         {
             ServiceGraph = serviceGraph;
             Resolvers = ServiceGraph.Resolvers;
@@ -31,7 +31,7 @@ namespace BlueMilk.IoC
 
         internal ResolverGraph Resolvers { get; }
 
-        internal NewServiceGraph ServiceGraph { get; }
+        internal ServiceGraph ServiceGraph { get; }
 
 
         // TODO -- hide this from the public class?

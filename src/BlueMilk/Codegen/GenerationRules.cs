@@ -20,10 +20,10 @@ namespace BlueMilk.Codegen
 
         public void ReadServices(IServiceCollection services)
         {
-            Services = new ServiceGraph(services);
+            Services = new OldServiceGraph(services);
         }
 
-        public ServiceGraph Services { get; private set; } = new ServiceGraph(new ServiceRegistry());
+        public OldServiceGraph Services { get; private set; } = new OldServiceGraph(new ServiceRegistry());
     }
 
 

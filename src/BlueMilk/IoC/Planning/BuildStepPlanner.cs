@@ -18,14 +18,14 @@ namespace BlueMilk.IoC.Planning
     
     public class BuildStepPlanner
     {
-        private readonly ServiceGraph _graph;
+        private readonly OldServiceGraph _graph;
         private readonly IMethodVariables _method;
         private readonly IList<BuildStep> _visited = new List<BuildStep>();
         private readonly Stack<BuildStep> _chain = new Stack<BuildStep>();
         
         private readonly List<string> _errorMessages = new List<string>();
 
-        public BuildStepPlanner(ServiceGraph graph, IMethodVariables method)
+        public BuildStepPlanner(OldServiceGraph graph, IMethodVariables method)
         {
             _graph = graph;
             _method = method;

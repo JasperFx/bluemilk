@@ -13,6 +13,6 @@ namespace BlueMilk
         /// at runtime.
         /// Return null if this policy does not apply to the given type
         /// </summary>
-        ServiceFamily Build(Type type, NewServiceGraph newServiceGraph);
+        ServiceFamily Build(Type type, ServiceGraph serviceGraph);
     }
 }

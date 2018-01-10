@@ -8,9 +8,9 @@ namespace BlueMilk.Codegen.ServiceLocation
     public class ServiceVariableSource : IVariableSource
     {
         private readonly IMethodVariables _method;
-        private readonly ServiceGraph _services;
+        private readonly OldServiceGraph _services;
 
-        public ServiceVariableSource(IMethodVariables method, ServiceGraph services)
+        public ServiceVariableSource(IMethodVariables method, OldServiceGraph services)
         {
             _method = method ?? throw new ArgumentNullException(nameof(method));
             _services = services;

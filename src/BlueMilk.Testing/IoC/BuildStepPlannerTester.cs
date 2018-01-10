@@ -21,12 +21,12 @@ namespace BlueMilk.Testing.IoC
     public class BuildStepPlannerTester
     {
         public readonly ServiceRegistry theServices = new ServiceRegistry();
-        private ServiceGraph theGraph;
+        private OldServiceGraph theGraph;
         private StubMethodVariables theMethod = new StubMethodVariables();
 
         public BuildStepPlannerTester()
         {
-            theGraph = new ServiceGraph(theServices);
+            theGraph = new OldServiceGraph(theServices);
         }
 
         private BuildStepPlanner executePlan<T>()
