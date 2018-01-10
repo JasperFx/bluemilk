@@ -75,12 +75,17 @@ namespace BlueMilk.IoC.Instances
         public bool IsDefault { get; set; } = false;
 
 
-        public override int GetHashCode()
+        public sealed override int GetHashCode()
         {
             unchecked
             {
-                return ((ServiceType != null ? ServiceType.GetHashCode() : 0) * 397) ^ (Name != null ? Name.GetHashCode() : 0);
+                return HashCode(ServiceType, Name);
             }
+        }
+
+        public static int HashCode(Type serviceType, string name = null)
+        {
+            return (serviceType.GetHashCode() * 397) ^ (name ?? "default").GetHashCode();
         }
     }
 }

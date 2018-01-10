@@ -6,5 +6,8 @@ namespace BlueMilk.IoC.Resolvers
     {
         object Resolve(Scope scope);
         Type ServiceType { get; }
+        
+        string Name { get; set; }
+        int Hash { get; set; }
     }
 }

@@ -41,5 +41,8 @@ namespace BlueMilk.IoC.Resolvers
         }
         
         public abstract T Build(Scope scope);
+        
+        public string Name { get; set; }
+        public int Hash { get; set; }
     }
 }

@@ -18,5 +18,8 @@ namespace BlueMilk.IoC.Resolvers
         public abstract object Build(Scope scope);
 
         public Type ServiceType => typeof(T);
+        
+        public string Name { get; set; }
+        public int Hash { get; set; }
     }
 }

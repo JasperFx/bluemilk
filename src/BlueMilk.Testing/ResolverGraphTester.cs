@@ -29,6 +29,22 @@ namespace BlueMilk.Testing
         }
         
         [Fact]
+        public void register_a_resolver_copies_over_the_hash_code_and_name()
+        {
+            var graph = ResolverGraph.Empty();
+
+            var instance = ObjectInstance.For(new Clock());
+            instance.IsDefault = false;
+            
+            var resolver = Substitute.For<IResolver>();
+            
+            graph.Register(instance, resolver);
+
+            resolver.Received().Name = instance.Name;
+            resolver.Received().Hash = instance.GetHashCode();
+        }
+        
+        [Fact]
         public void register_an_instance_that_is_the_default()
         {
             var graph = ResolverGraph.Empty();

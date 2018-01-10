@@ -20,6 +20,7 @@ namespace BlueMilk.IoC.Instances
         {
             Name = service?.GetType().NameInCode() ?? serviceType.NameInCode();
             Service = service;
+            Hash = GetHashCode();
         }
 
         public object Service { get; }
@@ -38,6 +39,8 @@ namespace BlueMilk.IoC.Instances
         {
             return Service;
         }
+
+        public int Hash { get; set; }
 
         public void Dispose()
         {

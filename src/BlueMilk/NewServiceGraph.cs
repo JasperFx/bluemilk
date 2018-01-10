@@ -26,7 +26,7 @@ namespace BlueMilk
         {
             _rootScope = rootScope;
             Services = services;
-            Resolvers = new ResolverGraph(this);
+            Resolvers = new ResolverGraph();
         }
 
         public void Initialize()

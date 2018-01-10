@@ -15,14 +15,11 @@ namespace BlueMilk
             return Scope.Empty().Resolvers;
         }
         
-        private readonly NewServiceGraph _services;
         public readonly IDictionary<Type, IResolver> ByType = new ConcurrentDictionary<Type, IResolver>();
         public readonly IDictionary<Type, IDictionary<string, IResolver>> ByTypeAndName = new ConcurrentDictionary<Type, IDictionary<string, IResolver>>();
 
-        public ResolverGraph(NewServiceGraph services)
+        public ResolverGraph()
         {
-            _services = services;
-            
             addScopeResolver<Scope>();
             addScopeResolver<IServiceProvider>();
             addScopeResolver<IContainer>();
@@ -35,6 +32,9 @@ namespace BlueMilk
 
         public void Register(Instance instance, IResolver resolver)
         {
+            resolver.Hash = instance.GetHashCode();
+            resolver.Name = instance.Name;
+            
             if (!ByTypeAndName.ContainsKey(instance.ServiceType))
             {
                 ByTypeAndName[instance.ServiceType] = new ConcurrentDictionary<string, IResolver>();
