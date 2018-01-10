@@ -14,21 +14,21 @@ namespace BlueMilk
 
         public Type ServiceType { get; }
 
-        public ServiceFamily(Type serviceType, Instance[] instances)
+        public ServiceFamily(Type serviceType, params Instance[] instances)
         {
-            if (instances.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(instances), "Cannot be an empty array");
-
             foreach (var instance in instances)
             {
                 instance.IsDefault = false;
             }
 
-            instances.Last().IsDefault = true;
+            if (instances.Any())
+            {
+                instances.Last().IsDefault = true;
+            }
 
             ServiceType = serviceType;
 
-            Default = instances.Last();
+            Default = instances.LastOrDefault();
 
 
             makeNamesUnique(instances);

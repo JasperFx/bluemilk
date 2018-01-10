@@ -22,19 +22,37 @@ namespace BlueMilk
         
         
         private readonly Dictionary<Type, ServiceFamily> _families = new Dictionary<Type, ServiceFamily>();
-        private readonly IList<IFamilyPolicy> _familyPolicies = new List<IFamilyPolicy>();
         public readonly IDictionary<Type, IResolver> ByType = new ConcurrentDictionary<Type, IResolver>();
         
         public ServiceGraph(IServiceCollection services, Scope rootScope)
         {
             _rootScope = rootScope;
             Services = services;
+
+            FamilyPolicies = services
+                .Where(x => x.ServiceType == typeof(IFamilyPolicy))
+                .Select(x => x.ImplementationInstance.As<IFamilyPolicy>())
+                .Concat(new IFamilyPolicy[]
+                {
+                    new CloseGenericFamilyPolicy(), 
+                    new ConcreteFamilyPolicy(), 
+                    new EmptyFamilyPolicy()
+                })
+                .ToArray();
+            
+            
+            var policies = services.Where(x => x.ServiceType == typeof(IFamilyPolicy));
+            services.RemoveAll(x => x.ServiceType == typeof(IFamilyPolicy));
             
             addScopeResolver<Scope>();
             addScopeResolver<IServiceProvider>();
             addScopeResolver<IContainer>();
+            
+            
         }
-        
+
+        public IFamilyPolicy[] FamilyPolicies { get; }
+
         private void addScopeResolver<T>()
         {
             // TODO -- will have to register by name as well?
@@ -59,7 +77,7 @@ namespace BlueMilk
         
         
         
-        public void Register(Instance instance, IResolver resolver)
+        public void RegisterResolver(Instance instance, IResolver resolver)
         {
             if (instance.IsDefault)
             {
@@ -67,13 +85,13 @@ namespace BlueMilk
             }
         }
         
-        public void Register(Scope rootScope, IEnumerable<Instance> instances)
+        public void RegisterResolver(Scope rootScope, IEnumerable<Instance> instances)
         {
             foreach (var instance in instances.Where(x => x.Resolver == null).TopologicalSort(x => x.Dependencies, false))
             {
                 instance.Initialize(rootScope);
                 
-                Register(instance, instance.Resolver);
+                RegisterResolver(instance, instance.Resolver);
             }
         }
         
@@ -124,8 +142,8 @@ namespace BlueMilk
 
             var noGeneration = instancesWithoutResolver().Where(x => !requiresGenerated.Contains(x));
 
-            Register(_rootScope, noGeneration);
-            Register(_rootScope, requiresGenerated);
+            RegisterResolver(_rootScope, noGeneration);
+            RegisterResolver(_rootScope, requiresGenerated);
         }
 
         private IEnumerable<Instance> instancesWithoutResolver()
@@ -197,7 +215,7 @@ namespace BlueMilk
             {
                 if (_families.ContainsKey(serviceType)) return null;
                 
-                var family = _familyPolicies.FirstValue(x => x.Build(serviceType, this));
+                var family = FamilyPolicies.FirstValue(x => x.Build(serviceType, this));
                 _families.Add(serviceType, family); // Legal to be null here
 
                 return family;
@@ -217,6 +235,12 @@ namespace BlueMilk
         public bool CouldBuild(ConstructorInfo ctor)
         {
             return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null || ByType.ContainsKey(x.ParameterType));
+        }
+
+        public bool CouldBuild(Type concreteType)
+        {
+            var ctor = ConstructorInstance.DetermineConstructor(this, concreteType, out string message);
+            return ctor != null && message.IsEmpty();
         }
 
         public void Dispose()
@@ -258,8 +282,12 @@ namespace BlueMilk
 
         public ServiceFamily TryToCreateMissingFamily(Type serviceType)
         {
-            throw new NotImplementedException();
-            //return false;
+            var family = FamilyPolicies.FirstValue(x => x.Build(serviceType, this));
+            _families.Add(serviceType, family);
+            
+            buildOutMissingResolvers();
+
+            return family;
         }
     }
 }

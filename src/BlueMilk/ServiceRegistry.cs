@@ -140,5 +140,72 @@ namespace BlueMilk
         {
             this.AddRange(new T());
         }
+        
+        /// <summary>
+        /// Configure Container-wide policies and conventions
+        /// </summary>
+        public PoliciesExpression Policies => new PoliciesExpression(this);
+
+        public class PoliciesExpression
+        {
+            private readonly ServiceRegistry _parent;
+
+
+            public PoliciesExpression(ServiceRegistry parent)
+            {
+                _parent = parent;
+            }
+
+            /*
+            /// <summary>
+            /// Adds a new instance policy to this container
+            /// that can apply to every object instance created
+            /// by this container
+            /// </summary>
+            /// <param name="policy"></param>
+            public void Add(IInstancePolicy policy)
+            {
+                alter = graph => graph.Policies.Add(policy);
+            }
+
+            /// <summary>
+            /// Adds a new instance policy to this container
+            /// that can apply to every object instance created
+            /// by this container
+            /// </summary>
+            public void Add<T>() where T : IInstancePolicy, new()
+            {
+                Add(new T());
+            }
+            
+            /// <summary>
+            /// Register an interception policy
+            /// </summary>
+            /// <param name="policy"></param>
+            public void Interceptors(IInterceptorPolicy policy)
+            {
+                alter = graph => graph.Policies.Add(policy);
+            }
+*/
+
+
+            /// <summary>
+            /// Register a strategy for automatically resolving "missing" families
+            /// when an unknown PluginType is first encountered
+            /// </summary>
+            /// <param name="policy"></param>
+            public void OnMissingFamily(IFamilyPolicy policy)
+            {
+                _parent.AddSingleton(policy);
+            }
+
+            public void OnMissingFamily<T>() where T : IFamilyPolicy, new()
+            {
+                OnMissingFamily(new T());
+            }
+
+
+        }
+
     }
 }
