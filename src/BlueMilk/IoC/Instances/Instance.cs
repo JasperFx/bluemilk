@@ -70,14 +70,22 @@ namespace BlueMilk.IoC.Instances
         
         public Instance[] Dependencies { get; protected set; } = new Instance[0];
 
-        public abstract IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope);
+
+        public void Initialize(Scope rootScope)
+        {
+            Resolver = buildResolver(rootScope);
+            Resolver.Hash = GetHashCode();
+            Resolver.Name = Name;
+        }
+
+        public IResolver Resolver { get; protected set; }
+
+        protected abstract IResolver buildResolver(Scope rootScope);
+        
 
         public bool IsDefault { get; set; } = false;
         
-        /// <summary>
-        /// Internal tracking only
-        /// </summary>
-        internal bool HasCreatedResolver { get; set; }
+
 
 
         public sealed override int GetHashCode()

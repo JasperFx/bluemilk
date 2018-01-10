@@ -34,7 +34,7 @@ namespace BlueMilk.IoC.Instances
             return new GetInstanceFrame(this).Variable;
         }
 
-        public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)
+        protected override IResolver buildResolver(Scope rootScope)
         {
             switch (Lifetime)
             {

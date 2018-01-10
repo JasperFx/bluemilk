@@ -54,7 +54,7 @@ namespace BlueMilk.IoC.Instances
             return new ConstructorInstance<TConcrete>(typeof(T), lifetime);
         }
 
-        public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)
+        protected override IResolver buildResolver(Scope rootScope)
         {
             if (_resolverType != null)
             {

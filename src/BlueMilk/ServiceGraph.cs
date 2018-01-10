@@ -59,7 +59,7 @@ namespace BlueMilk
 
         private IEnumerable<Instance> instancesWithoutResolver()
         {
-            return AllInstances().Where(x => !x.HasCreatedResolver);
+            return AllInstances().Where(x => x.Resolver == null);
         }
 
         private Instance[] generateDynamicAssembly()

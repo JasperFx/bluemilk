@@ -18,9 +18,8 @@ namespace BlueMilk.IoC.Instances
         
         public ObjectInstance(Type serviceType, object service) : base(serviceType, service?.GetType() ?? serviceType, ServiceLifetime.Singleton)
         {
-            Name = service?.GetType().NameInCode() ?? serviceType.NameInCode();
             Service = service;
-            Hash = GetHashCode();
+            Name = service?.GetType().NameInCode() ?? serviceType.NameInCode();
         }
 
         public object Service { get; }
@@ -30,7 +29,7 @@ namespace BlueMilk.IoC.Instances
             return new InjectedServiceField(this);
         }
 
-        public override IResolver BuildResolver(ResolverGraph resolvers, Scope rootScope)
+        protected override IResolver buildResolver(Scope rootScope)
         {
             return this;
         }

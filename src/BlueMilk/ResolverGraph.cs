@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Resolvers;
@@ -35,11 +36,6 @@ namespace BlueMilk
 
         public void Register(Instance instance, IResolver resolver)
         {
-            resolver.Hash = instance.GetHashCode();
-            resolver.Name = instance.Name;
-
-            instance.HasCreatedResolver = true;
-            
             if (!ByTypeAndName.ContainsKey(instance.ServiceType))
             {
                 ByTypeAndName[instance.ServiceType] = new ConcurrentDictionary<string, IResolver>();
@@ -54,10 +50,11 @@ namespace BlueMilk
 
         public void Register(Scope rootScope, IEnumerable<Instance> instances)
         {
-            foreach (var instance in instances.TopologicalSort(x => x.Dependencies, false))
+            foreach (var instance in instances.Where(x => x.Resolver == null).TopologicalSort(x => x.Dependencies, false))
             {
-                var resolver = instance.BuildResolver(this, rootScope);
-                Register(instance, resolver);
+                instance.Initialize(rootScope);
+                
+                Register(instance, instance.Resolver);
             }
         }
 

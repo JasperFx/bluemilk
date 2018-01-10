@@ -173,7 +173,8 @@ namespace BlueMilk.Testing.IoC.Instances
             
             instance.CreationStyle.ShouldBe(CreationStyle.NoArg);
 
-            instance.BuildResolver(null, null).ShouldBeOfType<NoArgTransientResolver<AWidget>>();
+            instance.Initialize(null);
+            instance.Resolver.ShouldBeOfType<NoArgTransientResolver<AWidget>>();
             instance.ResolverBaseType.ShouldBeNull();
             instance.RequiresServiceProvider.ShouldBeFalse();
         }
@@ -188,7 +189,8 @@ namespace BlueMilk.Testing.IoC.Instances
             
             instance.CreationStyle.ShouldBe(CreationStyle.NoArg);
 
-            instance.BuildResolver(null, null).ShouldBeOfType<NoArgScopedResolver<AWidget>>();
+            instance.Initialize(null);
+            instance.Resolver.ShouldBeOfType<NoArgScopedResolver<AWidget>>();
             instance.ResolverBaseType.ShouldBeNull();
             instance.RequiresServiceProvider.ShouldBeFalse();
         }
