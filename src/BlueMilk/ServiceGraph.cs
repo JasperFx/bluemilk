@@ -243,7 +243,7 @@ namespace BlueMilk
         
         public bool CouldBuild(ConstructorInfo ctor)
         {
-            return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null || ByType.ContainsKey(x.ParameterType));
+            return ctor.GetParameters().All(x => ByType.ContainsKey(x.ParameterType) || FindDefault(x.ParameterType) != null);
         }
 
         public bool CouldBuild(Type concreteType)
