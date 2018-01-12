@@ -6,6 +6,7 @@ namespace BlueMilk
     ///     Allows BlueMilk to fill in missing registrations by unknown plugin types
     ///     at runtime
     /// </summary>
+    [BlueMilkIgnore]
     public interface IFamilyPolicy
     {
         /// <summary>

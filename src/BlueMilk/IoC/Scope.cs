@@ -29,6 +29,8 @@ namespace BlueMilk.IoC
             ServiceGraph = serviceGraph;
         }
 
+        public DisposalLock DisposalLock { get; set; } = DisposalLock.Unlocked;
+
         public IModel Model => ServiceGraph;
 
         internal ServiceGraph ServiceGraph { get; }

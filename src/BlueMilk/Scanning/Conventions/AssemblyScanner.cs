@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Scanning.Conventions
 {
+    [BlueMilkIgnore]
     public class AssemblyScanner : IAssemblyScanner
     {
         private readonly List<Assembly> _assemblies = new List<Assembly>();

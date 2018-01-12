@@ -40,7 +40,7 @@ namespace BlueMilk.IoC.Instances
         public virtual bool RequiresServiceProvider => Dependencies.Any(x => x.RequiresServiceProvider);
 
         public ServiceLifetime Lifetime { get; set; } = ServiceLifetime.Transient;
-        public string Name { get; set; }
+        public string Name { get; set; } = "default";
         
         public bool HasPlanned { get; protected internal set; }
 

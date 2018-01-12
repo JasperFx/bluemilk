@@ -8,14 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Frames
 {
-    public static class VariableExtensions
-    {
-        public static bool RefersTo(this Variable variable, Instance instance)
-        {
-            return instance == (variable as IServiceVariable)?.Instance;
-        }
-    }
-    
     public class ResolverVariables
     {
         private readonly IList<Variable> _variables = new List<Variable>();

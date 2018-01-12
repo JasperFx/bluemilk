@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Scanning.Conventions
 {
+    [BlueMilkIgnore]
     public class ConnectedConcretions : List<Type>
     {
         

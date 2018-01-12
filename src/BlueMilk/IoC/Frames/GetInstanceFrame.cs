@@ -12,7 +12,7 @@ namespace BlueMilk.IoC.Frames
     public class GetInstanceFrame : SyncFrame
     {
         private Variable _scope;
-        private string _name;
+        private readonly string _name;
 
         public GetInstanceFrame(Instance instance)
         {

@@ -53,10 +53,9 @@ namespace BlueMilk
             
             services.RemoveAll(x => x.ServiceType == typeof(IFamilyPolicy));
             
-            addScopeResolver<Scope>();
-            addScopeResolver<IServiceProvider>();
-            addScopeResolver<IContainer>();
-            
+            addScopeResolver<IServiceProvider>(services);
+            addScopeResolver<IContainer>(services);
+            ByType[typeof(Scope)] = new ScopeResolver();
             
         }
 
@@ -74,10 +73,10 @@ namespace BlueMilk
 
         public IFamilyPolicy[] FamilyPolicies { get; }
 
-        private void addScopeResolver<T>()
+        private void addScopeResolver<T>(IServiceCollection services)
         {
-            // TODO -- will have to register by name as well?
-            ByType[typeof(T)] = new ScopeResolver<T>();
+            var instance = new ScopeInstance<T>();
+            services.Add(instance);
         }
 
         public void Initialize()
@@ -212,7 +211,7 @@ namespace BlueMilk
         private void organizeIntoFamilies(IServiceCollection services)
         {
             services
-                .Where(x => x.ServiceType.Assembly != GetType().Assembly)
+                .Where(x => !x.ServiceType.HasAttribute<BlueMilkIgnoreAttribute>())
                 .Select(Instance.For)
                 .GroupBy(x => x.ServiceType)
                 .Select(x => new ServiceFamily(x.Key, x.ToArray()))
