@@ -127,7 +127,7 @@ namespace BlueMilk
 
             lock (_locker)
             {
-                if (_families.ContainsKey(serviceType)) return _families[serviceType].Default.Resolver;
+                if (_families.ContainsKey(serviceType)) return _families[serviceType].Default?.Resolver;
 
                 var family = TryToCreateMissingFamily(serviceType);
 

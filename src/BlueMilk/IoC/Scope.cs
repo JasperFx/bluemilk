@@ -31,6 +31,7 @@ namespace BlueMilk.IoC
 
         public DisposalLock DisposalLock { get; set; } = DisposalLock.Unlocked;
 
+
         public IModel Model => ServiceGraph;
 
         internal ServiceGraph ServiceGraph { get; }
@@ -100,6 +101,28 @@ namespace BlueMilk.IoC
             
             return resolver.Resolve(this);
         }
+        
+        public T TryGetInstance<T>()
+        {
+            return (T)(TryGetInstance(typeof(T)) ?? default(T));
+        }
+
+        public T TryGetInstance<T>(string name)
+        {
+            return (T)(TryGetInstance(typeof(T), name) ?? default(T));
+        }
+
+        public object TryGetInstance(Type serviceType)
+        {
+            var resolver = ServiceGraph.FindResolver(serviceType);
+            return resolver?.Resolve(this) ?? null;
+        }
+
+        public object TryGetInstance(Type serviceType, string name)
+        {
+            var resolver = ServiceGraph.FindResolver(serviceType, name);
+            return resolver?.Resolve(this) ?? null;
+        }
 
         public T QuickBuild<T>()
         {
@@ -133,6 +156,8 @@ namespace BlueMilk.IoC
         {
             return ServiceGraph.FindAll(serviceType).Select(x => x.Resolver.Resolve(this)).ToArray();
         }
+        
+        
     }
 
 

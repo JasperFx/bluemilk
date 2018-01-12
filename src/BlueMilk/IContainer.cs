@@ -66,7 +66,7 @@ namespace BlueMilk
         IEnumerable GetAllInstances(Type serviceType);
         
         /// <summary>
-        /// Provides queryable access to the configured PluginType's and Instances of this Container.
+        /// Provides queryable access to the configured serviceType's and Instances of this Container.
         /// </summary>
         IModel Model { get; }
         
@@ -75,6 +75,45 @@ namespace BlueMilk
         /// being prematurely disposed
         /// </summary>
         DisposalLock DisposalLock { get; set; }
+        
+                /// <summary>
+        /// Creates or finds the default instance of <typeparamref name="T"/>. Returns the default value of
+        /// <typeparamref name="T"/> if it is not known to the container.
+        /// </summary>
+        /// <typeparam name="T">The type which instance is to be created or found.</typeparam>
+        /// <returns>The default instance of <typeparamref name="T"/> if resolved; the default value of
+        /// <typeparamref name="T"/> otherwise.</returns>
+        T TryGetInstance<T>();
+
+        /// <summary>
+        /// Creates or finds the named instance of <typeparamref name="T"/>. Returns the default value of
+        /// <typeparamref name="T"/> if the named instance is not known to the container.
+        /// </summary>
+        /// <typeparam name="T">The type which instance is to be created or found.</typeparam>
+        /// <param name="name">The name of the instance.</param>
+        /// <returns>The named instance of <typeparamref name="T"/> if resolved; the default value of
+        /// <typeparamref name="T"/> otherwise.</returns>
+        T TryGetInstance<T>(string name);
+
+        /// <summary>
+        /// Creates or finds the default instance of <paramref name="serviceType"/>. Returns <see langword="null"/> if
+        /// <paramref name="serviceType"/> is not known to the container.
+        /// </summary>
+        /// <param name="serviceType">The type which instance is to be created or found.</param>
+        /// <returns>The default instance of <paramref name="serviceType"/> if resolved; <see langword="null"/> otherwise.
+        /// </returns>
+        object TryGetInstance(Type serviceType);
+
+        /// <summary>
+        /// Creates or finds the named instance of <paramref name="serviceType"/>. Returns <see langword="null"/> if
+        /// the named instance is not known to the container.
+        /// </summary>
+        /// <param name="serviceType">The type which instance is to be created or found.</param>
+        /// <param name="name">The name of the instance.</param>
+        /// <returns>The named instance of <paramref name="serviceType"/> if resolved; <see langword="null"/> otherwise.
+        /// </returns>
+        object TryGetInstance(Type serviceType, string name);
+
 
 
     }
