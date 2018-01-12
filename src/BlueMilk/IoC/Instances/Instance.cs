@@ -100,5 +100,10 @@ namespace BlueMilk.IoC.Instances
         {
             return (serviceType.GetHashCode() * 397) ^ (name ?? "default").GetHashCode();
         }
+
+        public virtual Instance CloseType(Type serviceType, Type[] templateTypes)
+        {
+            return null;
+        }
     }
 }

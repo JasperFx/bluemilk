@@ -24,15 +24,23 @@ namespace BlueMilk.Scanning.Conventions
 
         public void ScanTypes(TypeSet types, IServiceCollection services)
         {
-            types.FindTypes(TypeClassification.Concretes | TypeClassification.Closed).Where(Matches).Each(type =>
+            if (_pluginType.IsOpenGeneric())
             {
-                services.AddType(determineLeastSpecificButValidType(_pluginType, type), type);
-            });
+                var scanner = new GenericConnectionScanner(_pluginType);
+                scanner.ScanTypes(types, services);
+            }
+            else
+            {
+                types.FindTypes(TypeClassification.Concretes | TypeClassification.Closed).Where(Matches).Each(type =>
+                {
+                    services.AddType(determineLeastSpecificButValidType(_pluginType, type), type);
+                });
+            }
         }
 
         private static Type determineLeastSpecificButValidType(Type pluginType, Type type)
         {
-            if (pluginType.GetTypeInfo().IsGenericTypeDefinition && !type.IsOpenGeneric())
+            if (pluginType.IsGenericTypeDefinition && !type.IsOpenGeneric())
                 return type.FindFirstInterfaceThatCloses(pluginType);
 
             return pluginType;

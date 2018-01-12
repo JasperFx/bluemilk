@@ -62,6 +62,7 @@ namespace BlueMilk.Testing.Scanning.Conventions
                 o.TheCallingAssembly();
                 o.ConnectImplementationsToTypesClosing(typeof(IFinder<>));
             }));
+            
             container.GetInstance<IFinder<string>>().ShouldBeOfType<StringFinder>();
             container.GetInstance<IFinder<int>>().ShouldBeOfType<IntFinder>();
             container.GetInstance<IFinder<double>>().ShouldBeOfType<DoubleFinder>();

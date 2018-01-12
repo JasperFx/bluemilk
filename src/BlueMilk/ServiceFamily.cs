@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Baseline;
+using BlueMilk.Codegen;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Resolvers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
 {
@@ -74,5 +76,50 @@ namespace BlueMilk
         }
 
         public IReadOnlyDictionary<string, Instance> Instances => _instances;
+
+        public void AddType(Type concreteType)
+        {
+            if (!concreteType.IsConcrete())
+            {
+                throw new ArgumentOutOfRangeException(nameof(concreteType), $"{concreteType.FullNameInCode()} is not a concrete type");
+            }
+            
+            if (!concreteType.CanBeCastTo(ServiceType)) return;
+
+            if (_instances.Values.Any(x => x.ImplementationType == concreteType)) return;
+            
+            var instance = new ConstructorInstance(ServiceType, concreteType, ServiceLifetime.Transient);
+            if (_instances.ContainsKey(instance.Name))
+            {
+                instance.Name += "_2";
+            }
+            
+            _instances.Add(instance.Name, instance);
+        }
+
+        /// <summary>
+        /// If the ServiceType is an open generic type, this method will create a 
+        /// closed type copy of this PluginFamily
+        /// </summary>
+        /// <param name="types"></param>
+        /// <param name="templateTypes"></param>
+        /// <returns></returns>
+        public ServiceFamily CreateTemplatedClone(Type serviceType, Type[] templateTypes)
+        {
+            if (!ServiceType.IsGenericType) throw new InvalidOperationException($"{ServiceType.FullNameInCode()} is not an open generic type");
+            
+            var templatedFamily = new ServiceFamily(serviceType);
+
+            var instances = _instances.Values.Select(x => {
+                var clone = x.CloseType(serviceType, templateTypes);
+                if (clone == null) return null;
+
+                clone.Name = x.Name;
+                return clone;
+            }).Where(x => x != null).ToArray();
+
+
+            return templatedFamily;
+        }
     }
 }

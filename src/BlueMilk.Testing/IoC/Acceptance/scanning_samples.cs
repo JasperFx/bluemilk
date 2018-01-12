@@ -22,7 +22,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
             {
                 _.Scan(x =>
                 {
-                    x.Assembly("StructureMap.Testing");
+                    x.Assembly("BlueMilk.Testing");
                     x.WithDefaultConventions();
                 });
             });

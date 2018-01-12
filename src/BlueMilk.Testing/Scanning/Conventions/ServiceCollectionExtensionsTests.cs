@@ -10,6 +10,14 @@ namespace BlueMilk.Testing.Scanning.Conventions
     public class ServiceCollectionExtensionsTests
     {
         [Fact]
+        public void find_the_connected_concretions()
+        {
+            var services = new ServiceRegistry();
+            services.ConnectedConcretions()
+                .ShouldBeSameAs(services.ConnectedConcretions());
+        }
+        
+        [Fact]
         public void add_type_on_an_empty_set()
         {
             var services = new ServiceRegistry();

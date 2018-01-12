@@ -7,6 +7,7 @@ using Xunit;
 
 namespace BlueMilk.Testing.IoC.Acceptance
 {
+    [Collection("scanning")]
     public class type_scanning
     {
         public interface ISomeInterface<in T>
@@ -47,12 +48,6 @@ namespace BlueMilk.Testing.IoC.Acceptance
             }
         }
         
-
-    }
-    
-    
-    public class Bug_247_ConnectOpenTypesToImplementations_doubling_up_registrations
-    {
         [Fact]
         public void Scanner_apply_should_only_register_two_instances()
         {
@@ -80,10 +75,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
         public class SomeService2 : ISomeServiceOf<string>
         {
         }
-    }
-    
-    public class Bug_313
-    {
+        
         [Fact]
         public void exclude_type_does_indeed_work()
         {
@@ -117,10 +109,9 @@ namespace BlueMilk.Testing.IoC.Acceptance
         public class Foo3 : IFoo
         {
         }
-    }
-    
-    public class Bug_320_generic_parent_child_relationship
-    {
+        
+        
+        
         public class Parent
         {
         };
@@ -168,10 +159,8 @@ namespace BlueMilk.Testing.IoC.Acceptance
             instances.Any(t => t.GetType() == typeof(GenericClass1)).ShouldBeTrue();
             instances.Any(t => t.GetType() == typeof(GenericClass2)).ShouldBeTrue();
         }
-    }
-    
-    public class Bug_338
-    {
+        
+        
         public abstract class ParentClass
         {
         }
@@ -197,10 +186,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
             container.GetAllInstances<ParentClass>()
                 .Single().ShouldBeOfType<ChildClass>();
         }
-    }
-    
-    public class CloseOpenGenericsWithSomeSpecifics
-    {
+        
         [Fact]
         public void should_handle_default_closed_and_specific_closed()
         {
@@ -230,10 +216,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
         public class SpecificClosedGeneric : TheClosedGeneric<string>
         {
         }
-    }
-    
-    public class ConnectImplementationsToTypesClosing_is_wonky_in_Registry_added_by_Configure
-    {
+        
         [Fact]
         public void has_the_correct_number_by_initialize()
         {
@@ -247,56 +230,8 @@ namespace BlueMilk.Testing.IoC.Acceptance
             var container = new Container(new BookRegistry());
             container.GetAllInstances<IBook<SciFi>>().Count().ShouldBe(1);
         }
-
-    }
-
-    public class BookRegistry : ServiceRegistry
-    {
-        public BookRegistry()
-        {
-            Scan(x =>
-            {
-                x.Exclude(type => type == typeof(DustCover<>));
-                x.TheCallingAssembly();
-                x.ConnectImplementationsToTypesClosing(typeof(IBook<>));
-            });
-        }
-    }
-
-
-    public class DustCover<T> : IBook<T>
-    {
-        public IBook<T> Book { get; }
-
-        public DustCover(IBook<T> book)
-        {
-            Book = book;
-        }
-    }
-
-    public interface IBook<T>
-    {
-    }
-
-    public class SciFi
-    {
-    }
-
-    public class SciFiBook : IBook<SciFi>
-    {
-    }
-
-    public class Fantasy
-    {
-    }
-
-    public class FantasyBook : IBook<Fantasy>
-    {
-    }
-    
-    
-    public class GenericVarianceResolution
-    {
+        
+        
         public interface INotificationHandler<in TNotification>
         {
             void Handle(TNotification notification);
@@ -352,10 +287,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
                 .ShouldHaveTheSameElementsAs(typeof(BaseNotificationHandler), typeof(ConcreteNotificationHandler),
                     typeof(OpenNotificationHandler<Notification>));
         }
-    }
-    
-    public class Jimmys_open_generics_bug_from_early_MediatR
-    {
+        
         [Fact]
         public void fix_it()
         {
@@ -374,7 +306,57 @@ namespace BlueMilk.Testing.IoC.Acceptance
                 .Select(x => x.GetType())
                 .ShouldHaveTheSameElementsAs(typeof(BirdImpl), typeof(BirdBaseImpl));
         }
+        
     }
+    
+
+
+
+
+    public class BookRegistry : ServiceRegistry
+    {
+        public BookRegistry()
+        {
+            Scan(x =>
+            {
+                x.Exclude(type => type == typeof(DustCover<>));
+                x.TheCallingAssembly();
+                x.ConnectImplementationsToTypesClosing(typeof(IBook<>));
+            });
+        }
+    }
+
+
+    public class DustCover<T> : IBook<T>
+    {
+        public IBook<T> Book { get; }
+
+        public DustCover(IBook<T> book)
+        {
+            Book = book;
+        }
+    }
+
+    public interface IBook<T>
+    {
+    }
+
+    public class SciFi
+    {
+    }
+
+    public class SciFiBook : IBook<SciFi>
+    {
+    }
+
+    public class Fantasy
+    {
+    }
+
+    public class FantasyBook : IBook<Fantasy>
+    {
+    }
+    
 
     public interface IBird<in T>
     {

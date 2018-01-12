@@ -25,13 +25,16 @@ namespace BlueMilk
         private readonly Dictionary<Type, ServiceFamily> _families = new Dictionary<Type, ServiceFamily>();
         public readonly IDictionary<Type, IResolver> ByType = new ConcurrentDictionary<Type, IResolver>();
         
+        
         public ServiceGraph(IServiceCollection services, Scope rootScope)
         {
+            Services = services;
+            
             // This should blow up pretty fast if it's no good
             services.ApplyScannedTypes().Wait();
             
             _rootScope = rootScope;
-            Services = services;
+            
 
             FamilyPolicies = services
                 .Where(x => x.ServiceType == typeof(IFamilyPolicy))
@@ -211,29 +214,31 @@ namespace BlueMilk
 
         public IReadOnlyDictionary<Type, ServiceFamily> Families => _families;
 
-        public ServiceFamily FindFamily(Type serviceType)
+        public bool HasFamily(Type serviceType)
+        {
+            return _families.ContainsKey(serviceType);
+        }
+        
+        public ServiceFamily ResolveFamily(Type serviceType)
         {
             if (_families.ContainsKey(serviceType)) return _families[serviceType];
 
             lock (_familyLock)
             {
-                if (_families.ContainsKey(serviceType)) return null;
-                
-                var family = FamilyPolicies.FirstValue(x => x.Build(serviceType, this));
-                _families.Add(serviceType, family); // Legal to be null here
+                if (_families.ContainsKey(serviceType)) return _families[serviceType];
 
-                return family;
+                return TryToCreateMissingFamily(serviceType);
             }
         }
         
         public Instance FindDefault(Type serviceType)
         {
-            return FindFamily(serviceType)?.Default;
+            return ResolveFamily(serviceType)?.Default;
         }
 
         public Instance[] FindAll(Type serviceType)
         {
-            return FindFamily(serviceType)?.Instances.Values.ToArray() ?? new Instance[0];
+            return ResolveFamily(serviceType)?.Instances.Values.ToArray() ?? new Instance[0];
         }
         
         public bool CouldBuild(ConstructorInfo ctor)
@@ -296,12 +301,12 @@ namespace BlueMilk
 
         IServiceFamilyConfiguration IModel.For<T>()
         {
-            return FindFamily(typeof(T));
+            return ResolveFamily(typeof(T));
         }
 
         IServiceFamilyConfiguration IModel.For(Type type)
         {
-            return FindFamily(type);
+            return ResolveFamily(type);
         }
     }
 }

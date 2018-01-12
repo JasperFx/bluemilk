@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Baseline;
+using BlueMilk.Codegen;
 using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -77,6 +78,11 @@ namespace BlueMilk.IoC
             var resolver = ServiceGraph.FindResolver(serviceType);
             
             // TODO -- validate the existence of the resolver first
+            if (resolver == null)
+            {
+                throw new BlueMilkMissingRegistrationException(serviceType);
+            }
+            
             return resolver.Resolve(this);
         }
 
@@ -85,7 +91,10 @@ namespace BlueMilk.IoC
             // TODO -- sad path, not found
             // TODO -- validate object disposed
             var resolver = ServiceGraph.FindResolver(serviceType, name);
-            
+            if (resolver == null)
+            {
+                throw new BlueMilkMissingRegistrationException(serviceType, name);
+            }
             
             return resolver.Resolve(this);
         }
@@ -115,17 +124,37 @@ namespace BlueMilk.IoC
 
         public IReadOnlyList<T> GetAllInstances<T>()
         {
-            throw new NotImplementedException();
+            return ServiceGraph.FindAll(typeof(T)).Select(x => x.Resolver.Resolve(this)).OfType<T>().ToList();
         }
 
         public IEnumerable GetAllInstances(Type serviceType)
         {
-            throw new NotImplementedException();
+            return ServiceGraph.FindAll(serviceType).Select(x => x.Resolver.Resolve(this)).ToArray();
         }
     }
-    
-    
-    
+
+
+    public class BlueMilkException : Exception
+    {
+        public BlueMilkException(string message) : base(message)
+        {
+        }
+
+        public BlueMilkException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+    }
+
+    public class BlueMilkMissingRegistrationException : BlueMilkException
+    {
+        public BlueMilkMissingRegistrationException(Type serviceType, string name) : base($"Unknown service registration '{name}' of {serviceType.FullNameInCode()}")
+        {
+        }
+
+        public BlueMilkMissingRegistrationException(Type serviceType) : base($"No service registrations exist or can be derived for {serviceType.FullNameInCode()}")
+        {
+        }
+    }
     
     
 }

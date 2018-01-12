@@ -157,14 +157,15 @@ namespace BlueMilk.Scanning.Conventions
             _typeFinder = TypeRepository.FindTypes(_assemblies, type => _filter.Matches(type));
         }
 
-        public async Task ApplyRegistrations(IServiceCollection services)
+        public Task ApplyRegistrations(IServiceCollection services)
         {
-            var types = await _typeFinder;
-
-            foreach (var convention in Conventions)
+            return _typeFinder.ContinueWith(t =>
             {
-                convention.ScanTypes(types, services);
-            }
+                foreach (var convention in Conventions)
+                {
+                    convention.ScanTypes(t.Result, services);
+                }
+            });
         }
 
         public bool Contains(string assemblyName)

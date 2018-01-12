@@ -54,6 +54,30 @@ namespace BlueMilk.IoC.Instances
             return new ConstructorInstance<TConcrete>(typeof(T), lifetime);
         }
 
+        public override Instance CloseType(Type serviceType, Type[] templateTypes)
+        {
+            if (!ImplementationType.IsOpenGeneric())
+                return null;
+
+            Type closedType;
+            try
+            {
+                closedType = ImplementationType.MakeGenericType(templateTypes);
+            }
+            catch
+            {
+                return null;
+            }
+
+            var closedInstance = new ConstructorInstance(serviceType, closedType, Lifetime);
+
+            // TODO' -- later!
+            //Dependencies.Each(arg => closedInstance.Dependencies.Add(arg.CloseType(types)));
+            
+
+            return closedInstance;
+        }
+
         protected override IResolver buildResolver(Scope rootScope)
         {
             if (_resolverType != null)
@@ -219,6 +243,8 @@ namespace BlueMilk.IoC.Instances
 
         public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {
+            if (CreationStyle == CreationStyle.NoArg) return;
+            
             var typeName = (ImplementationType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
                 .Replace(',', '_').Replace('.', '_');
             
@@ -231,5 +257,7 @@ namespace BlueMilk.IoC.Instances
             method.ReturnVariable = variable;
             method.Frames.Add(variable.Creator);
         }
+        
+        
     }
 }

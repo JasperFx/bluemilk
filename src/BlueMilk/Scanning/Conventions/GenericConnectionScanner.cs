@@ -34,7 +34,7 @@ namespace BlueMilk.Scanning.Conventions
             foreach (var type in types.AllTypes())
             {
                 var interfaceTypes = type.FindInterfacesThatClose(_openType).ToArray();
-                if (!interfaceTypes.Any()) return;
+                if (!interfaceTypes.Any()) continue;
 
                 if (type.IsConcrete())
                 {

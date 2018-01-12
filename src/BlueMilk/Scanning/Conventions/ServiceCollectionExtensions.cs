@@ -16,8 +16,7 @@ namespace BlueMilk.Scanning.Conventions
     {
         public static ConnectedConcretions ConnectedConcretions(this IServiceCollection services)
         {
-            var concretions = services
-                .FirstOrDefault(x => x.ImplementationInstance == typeof(ConnectedConcretions))
+            var concretions = services.FirstOrDefault(x => x.ServiceType == typeof(ConnectedConcretions))
                 ?.ImplementationInstance as ConnectedConcretions;
 
             if (concretions == null)
