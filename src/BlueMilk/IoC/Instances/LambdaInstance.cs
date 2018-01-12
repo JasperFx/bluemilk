@@ -51,6 +51,9 @@ namespace BlueMilk.IoC.Instances
             throw new ArgumentOutOfRangeException(nameof(Lifetime));
         }
 
-
+        public override string ToString()
+        {
+            return $"Lambda Factory of {ServiceType.FullNameInCode()}";
+        }
     }
 }

@@ -45,5 +45,10 @@ namespace BlueMilk.IoC.Instances
         {
             (Service as IDisposable)?.Dispose();
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Service)}: {Service} ('{Name}')";
+        }
     }
 }
