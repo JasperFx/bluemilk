@@ -79,29 +79,5 @@ namespace BlueMilk.Scanning.Conventions
                 .ToArray();
         }
 
-        public static async Task ApplyScannedTypes(this IServiceCollection services)
-        {
-            foreach (var scanner in services.Select(x => x.ImplementationInstance).OfType<AssemblyScanner>().ToArray())
-            {
-                await scanner.ApplyRegistrations(services);
-            }
-        }
-
-        public static async Task<IServiceCollection> Combine(this IServiceCollection[] serviceCollections)
-        {
-            if (!serviceCollections.Any()) return new ServiceRegistry();
-
-            foreach (var services in serviceCollections)
-            {
-                await services.ApplyScannedTypes();
-            }
-
-            if (serviceCollections.Length == 1) return serviceCollections[0];
-
-            var response = new ServiceRegistry();
-            response.AddRange(serviceCollections.SelectMany(x => x));
-
-            return response;
-        }
     }
 }

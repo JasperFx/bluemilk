@@ -4,6 +4,7 @@ using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Resolvers;
 using BlueMilk.Scanning.Conventions;
+using BlueMilk.Testing.IoC.Acceptance;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Shouldly;
@@ -20,6 +21,25 @@ namespace BlueMilk.Testing.IoC
         public ServiceGraphTester()
         {
             
+        }
+        
+        [Fact]
+        public void no_family_for_assembly_scanner_or_policy_or_connected_concretions()
+        {
+            var graph = ServiceGraph.For(_ =>
+            {
+                _.Scan(x =>
+                {
+                    x.TheCallingAssembly();
+                    x.ConnectImplementationsToTypesClosing(typeof(type_scanning.IGeneric<>));
+                });
+                
+                _.Policies.OnMissingFamily<CustomMissingFamily>();
+            });
+            
+            graph.HasFamily(typeof(ConnectedConcretions)).ShouldBeFalse();
+            graph.HasFamily(typeof(IFamilyPolicy)).ShouldBeFalse();
+            graph.HasFamily(typeof(AssemblyScanner)).ShouldBeFalse();
         }
         
         [Fact]

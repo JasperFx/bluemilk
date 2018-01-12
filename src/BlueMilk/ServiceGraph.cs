@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Compilation;
@@ -29,9 +30,11 @@ namespace BlueMilk
         public ServiceGraph(IServiceCollection services, Scope rootScope)
         {
             Services = services;
-            
+
+
+
             // This should blow up pretty fast if it's no good
-            services.ApplyScannedTypes().Wait();
+            applyScanners(services).Wait();
             
             _rootScope = rootScope;
             
@@ -55,6 +58,18 @@ namespace BlueMilk
             addScopeResolver<IContainer>();
             
             
+        }
+
+        private async Task applyScanners(IServiceCollection services)
+        {
+            var scanners = services.Select(x => x.ImplementationInstance).OfType<AssemblyScanner>().ToArray();
+            services.RemoveAll(x => x.ServiceType == typeof(AssemblyScanner));
+
+            foreach (var scanner in scanners)
+            {
+                await scanner.ApplyRegistrations(services);
+            }
+                        
         }
 
         public IFamilyPolicy[] FamilyPolicies { get; }
@@ -197,6 +212,7 @@ namespace BlueMilk
         private void organizeIntoFamilies(IServiceCollection services)
         {
             services
+                .Where(x => x.ServiceType.Assembly != GetType().Assembly)
                 .Select(Instance.For)
                 .GroupBy(x => x.ServiceType)
                 .Select(x => new ServiceFamily(x.Key, x.ToArray()))
