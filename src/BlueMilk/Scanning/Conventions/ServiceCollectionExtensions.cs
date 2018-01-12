@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Baseline;
 using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,15 +33,32 @@ namespace BlueMilk.Scanning.Conventions
         {
             services.Add(new ServiceDescriptor(instance.ServiceType, instance));
         }
-        
-        public static void AddType(this IServiceCollection services, Type serviceType, Type implementationType)
+
+        public static bool Matches(this ServiceDescriptor descriptor, Type serviceType, Type implementationType)
         {
-            var hasAlready = services.Any(x => x.ServiceType == serviceType && x.ImplementationType == implementationType);
+            if (descriptor.ServiceType != serviceType) return false;
+
+            if (descriptor.ImplementationType == implementationType) return true;
+
+            if (descriptor.ImplementationInstance is Instance)
+                return descriptor.ImplementationInstance.As<Instance>().ImplementationType == implementationType;
+
+            return false;
+        }
+        
+        public static Instance AddType(this IServiceCollection services, Type serviceType, Type implementationType)
+        {
+            var hasAlready = services.Any(x => x.Matches(serviceType, implementationType));
             if (!hasAlready)
             {
-                var serviceDescriptor = new ServiceDescriptor(serviceType, implementationType, ServiceLifetime.Transient);
-                services.Add(serviceDescriptor);
+                var instance = new ConstructorInstance(serviceType, implementationType, ServiceLifetime.Transient);
+                
+                services.Add(instance);
+
+                return instance;
             }
+
+            return null;
         }
 
         public static ServiceDescriptor FindDefault<T>(this IServiceCollection services)

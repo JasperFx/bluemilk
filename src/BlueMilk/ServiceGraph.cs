@@ -48,7 +48,6 @@ namespace BlueMilk
                 .ToArray();
             
             
-            var policies = services.Where(x => x.ServiceType == typeof(IFamilyPolicy));
             services.RemoveAll(x => x.ServiceType == typeof(IFamilyPolicy));
             
             addScopeResolver<Scope>();
@@ -155,7 +154,7 @@ namespace BlueMilk
 
         private IEnumerable<Instance> instancesWithoutResolver()
         {
-            return AllInstances().Where(x => x.Resolver == null);
+            return AllInstances().Where(x => x.Resolver == null && !x.ServiceType.IsOpenGeneric());
         }
 
         private Instance[] generateDynamicAssembly()
@@ -168,7 +167,7 @@ namespace BlueMilk
 
             // TODO -- will need to get at the GenerationRules from somewhere
             var generatedAssembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
-            AllInstances().Select(x => x.ImplementationType.Assembly)
+            AllInstances().Where(x => !x.ServiceType.IsOpenGeneric()).Select(x => x.ImplementationType.Assembly)
                 .Concat(AllInstances().Select(x => x.ServiceType.Assembly))
                 .Distinct()
                 .Each(a => generatedAssembly.Generation.Assemblies.Fill(a));
@@ -186,7 +185,7 @@ namespace BlueMilk
 
         private void planResolutionStrategies()
         {
-            while (AllInstances().Any(x => !x.HasPlanned))
+            while (AllInstances().Where(x => !x.ServiceType.IsOpenGeneric()).Any(x => !x.HasPlanned))
             {
                 foreach (var instance in AllInstances().Where(x => !x.HasPlanned).ToArray())
                 {
@@ -198,7 +197,6 @@ namespace BlueMilk
         private void organizeIntoFamilies(IServiceCollection services)
         {
             services
-                .Where(x => !x.ServiceType.IsGenericType && !x.ServiceType.CanBeCastTo<Instance>())
                 .Select(Instance.For)
                 .GroupBy(x => x.ServiceType)
                 .Select(x => new ServiceFamily(x.Key, x.ToArray()))
@@ -233,6 +231,8 @@ namespace BlueMilk
         
         public Instance FindDefault(Type serviceType)
         {
+            if (serviceType.IsSimple()) return null;
+            
             return ResolveFamily(serviceType)?.Default;
         }
 
@@ -292,7 +292,7 @@ namespace BlueMilk
         public ServiceFamily TryToCreateMissingFamily(Type serviceType)
         {
             var family = FamilyPolicies.FirstValue(x => x.Build(serviceType, this));
-            _families.Add(serviceType, family);
+            _families.SmartAdd(serviceType, family);
             
             buildOutMissingResolvers();
 
@@ -307,6 +307,11 @@ namespace BlueMilk
         IServiceFamilyConfiguration IModel.For(Type type)
         {
             return ResolveFamily(type);
+        }
+
+        internal void ClearPlanning()
+        {
+            _chain.Clear();
         }
     }
 }

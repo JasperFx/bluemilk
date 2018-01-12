@@ -9,31 +9,36 @@ namespace BlueMilk.Scanning.Conventions
 {
     public class FindAllTypesFilter : IRegistrationConvention
     {
-        private readonly Type _pluginType;
+        private readonly Type _serviceType;
         private Func<Type, string> _namePolicy = type => type.NameInCode();
 
-        public FindAllTypesFilter(Type pluginType)
+        public FindAllTypesFilter(Type serviceType)
         {
-            _pluginType = pluginType;
+            _serviceType = serviceType;
         }
 
         public bool Matches(Type type)
         {
-            return type.CanBeCastTo(_pluginType) && type.GetConstructors().Any() && type.CanBeCreated();
+            return type.CanBeCastTo(_serviceType) && type.GetConstructors().Any() && type.CanBeCreated();
         }
 
         public void ScanTypes(TypeSet types, IServiceCollection services)
         {
-            if (_pluginType.IsOpenGeneric())
+            if (_serviceType.IsOpenGeneric())
             {
-                var scanner = new GenericConnectionScanner(_pluginType);
+                var scanner = new GenericConnectionScanner(_serviceType);
                 scanner.ScanTypes(types, services);
             }
             else
             {
                 types.FindTypes(TypeClassification.Concretes | TypeClassification.Closed).Where(Matches).Each(type =>
                 {
-                    services.AddType(determineLeastSpecificButValidType(_pluginType, type), type);
+                    var serviceType = determineLeastSpecificButValidType(_serviceType, type);
+                    var instance = services.AddType(serviceType, type);
+                    if (instance != null)
+                    {
+                        instance.Name = _namePolicy(type);
+                    }
                 });
             }
         }
@@ -48,7 +53,7 @@ namespace BlueMilk.Scanning.Conventions
 
         public override string ToString()
         {
-            return "Find and register all types implementing " + _pluginType.FullName;
+            return "Find and register all types implementing " + _serviceType.FullName;
         }
 
         public FindAllTypesFilter NameBy(Func<Type, string> namePolicy)

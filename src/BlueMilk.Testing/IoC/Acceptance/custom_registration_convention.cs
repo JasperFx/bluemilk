@@ -1,4 +1,5 @@
-﻿using Baseline;
+﻿using System.Linq;
+using Baseline;
 using BlueMilk.Scanning;
 using BlueMilk.Scanning.Conventions;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +34,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
             public void ScanTypes(TypeSet types, IServiceCollection services)
             {
                 // Only work on concrete types
-                foreach (var type in types.FindTypes(TypeClassification.Concretes | TypeClassification.Closed))
+                foreach (var type in types.FindTypes(TypeClassification.Concretes | TypeClassification.Closed).Where(x => x.Name == "BusyGuy"))
                 {
                     // Register against all the interfaces implemented
                     // by this concrete class

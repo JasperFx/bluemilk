@@ -43,6 +43,11 @@ namespace BlueMilk
             All = instances;
         }
 
+        public override string ToString()
+        {
+            return $"{nameof(ServiceType)}: {ServiceType.FullNameInCode()}";
+        }
+
         // Has to be in order here
         public Instance[] All { get; }
 
@@ -108,8 +113,6 @@ namespace BlueMilk
         {
             if (!ServiceType.IsGenericType) throw new InvalidOperationException($"{ServiceType.FullNameInCode()} is not an open generic type");
             
-            var templatedFamily = new ServiceFamily(serviceType);
-
             var instances = _instances.Values.Select(x => {
                 var clone = x.CloseType(serviceType, templateTypes);
                 if (clone == null) return null;
@@ -118,8 +121,9 @@ namespace BlueMilk
                 return clone;
             }).Where(x => x != null).ToArray();
 
-
-            return templatedFamily;
+            return new ServiceFamily(serviceType, instances);
         }
+        
+        
     }
 }

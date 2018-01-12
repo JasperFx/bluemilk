@@ -27,26 +27,25 @@ namespace BlueMilk.Testing.IoC.Acceptance
         }
 
         // Brought over from StructureMap
-        public class Bug_101
+
+        [Fact]
+        public void open_generic_scanning()
         {
-            [Fact]
-            public void open_generic_scanning()
+            var container = new Container(i => i.Scan(s =>
             {
-                var container = new Container(i => i.Scan(s =>
-                {
-                    s.AssemblyContainingType<Bug_101>();
-                    //s.WithDefaultConventions();
-                    s.AddAllTypesOf(typeof(ISomeInterface<>));
-                }));
+                s.AssemblyContainingType<type_scanning>();
+                //s.WithDefaultConventions();
+                s.AddAllTypesOf(typeof(ISomeInterface<>));
+            }));
 
-                container.GetInstance<ISomeInterface<Base>>()
-                    .ShouldNotBeNull();
+            container.GetInstance<ISomeInterface<Base>>()
+                .ShouldNotBeNull();
 
-                container.GetInstance<ISomeInterface<Derived>>()
-                    .ShouldBeOfType<Foo>()
-                    .ShouldNotBeNull();
-            }
+            container.GetInstance<ISomeInterface<Derived>>()
+                .ShouldBeOfType<Foo>()
+                .ShouldNotBeNull();
         }
+        
         
         [Fact]
         public void Scanner_apply_should_only_register_two_instances()
@@ -262,32 +261,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
             }
         }
 
-        [Fact]
-        public void RegisterMultipleHandlersOfSameInterface()
-        {
-            typeof(OpenNotificationHandler<Notification>).CanBeCastTo<INotificationHandler<Notification>>()
-                .ShouldBeTrue();
 
-            typeof(OpenNotificationHandler<>).CanBeCastTo(typeof(INotificationHandler<>))
-                .ShouldBeTrue();
-
-            var container = new Container(x =>
-            {
-                x.Scan(s =>
-                {
-                    s.TheCallingAssembly();
-                    s.ConnectImplementationsToTypesClosing(typeof(INotificationHandler<>));
-                });
-            });
-
-            var handlers = container.GetAllInstances<INotificationHandler<Notification>>();
-
-            handlers.Select(x => x.GetType()).OrderBy(x => x.Name)
-                .Each(x => Debug.WriteLine(x.Name))
-                .ShouldHaveTheSameElementsAs(typeof(BaseNotificationHandler), typeof(ConcreteNotificationHandler),
-                    typeof(OpenNotificationHandler<Notification>));
-        }
-        
         [Fact]
         public void fix_it()
         {

@@ -4,6 +4,7 @@ using Xunit;
 
 namespace BlueMilk.Testing.IoC.Acceptance
 {
+    [Collection("scanning")]
     public class scanning_samples
     {
         // SAMPLE: WithDefaultConventions
@@ -51,7 +52,8 @@ namespace BlueMilk.Testing.IoC.Acceptance
                 {
                     x.TheCallingAssembly();
 
-                    x.AddAllTypesOf<IFantasySeries>();
+                    x.AddAllTypesOf<IFantasySeries>()
+                        .NameBy(type => type.Name.ToLower());
 
                     // or
 

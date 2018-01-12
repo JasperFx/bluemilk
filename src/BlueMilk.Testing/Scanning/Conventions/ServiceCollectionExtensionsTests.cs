@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using Baseline;
+using BlueMilk.IoC.Instances;
 using BlueMilk.Scanning.Conventions;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -27,7 +29,7 @@ namespace BlueMilk.Testing.Scanning.Conventions
 
             var widgetDescriptor = services.Single(x => x.ServiceType == typeof(IWidget));
             widgetDescriptor.ServiceType.ShouldBe(typeof(IWidget));
-            widgetDescriptor.ImplementationType.ShouldBe(typeof(AWidget));
+            widgetDescriptor.ImplementationInstance.As<Instance>().ImplementationType.ShouldBe(typeof(AWidget));
         }
 
         [Fact]
@@ -40,7 +42,7 @@ namespace BlueMilk.Testing.Scanning.Conventions
             services.AddType(typeof(IWidget), typeof(MoneyWidget));
 
             services.Where(x => x.ServiceType == typeof(IWidget))
-                .Select(x => x.ImplementationType)
+                .Select(x => x.ImplementationInstance).OfType<Instance>().Select(x => x.ImplementationType)
                 .ShouldHaveTheSameElementsAs(typeof(AWidget), typeof(MoneyWidget));
         }
 
@@ -56,7 +58,7 @@ namespace BlueMilk.Testing.Scanning.Conventions
             services.AddType(typeof(IWidget), typeof(MoneyWidget));
 
             services.Where(x => x.ServiceType == typeof(IWidget))
-                .Select(x => x.ImplementationType)
+                .Select(x => x.ImplementationInstance).OfType<Instance>().Select(x => x.ImplementationType)
                 .ShouldHaveTheSameElementsAs(typeof(AWidget), typeof(MoneyWidget));
         }
     }

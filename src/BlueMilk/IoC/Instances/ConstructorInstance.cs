@@ -10,6 +10,7 @@ using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
 using Microsoft.CodeAnalysis.Classification;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -102,7 +103,6 @@ namespace BlueMilk.IoC.Instances
 
                 return null;
             }
-
 
             return null;
         }
@@ -214,6 +214,16 @@ namespace BlueMilk.IoC.Instances
 
         }
 
+        public override string ToString()
+        {
+            if (Constructor != null)
+            {
+                return $"new {ImplementationType.FullNameInCode()}({Constructor.GetParameters().Select(x => x.ParameterType.NameInCode()).Join(", ")})";
+            }
+
+            return $"new {ImplementationType.FullNameInCode()}()";
+        }
+
         public static ConstructorInfo DetermineConstructor(ServiceGraph services, Type implementationType,
             out string message)
         {
@@ -244,6 +254,8 @@ namespace BlueMilk.IoC.Instances
         public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {
             if (CreationStyle == CreationStyle.NoArg) return;
+
+            if (ResolverBaseType == null || ErrorMessages.Any()) return;
             
             var typeName = (ImplementationType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
                 .Replace(',', '_').Replace('.', '_');

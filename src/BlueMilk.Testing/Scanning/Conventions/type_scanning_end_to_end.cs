@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BlueMilk.Scanning.Conventions;
 using Shouldly;
@@ -76,20 +77,21 @@ namespace BlueMilk.Testing.Scanning.Conventions
         }
 
         [Fact]
-        public async Task find_all_implementations()
+        public void find_all_implementations()
         {
-            var services = new ServiceRegistry();
-
-            services.Scan(x =>
+            var container = Container.For(_ =>
             {
-                x.AssemblyContainingType<IShoes>();
-                x.AssemblyContainingType<IWidget>();
-                x.AddAllTypesOf<IWidget>();
+                 _.Scan(x =>
+                 {
+                     x.AssemblyContainingType<IShoes>();
+                     x.AssemblyContainingType<IWidget>();
+                     x.AddAllTypesOf<IWidget>();
+                 });   
             });
 
-            await services.ApplyScannedTypes();
+            var widgetTypes = container.Model.For<IWidget>()
+                .Instances.Select(x => x.ImplementationType).ToArray();
 
-            var widgetTypes = services.RegisteredTypesFor<IWidget>();
             widgetTypes.ShouldContain(typeof(MoneyWidget));
             widgetTypes.ShouldContain(typeof(AWidget));
         }
@@ -121,37 +123,36 @@ namespace BlueMilk.Testing.Scanning.Conventions
         }
 
         [Fact]
-        public async Task single_implementation()
+        public void single_implementation()
         {
-            var services = new ServiceRegistry();
-
-            services.Scan(x =>
+            var container = Container.For(_ =>
             {
-                x.AssemblyContainingType<IShoes>();
-                x.SingleImplementationsOfInterface();
+                _.Scan(x =>
+                {
+                    x.AssemblyContainingType<IShoes>();
+                    x.SingleImplementationsOfInterface();
+                });
             });
 
-            await services.ApplyScannedTypes();
-
-            services.FindDefault<Muppet>().ImplementationType.ShouldBe(typeof(Grover));
+            container.Model.For<Muppet>().Default.ImplementationType.ShouldBe(typeof(Grover));
         }
 
 
         [Fact]
-        public async Task use_default_scanning()
+        public void use_default_scanning()
         {
-            var services = new ServiceRegistry();
-
-            services.Scan(x =>
+            var container = Container.For(_ =>
             {
-                x.AssemblyContainingType<IShoes>();
-                x.WithDefaultConventions();
+                _.Scan(x =>
+                {
+                    x.AssemblyContainingType<IShoes>();
+                    x.WithDefaultConventions();
+                });
+                
             });
 
-            await services.ApplyScannedTypes();
-
-            services.FindDefault<IShoes>().ImplementationType.ShouldBe(typeof(Shoes));
-            services.FindDefault<IShorts>().ImplementationType.ShouldBe(typeof(Shorts));
+            container.Model.For<IShoes>().Default.ImplementationType.ShouldBe(typeof(Shoes));
+            container.Model.For<IShorts>().Default.ImplementationType.ShouldBe(typeof(Shorts));
         }
     }
 

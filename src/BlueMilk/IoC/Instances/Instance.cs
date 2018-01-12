@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
@@ -47,13 +48,24 @@ namespace BlueMilk.IoC.Instances
         {
             if (HasPlanned) return;
 
-            services.StartingToPlan(this);
+            try
+            {
+                services.StartingToPlan(this);
+            }
+            catch (Exception e)
+            {
+                ErrorMessages.Add(e.Message);
+                
+                services.FinishedPlanning();
+                HasPlanned = true;
+                return;
+            }
             
             var dependencies = createPlan(services) ?? Enumerable.Empty<Instance>();
 
             Dependencies = dependencies.Concat(dependencies.SelectMany(x => x.Dependencies)).Distinct().ToArray();
 
-            services.FinishedPlanning();
+            services.ClearPlanning();
             HasPlanned = true;
         }
 
@@ -74,6 +86,19 @@ namespace BlueMilk.IoC.Instances
         public void Initialize(Scope rootScope)
         {
             Resolver = buildResolver(rootScope);
+
+            if (Resolver == null)
+            {
+                if (ErrorMessages.Any())
+                {
+                    Resolver = new ErrorMessageResolver(this);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Instance {this} cannot build a valid resolver");
+                }
+            }
+
             Resolver.Hash = GetHashCode();
             Resolver.Name = Name;
         }
@@ -105,5 +130,28 @@ namespace BlueMilk.IoC.Instances
         {
             return null;
         }
+    }
+
+    public class ErrorMessageResolver : IResolver
+    {
+        private readonly string _message;
+
+        public ErrorMessageResolver(Instance instance)
+        {
+            ServiceType = instance.ServiceType;
+            Name = instance.Name;
+            Hash = instance.GetHashCode();
+
+            _message = instance.ErrorMessages.Join(Environment.NewLine);
+        }
+
+        public object Resolve(Scope scope)
+        {
+            throw new BlueMilkException($"Cannot build registered instance {Name} of '{ServiceType.FullNameInCode()}':{Environment.NewLine}{_message}");
+        }
+
+        public Type ServiceType { get; }
+        public string Name { get; set; }
+        public int Hash { get; set; }
     }
 }
