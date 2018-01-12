@@ -7,9 +7,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Baseline;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Frames;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC;
+using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
+using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
 using BlueMilk.Scanning.Conventions;
 using BlueMilk.Util;
@@ -327,6 +331,67 @@ namespace BlueMilk
         internal void ClearPlanning()
         {
             _chain.Clear();
+        }
+    }
+
+    public class FuncParentInstance : Instance
+    {
+        public FuncParentInstance() : base(typeof(Func<>), typeof(Func<>), ServiceLifetime.Transient)
+        {
+        }
+
+        public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IResolver buildResolver(Scope rootScope)
+        {
+            return null;
+        }
+
+        public override Instance CloseType(Type serviceType, Type[] templateTypes)
+        {
+            if (templateTypes.Length != 1) throw new ArgumentOutOfRangeException(nameof(templateTypes));
+            
+            return new FuncInstance(templateTypes.Single());
+        }
+    }
+
+    public class FuncInstance : Instance, IResolver
+    {
+        private readonly Type _serviceType;
+
+        public FuncInstance(Type serviceType) : base(typeof(Func<>).MakeGenericType(serviceType), typeof(Func<>).MakeGenericType(serviceType), ServiceLifetime.Transient)
+        {
+            _serviceType = serviceType;
+        }
+
+        public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IResolver buildResolver(Scope rootScope)
+        {
+            return this;
+        }
+
+        public object Resolve(Scope scope)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Hash { get; set; }
+    }
+
+    public class GetFuncFrame : SyncFrame
+    {
+        // TODO -- START HERE
+        
+        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        {
+            throw new NotImplementedException();
         }
     }
 }
