@@ -44,6 +44,20 @@ namespace BlueMilk.Testing.Codegen
         {
             type.FullNameInCode().ShouldBe(name);
         }
+        
+        [Fact]
+        public void name_in_code_of_inner_type()
+        {
+            typeof(ThingHolder.Thing1).NameInCode().ShouldBe("ThingHolder.Thing1");
+        }
+    }
+
+    public class ThingHolder
+    {
+        public class Thing1
+        {
+            
+        }
     }
 
     public class Handler<T>

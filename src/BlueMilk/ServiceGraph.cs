@@ -7,13 +7,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Baseline;
 using BlueMilk.Codegen;
-using BlueMilk.Codegen.Frames;
-using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC;
-using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
-using BlueMilk.IoC.Planning;
+using BlueMilk.IoC.Lazy;
 using BlueMilk.IoC.Resolvers;
 using BlueMilk.Scanning.Conventions;
 using BlueMilk.Util;
@@ -48,6 +45,7 @@ namespace BlueMilk
                 .Select(x => x.ImplementationInstance.As<IFamilyPolicy>())
                 .Concat(new IFamilyPolicy[]
                 {
+                    new FuncOrLazyPolicy(), 
                     new CloseGenericFamilyPolicy(), 
                     new ConcreteFamilyPolicy(), 
                     new EmptyFamilyPolicy()
@@ -85,12 +83,7 @@ namespace BlueMilk
 
         public void Initialize()
         {
-            // TODO -- will need to be able to use custom family policies
-
             organizeIntoFamilies(Services);
-
-            
-            
 
 
             // TODO -- any validations
@@ -160,14 +153,25 @@ namespace BlueMilk
 
         private void buildOutMissingResolvers()
         {
-            planResolutionStrategies();
+            if (_inPlanning) return;
 
-            var requiresGenerated = generateDynamicAssembly();
+            _inPlanning = true;
 
-            var noGeneration = instancesWithoutResolver().Where(x => !requiresGenerated.Contains(x));
+            try
+            {
+                planResolutionStrategies();
 
-            RegisterResolver(_rootScope, noGeneration);
-            RegisterResolver(_rootScope, requiresGenerated);
+                var requiresGenerated = generateDynamicAssembly();
+
+                var noGeneration = instancesWithoutResolver().Where(x => !requiresGenerated.Contains(x));
+
+                RegisterResolver(_rootScope, noGeneration);
+                RegisterResolver(_rootScope, requiresGenerated);
+            }
+            finally
+            {
+                _inPlanning = false;
+            }
         }
 
         private IEnumerable<Instance> instancesWithoutResolver()
@@ -185,10 +189,13 @@ namespace BlueMilk
 
             // TODO -- will need to get at the GenerationRules from somewhere
             var generatedAssembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
-            AllInstances().Where(x => !x.ServiceType.IsOpenGeneric()).Select(x => x.ImplementationType.Assembly)
-                .Concat(AllInstances().Select(x => x.ServiceType.Assembly))
+            AllInstances().SelectMany(x => x.ReferencedAssemblies())
                 .Distinct()
                 .Each(a => generatedAssembly.Generation.Assemblies.Fill(a));
+            
+            
+            
+            
 
             foreach (var instance in generatedResolvers)
             {
@@ -200,6 +207,7 @@ namespace BlueMilk
             return generatedResolvers.OfType<Instance>().ToArray();
         }
 
+        private bool _inPlanning = false;
 
         private void planResolutionStrategies()
         {
@@ -313,7 +321,10 @@ namespace BlueMilk
             var family = FamilyPolicies.FirstValue(x => x.Build(serviceType, this));
             _families.SmartAdd(serviceType, family);
             
-            buildOutMissingResolvers();
+            if (!_inPlanning)
+            {
+                buildOutMissingResolvers();
+            }
 
             return family;
         }
@@ -331,67 +342,6 @@ namespace BlueMilk
         internal void ClearPlanning()
         {
             _chain.Clear();
-        }
-    }
-
-    public class FuncParentInstance : Instance
-    {
-        public FuncParentInstance() : base(typeof(Func<>), typeof(Func<>), ServiceLifetime.Transient)
-        {
-        }
-
-        public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override IResolver buildResolver(Scope rootScope)
-        {
-            return null;
-        }
-
-        public override Instance CloseType(Type serviceType, Type[] templateTypes)
-        {
-            if (templateTypes.Length != 1) throw new ArgumentOutOfRangeException(nameof(templateTypes));
-            
-            return new FuncInstance(templateTypes.Single());
-        }
-    }
-
-    public class FuncInstance : Instance, IResolver
-    {
-        private readonly Type _serviceType;
-
-        public FuncInstance(Type serviceType) : base(typeof(Func<>).MakeGenericType(serviceType), typeof(Func<>).MakeGenericType(serviceType), ServiceLifetime.Transient)
-        {
-            _serviceType = serviceType;
-        }
-
-        public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override IResolver buildResolver(Scope rootScope)
-        {
-            return this;
-        }
-
-        public object Resolve(Scope scope)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int Hash { get; set; }
-    }
-
-    public class GetFuncFrame : SyncFrame
-    {
-        // TODO -- START HERE
-        
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
-        {
-            throw new NotImplementedException();
         }
     }
 }

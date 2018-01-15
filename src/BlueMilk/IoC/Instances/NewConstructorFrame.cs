@@ -14,7 +14,7 @@ namespace BlueMilk.IoC.Instances
     {
         private readonly Variable[] _arguments;
         private Variable _scope;
-        private Type _implementationType;
+        private readonly Type _implementationType;
 
         public NewConstructorFrame(ConstructorInstance instance, DisposeTracking disposal, Variable[] arguments)
         {

@@ -67,6 +67,11 @@ namespace BlueMilk.Codegen
                 return $"{cleanName}<{args}>";
             }
 
+            if (type.MemberType == MemberTypes.NestedType)
+            {
+                return $"{type.ReflectedType.NameInCode()}.{type.Name}";
+            }
+
             return type.Name.Replace("+", ".");
         }
 

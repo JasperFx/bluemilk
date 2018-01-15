@@ -9,11 +9,40 @@ namespace BlueMilk.Testing.IoC.Acceptance
 public class lazy_and_func_resolution
     {
         [Fact]
-        public void FactoryTemplateTester()
+        public void resolve_func_by_type()
         {
-            var container = Container.Empty();
+            var container = Container.For(_ => _.AddTransient<IWidget, AWidget>());
 
-            container.GetInstance<Func<ConcreteClass>>()().ShouldNotBeNull();
+            var func = container.GetInstance<Func<IWidget>>();
+            
+            func.ShouldNotBeNull();
+
+            func().ShouldBeOfType<AWidget>();
+        }
+
+        public class FuncUser
+        {
+            private readonly Func<IWidget> _func;
+
+            public FuncUser(Func<IWidget> func)
+            {
+                _func = func;
+            }
+
+            public IWidget Build()
+            {
+                return _func();
+            }
+        }
+        
+        [Fact]
+        public void use_func_by_type_as_dependency()
+        {
+            var container = Container.For(_ => _.AddTransient<IWidget, AWidget>());
+
+            var user = container.GetInstance<FuncUser>();
+
+            user.Build().ShouldBeOfType<AWidget>();
         }
 
         // SAMPLE: Lazy-in-usage

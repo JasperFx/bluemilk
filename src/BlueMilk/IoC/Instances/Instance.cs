@@ -16,6 +16,30 @@ namespace BlueMilk.IoC.Instances
 {
     public abstract class Instance
     {
+        internal IEnumerable<Assembly> ReferencedAssemblies()
+        {
+            yield return ServiceType.Assembly;
+            yield return ImplementationType.Assembly;
+
+            if (ServiceType.IsGenericType)
+            {
+                foreach (var type in ServiceType.GetGenericArguments())
+                {
+                    yield return type.Assembly;
+                }
+            }
+
+            if (ImplementationType.IsGenericType)
+            {
+                foreach (var type in ImplementationType.GetGenericArguments())
+                {
+                    yield return type.Assembly;
+                }
+            }
+        }
+
+        public virtual bool IsLazy { get; } = false;
+        
         public Type ServiceType { get; }
         public Type ImplementationType { get; }
 
@@ -51,6 +75,7 @@ namespace BlueMilk.IoC.Instances
             try
             {
                 services.StartingToPlan(this);
+                
             }
             catch (Exception e)
             {

@@ -38,6 +38,11 @@ namespace BlueMilk.Codegen.Frames
             IsAsync = isAsync;
         }
 
+        public Variable Create(Type variableType)
+        {
+            return new Variable(variableType, this);
+        }
+
         public Variable Create<T>()
         {
             return new Variable(typeof(T), this);

@@ -18,10 +18,6 @@ namespace BlueMilk.Codegen
 
         public readonly IList<Assembly> Assemblies = new List<Assembly>();
 
-        public void ReadServices(IServiceCollection services)
-        {
-            Services = new OldServiceGraph(services);
-        }
 
         public OldServiceGraph Services { get; private set; } = new OldServiceGraph(new ServiceRegistry());
     }
