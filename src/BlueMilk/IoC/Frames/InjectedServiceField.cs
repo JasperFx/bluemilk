@@ -1,15 +1,18 @@
-﻿using BlueMilk.Codegen.Variables;
+﻿using BlueMilk.Codegen;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Instances;
 
 namespace BlueMilk.IoC.Frames
 {
     public class InjectedServiceField : InjectedField, IServiceVariable
     {
-        public InjectedServiceField(Instance instance) : base(instance.ServiceType)
+        public InjectedServiceField(Instance instance) : base(instance.ServiceType, instance.Name.Replace(".", "_"))
         {
             Instance = instance;
         }
 
         public Instance Instance { get; }
+
+        public override string CtorArgDeclaration => $"[BlueMilk.Named(\"{Instance.Name}\")] {ArgType.NameInCode()} {CtorArg}";
     }
 }

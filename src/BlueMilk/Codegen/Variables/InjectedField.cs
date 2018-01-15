@@ -19,9 +19,9 @@ namespace BlueMilk.Codegen.Variables
 
         public string CtorArg { get; }
 
-        public string CtorArgDeclaration => $"{ArgType.NameInCode()} {CtorArg}";
+        public virtual string CtorArgDeclaration => $"{ArgType.NameInCode()} {CtorArg}";
 
-        public virtual void WriteDeclaration(ISourceWriter writer)
+        public void WriteDeclaration(ISourceWriter writer)
         {
             writer.Write($"private readonly {ArgType.NameInCode()} {Usage};");
         }
