@@ -68,6 +68,7 @@ namespace BlueMilk.IoC.Enumerables
 
         public ArrayInstance(Type serviceType) : base(serviceType, typeof(T[]), ServiceLifetime.Transient)
         {
+            Name = Variable.DefaultArgName<T[]>();
         }
 
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
@@ -96,8 +97,9 @@ namespace BlueMilk.IoC.Enumerables
         
         public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {
+            // TODO -- lots of duplication in here
             var typeName = (ImplementationType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
-                .Replace(',', '_').Replace('.', '_');
+                .Replace(',', '_').Replace('.', '_').Replace("[", "").Replace("]", "");
             
             _resolverType = generatedAssembly.AddType(typeName, typeof(TransientResolver<>).MakeGenericType(ServiceType));
 
@@ -119,6 +121,7 @@ namespace BlueMilk.IoC.Enumerables
         
         public ListInstance(Type serviceType) : base(serviceType, typeof(List<T>), ServiceLifetime.Transient)
         {
+            Name = Variable.DefaultArgName(serviceType);
         }
 
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
@@ -145,8 +148,9 @@ namespace BlueMilk.IoC.Enumerables
 
         public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {
+            // TODO -- lots of duplication in here
             var typeName = (ImplementationType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
-                .Replace(',', '_').Replace('.', '_');
+                .Replace(',', '_').Replace('.', '_').Replace("[", "").Replace("]", "");
             
             _resolverType = generatedAssembly.AddType(typeName, typeof(TransientResolver<>).MakeGenericType(ServiceType));
 

@@ -16,7 +16,8 @@ namespace BlueMilk.IoC.Frames
 
         public GetInstanceFrame(Instance instance)
         {
-            Variable = new ServiceVariable(instance, this);
+            Variable = new ServiceVariable(instance, this, ServiceDeclaration.ServiceType);
+            
             _name = instance.Name;
         }
 

@@ -109,6 +109,8 @@ namespace BlueMilk.IoC.Instances
 
         public void Initialize(Scope rootScope)
         {
+            if (Resolver != null) throw new InvalidOperationException("The Resolver has already been built for this Instance");
+            
             Resolver = buildResolver(rootScope);
 
             if (Resolver == null)

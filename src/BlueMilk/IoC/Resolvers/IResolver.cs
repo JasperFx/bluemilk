@@ -9,5 +9,6 @@ namespace BlueMilk.IoC.Resolvers
         
         string Name { get; set; }
         int Hash { get; set; }
+        
     }
 }

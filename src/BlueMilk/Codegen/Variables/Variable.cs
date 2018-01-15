@@ -33,9 +33,7 @@ namespace BlueMilk.Codegen.Variables
             if (EnumerablePolicy.IsEnumerable(argType))
             {
                 var argPrefix = DefaultArgName(EnumerablePolicy.DetermineElementType(argType));
-                var suffix = argType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-                    ? "Enumerable"
-                    : "List";
+                var suffix = argType.GetGenericTypeDefinition().Name.Split('`').First();
 
                 return argPrefix + suffix;
             }

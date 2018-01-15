@@ -42,20 +42,20 @@ namespace BlueMilk.Testing.Codegen
         public void default_arg_name_of_List()
         {
             Variable.DefaultArgName<IList<IWidget>>()
-                .ShouldBe("widgetList");
+                .ShouldBe("widgetIList");
 
             Variable.DefaultArgName<List<IWidget>>()
                 .ShouldBe("widgetList");
 
             Variable.DefaultArgName<IReadOnlyList<IWidget>>()
-                .ShouldBe("widgetList");
+                .ShouldBe("widgetIReadOnlyList");
         }
 
         [Fact]
         public void default_arg_name_of_enumerable()
         {
             Variable.DefaultArgName<IEnumerable<IWidget>>()
-                .ShouldBe("widgetEnumerable");
+                .ShouldBe("widgetIEnumerable");
         }
 
         [Fact]

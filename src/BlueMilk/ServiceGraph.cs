@@ -106,7 +106,9 @@ namespace BlueMilk
         
         public void RegisterResolver(Scope rootScope, IEnumerable<Instance> instances)
         {
-            foreach (var instance in instances.Where(x => x.Resolver == null).TopologicalSort(x => x.Dependencies, false))
+            // Yes, you really have to filter twice, because the TopologicalSort will throw back
+            // in dependencies that might already have a resolver
+            foreach (var instance in instances.Where(x => x.Resolver == null).TopologicalSort(x => x.Dependencies, false).Where(x => x.Resolver == null))
             {
                 instance.Initialize(rootScope);
                 

@@ -21,17 +21,30 @@ namespace BlueMilk.IoC.Resolvers
         {
             if (_service != null) return _service;
 
+            if (_topLevelScope.Services.ContainsKey(Hash))
+            {
+                _service = (T) _topLevelScope.Services[Hash];
+                return _service;
+            }
+
             lock (_locker)
             {
                 if (_service == null)
                 {
-                    _service = Build(_topLevelScope);
-                    if (_service is IDisposable)
+                    if (_topLevelScope.Services.ContainsKey(Hash))
                     {
-                        _topLevelScope.Disposables.Add((IDisposable) _service);
+                        _service = (T) _topLevelScope.Services[Hash];
                     }
-                    
-                    _topLevelScope.Services.Add(Hash, _service);
+                    else
+                    {
+                        _service = Build(_topLevelScope);
+                        if (_service is IDisposable)
+                        {
+                            _topLevelScope.Disposables.Add((IDisposable) _service);
+                        }
+
+                        _topLevelScope.Services.SmartAdd(Hash, _service);
+                    }
                 }
             }
 
@@ -42,5 +55,6 @@ namespace BlueMilk.IoC.Resolvers
         
         public string Name { get; set; }
         public int Hash { get; set; }
+
     }
 }
