@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Baseline;
+using Baseline.Reflection;
 using BlueMilk.Codegen;
 using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
@@ -137,7 +138,16 @@ namespace BlueMilk.IoC
             var ctor = ConstructorInstance.DetermineConstructor(ServiceGraph, objectType, out var message);
             if (ctor == null) throw new InvalidOperationException(message);
 
-            var dependencies = ctor.GetParameters().Select(x => GetInstance(x.ParameterType)).ToArray();
+            var dependencies = ctor.GetParameters().Select(x =>
+            {
+                if (x.HasAttribute<NamedAttribute>())
+                {
+                    return GetInstance(x.ParameterType, x.GetAttribute<NamedAttribute>().Name);
+                }
+                
+                
+                return GetInstance(x.ParameterType);
+            }).ToArray();
 
             return Activator.CreateInstance(objectType, dependencies);
         }

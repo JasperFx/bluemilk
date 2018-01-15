@@ -1,5 +1,6 @@
 ﻿using System;
 using BlueMilk.IoC.Instances;
+using BlueMilk.Testing.IoC.Acceptance;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using StructureMap.Testing.Widget;
@@ -7,7 +8,7 @@ using Xunit;
 
 namespace BlueMilk.Testing.IoC
 {
-    public class QuickBuildTests
+    public class quick_build_specs
     {
         [Fact]
         public void happy_path()
@@ -94,6 +95,37 @@ namespace BlueMilk.Testing.IoC
 
             Exception<InvalidOperationException>.ShouldBeThrownBy(() => { container.QuickBuild<IWidget>(); });
         }
+
+        public class GreenWidget : IWidget
+        {
+            public void DoSomething()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public class BlueWidget : IWidget
+        {
+            public void DoSomething()
+            {
+                throw new NotImplementedException();
+            }
+        }
+        
+        [Fact]
+        public void honor_named_attribute_on_parameter()
+        {
+            var container = new Container(_ =>
+            {
+                _.For<IWidget>().Use<GreenWidget>().Named("green");
+                _.For<IWidget>().Use<BlueWidget>().Named("blue");
+            });
+
+            container.GetInstance<IWidget>().ShouldBeOfType<BlueWidget>();
+
+            container.QuickBuild<SelectiveWidgetUser>()
+                .Widget.ShouldBeOfType<GreenWidget>();
+        }
     }
 
     public class GuyWithNoPublicConstructors
@@ -107,6 +139,16 @@ namespace BlueMilk.Testing.IoC
     {
         public GuyWithStringArg(IWidget widget, string arg)
         {
+        }
+    }
+
+    public class SelectiveWidgetUser
+    {
+        public IWidget Widget { get; }
+
+        public SelectiveWidgetUser([Named("green")]IWidget widget)
+        {
+            Widget = widget;
         }
     }
     
