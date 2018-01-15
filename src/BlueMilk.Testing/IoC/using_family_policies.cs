@@ -1,4 +1,5 @@
 ﻿using System;
+using BlueMilk.IoC.Enumerables;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Lazy;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,11 +16,13 @@ namespace BlueMilk.Testing.IoC
         {
             var graph = ServiceGraph.Empty();
 
-            graph.FamilyPolicies[0].ShouldBeOfType<FuncOrLazyPolicy>();
             
-            graph.FamilyPolicies[1].ShouldBeOfType<CloseGenericFamilyPolicy>();
-            graph.FamilyPolicies[2].ShouldBeOfType<ConcreteFamilyPolicy>();
-            graph.FamilyPolicies[3].ShouldBeOfType<EmptyFamilyPolicy>();
+            graph.FamilyPolicies[0].ShouldBeOfType<EnumerablePolicy>();
+            graph.FamilyPolicies[1].ShouldBeOfType<FuncOrLazyPolicy>();
+            
+            graph.FamilyPolicies[2].ShouldBeOfType<CloseGenericFamilyPolicy>();
+            graph.FamilyPolicies[3].ShouldBeOfType<ConcreteFamilyPolicy>();
+            graph.FamilyPolicies[4].ShouldBeOfType<EmptyFamilyPolicy>();
 
         }
         
@@ -32,10 +35,12 @@ namespace BlueMilk.Testing.IoC
             });
             
             graph.FamilyPolicies[0].ShouldBeOfType<CustomMissingFamily>();
-            graph.FamilyPolicies[1].ShouldBeOfType<FuncOrLazyPolicy>();
-            graph.FamilyPolicies[2].ShouldBeOfType<CloseGenericFamilyPolicy>();
-            graph.FamilyPolicies[3].ShouldBeOfType<ConcreteFamilyPolicy>();
-            graph.FamilyPolicies[4].ShouldBeOfType<EmptyFamilyPolicy>();
+            
+            graph.FamilyPolicies[1].ShouldBeOfType<EnumerablePolicy>();
+            graph.FamilyPolicies[2].ShouldBeOfType<FuncOrLazyPolicy>();
+            graph.FamilyPolicies[3].ShouldBeOfType<CloseGenericFamilyPolicy>();
+            graph.FamilyPolicies[4].ShouldBeOfType<ConcreteFamilyPolicy>();
+            graph.FamilyPolicies[5].ShouldBeOfType<EmptyFamilyPolicy>();
         }
         
         [Fact]

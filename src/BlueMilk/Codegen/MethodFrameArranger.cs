@@ -5,7 +5,6 @@ using Baseline;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.ServiceLocation;
 using BlueMilk.Codegen.Variables;
-using BlueMilk.IoC.Planning;
 using BlueMilk.Util;
 
 namespace BlueMilk.Codegen
@@ -16,20 +15,14 @@ namespace BlueMilk.Codegen
         private readonly GeneratedType _type;
         private readonly Dictionary<Type, Variable> _variables = new Dictionary<Type, Variable>();
         
-        // TODO -- reevaluate if this is a good idea. Probably not now
-        private readonly SingletonVariableSource _singletons;
-        private readonly ServiceVariableSource _services;
 
         public MethodFrameArranger(GeneratedMethod method, GeneratedType type)
         {
             _method = method;
             _type = type;
 
-            _singletons = new SingletonVariableSource(_type.Rules.Services);
-            _services = new ServiceVariableSource(this, _type.Rules.Services);
         }
 
-        public IList<BuildStep> AllKnownBuildSteps { get; } = new List<BuildStep>();
 
         public void Arrange(out AsyncMode asyncMode, out Frame topFrame)
         {
@@ -71,24 +64,9 @@ namespace BlueMilk.Codegen
 
             // Step 1a;) -- figure out if you can switch to inline service
             // creation instead of the container.
-            var services = frames.SelectMany(x => x.Uses).OfType<ServiceVariable>().ToArray();
-            if (services.Any() && services.All(x => x.CanBeReduced))
-            {
-                AllKnownBuildSteps.GroupBy(x => x.ServiceType).Where(x => x.Count() > 1).Each(group =>
-                {
-                    var index = 0;
-                    group.Reverse().Each(step =>
-                    {
-                        step.Number = ++index;
-                    });
-                });
-
-                foreach (var service in services)
-                {
-                    service.UseInlinePlan();
-                }
-            }
-
+            // TODO -- new service inliner
+            
+            
             // Step 2, calculate dependencies
             var dependencies = new DependencyGatherer(this, frames);
             findInjectedFields(dependencies);
@@ -130,8 +108,6 @@ namespace BlueMilk.Codegen
                 yield return source;
             }
 
-            yield return _singletons;
-
             // To get injected fields
             yield return _type;
 
@@ -140,12 +116,6 @@ namespace BlueMilk.Codegen
 
             //yield return new NoArgConcreteCreator();
 
-
-
-            if (variableSource == VariableSource.All)
-            {
-                yield return _services;
-            }
 
         }
 

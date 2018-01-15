@@ -17,9 +17,6 @@ namespace BlueMilk.Codegen
         public readonly IList<IVariableSource> Sources = new List<IVariableSource>();
 
         public readonly IList<Assembly> Assemblies = new List<Assembly>();
-
-
-        public OldServiceGraph Services { get; private set; } = new OldServiceGraph(new ServiceRegistry());
     }
 
 

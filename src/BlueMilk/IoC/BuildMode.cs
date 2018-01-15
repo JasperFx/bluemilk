@@ -1,4 +1,4 @@
-﻿namespace BlueMilk.IoC.Planning
+﻿namespace BlueMilk.IoC
 {
     public enum BuildMode
     {

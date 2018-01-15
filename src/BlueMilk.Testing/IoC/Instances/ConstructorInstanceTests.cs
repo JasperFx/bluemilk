@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using BlueMilk.Codegen;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
-using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
+using BlueMilk.Testing.IoC.Acceptance;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using StructureMap.Testing.Widget;
@@ -332,7 +334,44 @@ namespace BlueMilk.Testing.IoC.Instances
 
     }
 
+    public class NoArgGuy
+    {
 
+    }
+    
+    public interface IThing
+    {
+            
+    }
+
+    public class Thing : IThing
+    {
+            
+    }
+        
+
+    public class DeepConstructorGuy
+    {
+        public DeepConstructorGuy()
+        {
+
+        }
+
+        public DeepConstructorGuy(IWidget widget, IThing method)
+        {
+
+        }
+
+        public DeepConstructorGuy(IWidget widget, bool nothing)
+        {
+
+        }
+
+        public DeepConstructorGuy(IWidget widget, GeneratedMethod method, IVariableSource source)
+        {
+
+        }
+    }
 
     public class GuyWithWidgetAndRule
     {

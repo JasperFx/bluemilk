@@ -1,7 +1,7 @@
 ﻿using Baseline;
+using BlueMilk.IoC;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
-using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
 using Shouldly;
 using Xunit;

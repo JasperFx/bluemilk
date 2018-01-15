@@ -9,6 +9,7 @@ using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Compilation;
 using BlueMilk.IoC;
+using BlueMilk.IoC.Enumerables;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Lazy;
 using BlueMilk.IoC.Resolvers;
@@ -45,6 +46,7 @@ namespace BlueMilk
                 .Select(x => x.ImplementationInstance.As<IFamilyPolicy>())
                 .Concat(new IFamilyPolicy[]
                 {
+                    new EnumerablePolicy(), 
                     new FuncOrLazyPolicy(), 
                     new CloseGenericFamilyPolicy(), 
                     new ConcreteFamilyPolicy(), 
@@ -342,6 +344,18 @@ namespace BlueMilk
         internal void ClearPlanning()
         {
             _chain.Clear();
+        }
+
+        /// <summary>
+        /// Can the ServiceGraph possible resolve this requested type,
+        /// somehow
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public bool CanResolve(Type type)
+        {
+            throw new NotImplementedException();
         }
     }
 }

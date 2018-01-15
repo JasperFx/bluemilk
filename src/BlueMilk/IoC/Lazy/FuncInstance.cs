@@ -3,9 +3,7 @@ using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
-using BlueMilk.IoC.Planning;
 using BlueMilk.IoC.Resolvers;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Lazy

@@ -6,9 +6,9 @@ namespace BlueMilk.Codegen.ServiceLocation
 {
     public class SingletonVariableSource : IVariableSource
     {
-        private readonly OldServiceGraph _graph;
+        private readonly ServiceGraph _graph;
 
-        public SingletonVariableSource(OldServiceGraph graph)
+        public SingletonVariableSource(ServiceGraph graph)
         {
             _graph = graph;
         }

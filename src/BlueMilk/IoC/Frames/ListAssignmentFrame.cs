@@ -6,16 +6,16 @@ using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
-using BlueMilk.IoC.Planning;
+using BlueMilk.IoC.Enumerables;
 
 namespace BlueMilk.IoC.Frames
 {
-    public class ListAssignmentFrame : Frame
+    public class ListAssignmentFrame<T> : Frame
     {
-        public ListAssignmentFrame(Type serviceType, Variable[] elements) : base(false)
+        public ListAssignmentFrame(ListInstance<T> instance, Variable[] elements) : base(false)
         {
-            ElementType = EnumerableStep.DetermineElementType(serviceType);
-            Variable = new Variable(serviceType, Variable.DefaultArgName(ElementType) + "List", this);
+            ElementType = typeof(T);
+            Variable = new ServiceVariable(instance, this);
 
             Elements = elements;
         }

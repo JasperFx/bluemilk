@@ -5,6 +5,12 @@ using Xunit;
 
 namespace BlueMilk.Testing.IoC.Acceptance
 {
+    public interface IThing{}
+
+    public class Thing : IThing
+    {
+    }
+
     public class end_to_end_resolution
     {
         [Fact]

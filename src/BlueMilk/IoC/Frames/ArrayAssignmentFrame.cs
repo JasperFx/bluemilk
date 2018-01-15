@@ -6,18 +6,20 @@ using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
+using BlueMilk.IoC.Enumerables;
 
 namespace BlueMilk.IoC.Frames
 {
-    public class ArrayAssignmentFrame : Frame
+    public class ArrayAssignmentFrame<T> : SyncFrame
     {
-        public ArrayAssignmentFrame(Type elementType, Variable[] elements) : base(false)
+        public ArrayAssignmentFrame(ArrayInstance<T> instance, Variable[] elements)
         {
-            ElementType = elementType;
-            Variable = new Variable(elementType.MakeArrayType(), Variable.DefaultArgName(elementType) + "Array", this);
-
             Elements = elements;
+            Variable = new ServiceVariable(instance, this);
+            ElementType = typeof(T);
         }
+
+
 
         public Type ElementType { get; }
 

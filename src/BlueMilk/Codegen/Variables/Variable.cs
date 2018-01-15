@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Baseline;
 using BlueMilk.Codegen.Frames;
-using BlueMilk.IoC.Planning;
+using BlueMilk.IoC.Enumerables;
 
 namespace BlueMilk.Codegen.Variables
 {
@@ -30,9 +30,9 @@ namespace BlueMilk.Codegen.Variables
                 return DefaultArgName(argType.GetElementType()) + "Array";
             }
 
-            if (EnumerableStep.IsEnumerable(argType))
+            if (EnumerablePolicy.IsEnumerable(argType))
             {
-                var argPrefix = DefaultArgName(EnumerableStep.DetermineElementType(argType));
+                var argPrefix = DefaultArgName(EnumerablePolicy.DetermineElementType(argType));
                 var suffix = argType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
                     ? "Enumerable"
                     : "List";

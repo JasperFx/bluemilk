@@ -4,7 +4,6 @@ using Baseline;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
-using BlueMilk.IoC.Planning;
 
 namespace BlueMilk.Codegen.ServiceLocation
 {
@@ -20,35 +19,19 @@ namespace BlueMilk.Codegen.ServiceLocation
         public ServiceVariable(Type variableType, ServiceCreationFrame creator) : base(variableType, creator)
         {
         }
-
-        public bool CanBeReduced => Creator.As<ServiceCreationFrame>().CanBeReduced;
-
-        public void UseInlinePlan()
-        {
-            if (!(Creator is ServiceCreationFrame)) return;
-
-            var inner = Creator.As<ServiceCreationFrame>().BuildStepPlannerVariable;
-            Usage = inner.Usage;
-            Creator = inner.Creator;
-        }
     }
 
     public class ServiceCreationFrame : SyncFrame
     {
-        private readonly BuildStepPlanner _planner;
-        private readonly BuildStep _step;
         private Variable _provider;
 
-        public ServiceCreationFrame(Type serviceType, BuildStepPlanner planner, BuildStep step)
+        public ServiceCreationFrame(Type serviceType)
         {
-            _planner = planner;
-            _step = step;
             Service = new ServiceVariable(serviceType, this);
             
         }
 
         public Variable Service { get; }
-        public bool CanBeReduced => _planner?.Determination == PlanningDetermination.ConstructorsOnly;
 
         public override IEnumerable<Variable> FindVariables(IMethodVariables chain)
         {
@@ -71,8 +54,5 @@ namespace BlueMilk.Codegen.ServiceLocation
                 Next?.GenerateCode(method, writer);
             }
         }
-
-        // TODO -- this will have to be smarter for things that use ServiceProvider
-        public Variable BuildStepPlannerVariable => _step.CreateVariable(BuildMode.Inline);
     }
 }

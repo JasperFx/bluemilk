@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
-using BlueMilk.IoC.Planning;
 
 namespace BlueMilk.Testing
 {
@@ -12,7 +11,6 @@ namespace BlueMilk.Testing
         public readonly Dictionary<Type, Variable> Variables = new Dictionary<Type, Variable>();
         public readonly IList<Variable> Extras = new List<Variable>();
         
-        public IList<BuildStep> AllKnownBuildSteps { get; } = new List<BuildStep>();
 
         public Variable FindVariable(Type type)
         {
