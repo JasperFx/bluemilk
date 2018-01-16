@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BlueMilk.Codegen.Variables;
+using BlueMilk.Testing.Scanning.Conventions;
 using Shouldly;
 using StructureMap.Testing.Widget;
 using Xunit;
@@ -70,6 +71,15 @@ namespace BlueMilk.Testing.Codegen
         {
             Variable.DefaultArgName<IFooHandler<HyperdriveMotivator>>()
                 .ShouldBe("fooHandler");
+        }
+        
+        [Fact]
+        public void default_arg_name_of_open_generic_type()
+        {
+            Variable.DefaultArgName(typeof(TypeFindingTester.IOpenGeneric<>))
+                .ShouldBe("openGeneric");
+            
+            Variable.DefaultArgName(typeof(FooHandler<>)).ShouldBe("fooHandler");
         }
 
         [Fact]

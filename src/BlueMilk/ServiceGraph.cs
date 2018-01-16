@@ -15,6 +15,7 @@ using BlueMilk.IoC.Lazy;
 using BlueMilk.IoC.Resolvers;
 using BlueMilk.Scanning.Conventions;
 using BlueMilk.Util;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
@@ -59,6 +60,7 @@ namespace BlueMilk
             
             addScopeResolver<IServiceProvider>(services);
             addScopeResolver<IContainer>(services);
+            addScopeResolver<IServiceScopeFactory>(services);
             ByType[typeof(Scope)] = new ScopeResolver();
             
         }
@@ -226,12 +228,56 @@ namespace BlueMilk
 
         private void organizeIntoFamilies(IServiceCollection services)
         {
+
+
+
+            
             services
                 .Where(x => !x.ServiceType.HasAttribute<BlueMilkIgnoreAttribute>())
-                .Select(Instance.For)
+                
                 .GroupBy(x => x.ServiceType)
-                .Select(x => new ServiceFamily(x.Key, x.ToArray()))
+                .Select(group =>
+                {
+                    if (group.Key.IsGenericType)
+                    {
+                        return buildClosedGenericType(group.Key, services);
+                    }
+
+                    var instances = group.Select(Instance.For).ToArray();
+                    return new ServiceFamily(group.Key, instances);
+                })
                 .Each(family => _families.Add(family.ServiceType, family));
+
+
+        }
+
+        private ServiceFamily buildClosedGenericType(Type serviceType, IServiceCollection services)
+        {
+            var closed = services.Where(x => x.ServiceType == serviceType).Select(Instance.For);
+
+            var templated = services
+                .Where(x => x.ServiceType.IsOpenGeneric() && serviceType.Closes(x.ServiceType))
+                .Select(Instance.For)
+                .Select(instance =>
+                {
+                    var arguments = serviceType.GetGenericArguments();
+
+                    try
+                    {
+                        return instance.CloseType(serviceType, arguments);
+                    }
+                    catch (Exception e)
+                    {
+                        return null;
+                    }
+                })
+                .Where(x => x != null);
+            
+            
+
+            var instances = templated.Concat(closed).ToArray();
+            
+            return new ServiceFamily(serviceType, instances);
         }
 
         public IServiceCollection Services { get; }
@@ -274,7 +320,7 @@ namespace BlueMilk
         
         public bool CouldBuild(ConstructorInfo ctor)
         {
-            return ctor.GetParameters().All(x => ByType.ContainsKey(x.ParameterType) || FindDefault(x.ParameterType) != null);
+            return ctor.GetParameters().All(x => ByType.ContainsKey(x.ParameterType) || FindDefault(x.ParameterType) != null || x.IsOptional);
         }
 
         public bool CouldBuild(Type concreteType)
@@ -322,6 +368,9 @@ namespace BlueMilk
 
         public ServiceFamily TryToCreateMissingFamily(Type serviceType)
         {
+            // TODO -- will need to make this more formal somehow
+            if (serviceType.IsSimple() || serviceType.IsDateTime() || serviceType == typeof(TimeSpan) || serviceType.IsValueType || serviceType == typeof(DateTimeOffset)) return new ServiceFamily(serviceType);
+            
             var family = FamilyPolicies.FirstValue(x => x.Build(serviceType, this));
             _families.SmartAdd(serviceType, family);
             
@@ -348,16 +397,5 @@ namespace BlueMilk
             _chain.Clear();
         }
 
-        /// <summary>
-        /// Can the ServiceGraph possible resolve this requested type,
-        /// somehow
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public bool CanResolve(Type type)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

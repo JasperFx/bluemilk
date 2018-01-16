@@ -6,7 +6,7 @@ namespace BlueMilk.IoC.Frames
 {
     public class InjectedServiceField : InjectedField, IServiceVariable
     {
-        public InjectedServiceField(Instance instance) : base(instance.ServiceType, instance.Name.Replace(".", "_"))
+        public InjectedServiceField(Instance instance) : base(instance.ServiceType, DefaultArgName(instance.ServiceType) + instance.GetHashCode().ToString().Replace("-", "_"))
         {
             Instance = instance;
         }

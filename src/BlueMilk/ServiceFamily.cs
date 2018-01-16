@@ -71,7 +71,7 @@ namespace BlueMilk
                 });
         }
 
-        public Instance Default { get; }
+        public Instance Default { get; private set; }
 
         IEnumerable<Instance> IServiceFamilyConfiguration.Instances => _instances.Values;
 
@@ -82,25 +82,6 @@ namespace BlueMilk
 
         public IReadOnlyDictionary<string, Instance> Instances => _instances;
 
-        public void AddType(Type concreteType)
-        {
-            if (!concreteType.IsConcrete())
-            {
-                throw new ArgumentOutOfRangeException(nameof(concreteType), $"{concreteType.FullNameInCode()} is not a concrete type");
-            }
-            
-            if (!concreteType.CanBeCastTo(ServiceType)) return;
-
-            if (_instances.Values.Any(x => x.ImplementationType == concreteType)) return;
-            
-            var instance = new ConstructorInstance(ServiceType, concreteType, ServiceLifetime.Transient);
-            if (_instances.ContainsKey(instance.Name))
-            {
-                instance.Name += "_2";
-            }
-            
-            _instances.Add(instance.Name, instance);
-        }
 
         /// <summary>
         /// If the ServiceType is an open generic type, this method will create a 

@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
 {
-    public class Scope : IContainer, IServiceScope, IServiceProvider
+    public class Scope : IContainer, IServiceScope, IServiceProvider, ISupportRequiredService, IServiceScopeFactory
     {
         public static Scope Empty()
         {
@@ -59,10 +59,9 @@ namespace BlueMilk.IoC
 
         public IServiceProvider ServiceProvider => this;
         
-        // TODO -- really the same thing as TryGetInstance in StructureMap
         public object GetService(Type serviceType)
         {
-            return GetInstance(serviceType);
+            return TryGetInstance(serviceType);
         }
         
         public T GetInstance<T>()
@@ -166,8 +165,17 @@ namespace BlueMilk.IoC
         {
             return ServiceGraph.FindAll(serviceType).Select(x => x.Resolver.Resolve(this)).ToArray();
         }
-        
-        
+
+
+        object ISupportRequiredService.GetRequiredService(Type serviceType)
+        {
+            return GetInstance(serviceType);
+        }
+
+        IServiceScope IServiceScopeFactory.CreateScope()
+        {
+            return new Scope(ServiceGraph);
+        }
     }
 
 

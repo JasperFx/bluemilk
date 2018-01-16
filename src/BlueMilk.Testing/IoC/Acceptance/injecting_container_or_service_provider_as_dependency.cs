@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
@@ -26,6 +27,14 @@ namespace BlueMilk.Testing.IoC.Acceptance
             container.GetInstance<GuyWithServiceProvider>()
                 .Provider
                 .ShouldBeSameAs(container);
+        }
+        
+        [Fact]
+        public void scope_factory_from_root()
+        {
+            var container = Container.Empty();
+            
+            container.GetInstance<IServiceScopeFactory>().ShouldBe(container);
         }
         
         [Fact]

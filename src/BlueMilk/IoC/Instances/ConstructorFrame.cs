@@ -10,13 +10,15 @@ using BlueMilk.IoC.Frames;
 
 namespace BlueMilk.IoC.Instances
 {
-    public class NewConstructorFrame : SyncFrame
+    
+    
+    public class ConstructorFrame : SyncFrame
     {
         private readonly Variable[] _arguments;
         private Variable _scope;
         private readonly Type _implementationType;
 
-        public NewConstructorFrame(ConstructorInstance instance, DisposeTracking disposal, Variable[] arguments)
+        public ConstructorFrame(ConstructorInstance instance, DisposeTracking disposal, Variable[] arguments)
         {
             Disposal = disposal;
             _arguments = arguments;
@@ -27,12 +29,20 @@ namespace BlueMilk.IoC.Instances
         public ServiceVariable Variable { get; }
 
         public DisposeTracking Disposal { get; }
+        public bool ReturnCreated { get; set; }
 
         public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             var arguments = _arguments.Select(x => x.Usage).Join(", ");
             var implementationTypeName = _implementationType.FullNameInCode();
 
+            if (ReturnCreated)
+            {
+                writer.Write($"return new {implementationTypeName}({arguments});");
+                Next?.GenerateCode(method, writer);
+                return;
+            }
+            
             var declaration = $"var {Variable.Usage} = new {implementationTypeName}({arguments})";
 
             switch (Disposal)
@@ -43,7 +53,7 @@ namespace BlueMilk.IoC.Instances
                     break;
                     
                 case DisposeTracking.WithUsing:
-                    if (Next is NewConstructorFrame && Next.As<NewConstructorFrame>().Disposal == DisposeTracking.WithUsing)
+                    if (Next is ConstructorFrame && Next.As<ConstructorFrame>().Disposal == DisposeTracking.WithUsing)
                     {
                         writer.Write($"using ({declaration})");
                         Next?.GenerateCode(method, writer);

@@ -20,7 +20,7 @@ namespace BlueMilk.Testing.IoC.Instances
         public void derive_the_default_name()
         {
             ConstructorInstance.For<IClock, DisposableClock>()
-                .Name.ShouldBe(nameof(DisposableClock));
+                .Name.ShouldBe("disposableClock");
 
         }
 
@@ -320,7 +320,7 @@ namespace BlueMilk.Testing.IoC.Instances
         {
             var instance = new ConstructorInstance(concreteType, concreteType, lifetime);
             instance.CreateVariable(build, new ResolverVariables(), false).Creator
-                .ShouldBeOfType<NewConstructorFrame>()
+                .ShouldBeOfType<ConstructorFrame>()
                 .Disposal.ShouldBe(disposal);
         }
         

@@ -32,12 +32,12 @@ namespace BlueMilk.Testing.IoC
                 ConstructorInstance.For<IWidget, MoneyWidget>(), 
             });
             
-            family.Instances.ContainsKey("AWidget1").ShouldBeTrue();
-            family.Instances.ContainsKey("AWidget2").ShouldBeTrue();
-            family.Instances.ContainsKey("AWidget3").ShouldBeTrue();
-            family.Instances.ContainsKey("ColorWidget1").ShouldBeTrue();
-            family.Instances.ContainsKey("ColorWidget2").ShouldBeTrue();
-            family.Instances.ContainsKey("MoneyWidget").ShouldBeTrue();
+            family.Instances.ContainsKey("aWidget1").ShouldBeTrue();
+            family.Instances.ContainsKey("aWidget2").ShouldBeTrue();
+            family.Instances.ContainsKey("aWidget3").ShouldBeTrue();
+            family.Instances.ContainsKey("colorWidget1").ShouldBeTrue();
+            family.Instances.ContainsKey("colorWidget2").ShouldBeTrue();
+            family.Instances.ContainsKey("moneyWidget").ShouldBeTrue();
         }
         
         [Fact]
@@ -66,8 +66,8 @@ namespace BlueMilk.Testing.IoC
                 ConstructorInstance.For<IWidget, MoneyWidget>(), 
             });
             
-            family.Instances["MoneyWidget"].IsDefault.ShouldBeTrue();
-            family.Instances.Values.Where(x => x.Name != "MoneyWidget").Each(x => x.IsDefault.ShouldBeFalse());
+            family.Instances["moneyWidget"].IsDefault.ShouldBeTrue();
+            family.Instances.Values.Where(x => x.Name != "moneyWidget").Each(x => x.IsDefault.ShouldBeFalse());
         }
     }
 }

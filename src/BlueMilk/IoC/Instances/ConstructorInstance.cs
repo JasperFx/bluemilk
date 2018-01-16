@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using Baseline;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Frames;
@@ -26,13 +28,13 @@ namespace BlueMilk.IoC.Instances
         public static readonly string NoPublicConstructorCanBeFilled =
             "Cannot fill the dependencies of any of the public constructors";
 
-        private Instance[] _arguments = new Instance[0];
+        private CtorArg[] _arguments = new CtorArg[0];
         private GeneratedType _resolverType;
 
         public ConstructorInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(
             serviceType, implementationType, lifetime)
         {
-            Name = implementationType.NameInCode();
+            Name = Variable.DefaultArgName(implementationType);
         }
 
         public CreationStyle CreationStyle { get; private set; }
@@ -103,6 +105,17 @@ namespace BlueMilk.IoC.Instances
 
             return null;
         }
+        
+        public Frame CreateBuildFrame()
+        {
+            var variables = new ResolverVariables();
+            var ctorParameters = _arguments.Select(arg => arg.Resolve(variables, BuildMode.Dependency)).ToArray();
+            
+            return new ConstructorFrame(this, DisposeTracking.None, ctorParameters)
+            {
+                ReturnCreated = true
+            };
+        }
 
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
         {
@@ -153,9 +166,12 @@ namespace BlueMilk.IoC.Instances
             // being created here, make the dependencies all be Dependency mode
             var dependencyMode = isRoot && mode == BuildMode.Build ? BuildMode.Dependency : mode;
 
-            var ctorParameters = _arguments.Select(arg => variables.Resolve(arg, dependencyMode)).ToArray();
+            var ctorParameters = _arguments.Select(arg => arg.Resolve(variables, dependencyMode)).ToArray();
             
-            return new NewConstructorFrame(this, disposalTracking, ctorParameters).Variable;
+            var frame = new ConstructorFrame(this, disposalTracking, ctorParameters).Variable;
+
+
+            return frame;
         }
 
         protected override IEnumerable<Instance> createPlan(ServiceGraph services)
@@ -168,24 +184,58 @@ namespace BlueMilk.IoC.Instances
             if (Constructor != null)
             {
                 // TODO -- this will need to get smarter when we have inline dependencies and named stuff
-                _arguments = Constructor.GetParameters().Select(x => services.FindDefault(x.ParameterType)).ToArray();
+                
+                
+                _arguments = Constructor.GetParameters().Select(x => new CtorArg(x, services.FindDefault(x.ParameterType))).Where(x => x.Instance != null).ToArray();
+
+
 
                 foreach (var argument in _arguments)
                 {
-                    argument.CreatePlan(services);
+                    argument.Instance.CreatePlan(services);
                 }
 
                 determineCreationStyleFromArguments();
             }
 
 
-            return _arguments;
+            return _arguments.Select(x => x.Instance);
+        }
+
+        public class CtorArg
+        {
+            public ParameterInfo Parameter { get; }
+            public Instance Instance { get; }
+
+            public CtorArg(ParameterInfo parameter, Instance instance)
+            {
+                Parameter = parameter;
+                Instance = instance;
+            }
+
+            public Variable Resolve(ResolverVariables variables, BuildMode mode)
+            {
+                var inner = Instance.CreateVariable(mode, variables, false);
+                if (Parameter.IsOptional)
+                {
+                    var wrapped = new Variable(inner.VariableType, $"{Parameter.Name}: {inner.Usage}");
+                    wrapped.Dependencies.Add(inner);
+
+                    return wrapped;
+                }
+                else
+                {
+                    return inner;
+                }
+            }
         }
 
 
         private void determineCreationStyleFromArguments()
         {
-            if (_arguments.Any())
+            // Have to do this on parameters and not args because of optional parameters
+            // Thank you ASP.Net Core team!
+            if (Constructor.GetParameters().Any())
             {
                 CreationStyle = CreationStyle.Generated;
 
@@ -261,12 +311,13 @@ namespace BlueMilk.IoC.Instances
 
             var method = _resolverType.MethodFor("Build");
 
-            var variable = CreateVariable(BuildMode.Build, new ResolverVariables(), true);
+            var frame = CreateBuildFrame();
 
-            method.ReturnVariable = variable;
-            method.Frames.Add(variable.Creator);
+            method.Frames.Add(frame);
+            
+            
         }
-        
-        
+
+
     }
 }

@@ -16,7 +16,9 @@ namespace BlueMilk.Codegen.ServiceLocation
 
         public bool Matches(Type type)
         {
-            return _services.CanResolve(type);
+            // TODO -- will need to redo this one
+            throw new NotImplementedException();
+            //return _services.CanResolve(type);
         }
 
         public Variable Create(Type type)
