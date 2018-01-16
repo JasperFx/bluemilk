@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Baseline;
+using Baseline.Dates;
 using BlueMilk.Codegen;
 using BlueMilk.Compilation;
 using BlueMilk.IoC;
@@ -37,7 +38,7 @@ namespace BlueMilk
 
 
             // This should blow up pretty fast if it's no good
-            applyScanners(services).Wait();
+            applyScanners(services).Wait(2.Seconds());
             
             _rootScope = rootScope;
             
