@@ -10,12 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
-    public interface IInstanceThatGeneratesResolver
-    {
-        void GenerateResolver(GeneratedAssembly generatedAssembly);
-    }
-
-    public abstract class GeneratedInstance : Instance, IInstanceThatGeneratesResolver
+    public abstract class GeneratedInstance : Instance
     {
         private GeneratedType _resolverType;
         
@@ -23,14 +18,14 @@ namespace BlueMilk.IoC.Instances
         {
         }
 
-        public abstract Frame CreateBuildFrame();
+        
         
         public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {
             if (ResolverBaseType == null || ErrorMessages.Any()) return;
             
             var typeName = (ServiceType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
-                .Replace(',', '_').Replace('.', '_');
+                .Replace(',', '_').Replace('.', '_').Replace("[", "").Replace("]", "");
             
             _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType));
 
@@ -63,11 +58,11 @@ namespace BlueMilk.IoC.Instances
             return generateVariableForBuilding(variables, mode, isRoot);
         }
 
-        protected abstract Variable generateVariableForBuilding(ResolverVariables variables, BuildMode mode,
-            bool isRoot);
+        public abstract Frame CreateBuildFrame();
+        protected abstract Variable generateVariableForBuilding(ResolverVariables variables, BuildMode mode, bool isRoot);
         
         
-        protected override IResolver buildResolver(Scope rootScope)
+        protected sealed override IResolver buildResolver(Scope rootScope)
         {
             if (_resolverType != null)
             {

@@ -189,7 +189,7 @@ namespace BlueMilk
         private Instance[] generateDynamicAssembly()
         {
             var generatedResolvers = instancesWithoutResolver()
-                .OfType<IInstanceThatGeneratesResolver>()
+                .OfType<GeneratedInstance>()
                 .ToArray();
 
 

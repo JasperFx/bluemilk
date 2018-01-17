@@ -75,6 +75,21 @@ namespace BlueMilk.IoC.Instances
 
             return closedInstance;
         }
+        
+        
+        protected override Variable generateVariableForBuilding(ResolverVariables variables, BuildMode mode, bool isRoot)
+        {
+            var disposalTracking = determineDisposalTracking(mode);
+
+            // This is goofy, but if the current service is the top level root of the resolver
+            // being created here, make the dependencies all be Dependency mode
+            var dependencyMode = isRoot && mode == BuildMode.Build ? BuildMode.Dependency : mode;
+
+            var ctorParameters = _arguments.Select(arg => arg.Resolve(variables, dependencyMode)).ToArray();
+
+
+            return new ConstructorFrame(this, disposalTracking, ctorParameters).Variable;
+        }
 
         
         public override Frame CreateBuildFrame()
@@ -111,21 +126,7 @@ namespace BlueMilk.IoC.Instances
             return DisposeTracking.None;
         }
 
-        protected override Variable generateVariableForBuilding(ResolverVariables variables, BuildMode mode, bool isRoot)
-        {
-            var disposalTracking = determineDisposalTracking(mode);
 
-            // This is goofy, but if the current service is the top level root of the resolver
-            // being created here, make the dependencies all be Dependency mode
-            var dependencyMode = isRoot && mode == BuildMode.Build ? BuildMode.Dependency : mode;
-
-            var ctorParameters = _arguments.Select(arg => arg.Resolve(variables, dependencyMode)).ToArray();
-            
-            var frame = new ConstructorFrame(this, disposalTracking, ctorParameters).Variable;
-
-
-            return frame;
-        }
 
         protected override IEnumerable<Instance> createPlan(ServiceGraph services)
         {

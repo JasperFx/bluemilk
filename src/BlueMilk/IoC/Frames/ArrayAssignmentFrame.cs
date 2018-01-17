@@ -26,11 +26,22 @@ namespace BlueMilk.IoC.Frames
         public Variable[] Elements { get; }
 
         public Variable Variable { get; }
+        public bool ReturnCreated { get; set; }
 
         public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             var elements = Elements.Select(x => x.Usage).Join(", ");
-            writer.Write($"var {Variable.Usage} = new {ElementType.FullNameInCode()}[]{{{elements}}};");
+
+            if (ReturnCreated)
+            {
+                writer.Write($"return new {ElementType.FullNameInCode()}[]{{{elements}}};");
+            }
+            else
+            {
+                writer.Write($"var {Variable.Usage} = new {ElementType.FullNameInCode()}[]{{{elements}}};");
+            }
+            
+            
             Next?.GenerateCode(method, writer);
         }
 
