@@ -21,7 +21,7 @@ namespace BlueMilk.IoC.Instances
         }
     }
      
-    public class ConstructorInstance : Instance, IInstanceThatGeneratesResolver
+    public class ConstructorInstance : GeneratedInstance
     {
         public static readonly string NoPublicConstructors = "No public constructors";
 
@@ -29,7 +29,7 @@ namespace BlueMilk.IoC.Instances
             "Cannot fill the dependencies of any of the public constructors";
 
         private CtorArg[] _arguments = new CtorArg[0];
-        private GeneratedType _resolverType;
+        
 
         public ConstructorInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(
             serviceType, implementationType, lifetime)
@@ -39,25 +39,7 @@ namespace BlueMilk.IoC.Instances
 
         public ConstructorInfo Constructor { get; private set; }
 
-        public Type ResolverBaseType
-        {
-            get
-            {
-                switch (Lifetime)
-                {
-                    case ServiceLifetime.Scoped:
-                        return typeof(ScopedResolver<>);
 
-                    case ServiceLifetime.Singleton:
-                        return typeof(SingletonResolver<>);
-
-                    case ServiceLifetime.Transient:
-                        return typeof(TransientResolver<>);
-                }
-
-                return null;
-            }
-        }
 
         public static ConstructorInstance For<T>(ServiceLifetime lifetime = ServiceLifetime.Transient)
         {
@@ -94,17 +76,8 @@ namespace BlueMilk.IoC.Instances
             return closedInstance;
         }
 
-        protected override IResolver buildResolver(Scope rootScope)
-        {
-            if (_resolverType != null)
-            {
-                return (IResolver) rootScope.QuickBuild(_resolverType.CompiledType);
-            }
-            
-            return null;
-        }
         
-        public Frame CreateBuildFrame()
+        public override Frame CreateBuildFrame()
         {
             var variables = new ResolverVariables();
             var ctorParameters = _arguments.Select(arg => arg.Resolve(variables, BuildMode.Dependency)).ToArray();
@@ -115,25 +88,7 @@ namespace BlueMilk.IoC.Instances
             };
         }
 
-        public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
-        {
-            if (Lifetime == ServiceLifetime.Singleton)
-                return mode == BuildMode.Build
-                    ? generateVariableForBuilding(variables, mode, isRoot)
-                    : new InjectedServiceField(this);
 
-            
-
-
-            if (Lifetime == ServiceLifetime.Scoped && mode == BuildMode.Dependency)
-            {
-                return new GetInstanceFrame(this).Variable;
-            }
-            
-            
-            
-            return generateVariableForBuilding(variables, mode, isRoot);
-        }
 
         private DisposeTracking determineDisposalTracking(BuildMode mode)
         {
@@ -156,7 +111,7 @@ namespace BlueMilk.IoC.Instances
             return DisposeTracking.None;
         }
 
-        private Variable generateVariableForBuilding(ResolverVariables variables, BuildMode mode, bool isRoot)
+        protected override Variable generateVariableForBuilding(ResolverVariables variables, BuildMode mode, bool isRoot)
         {
             var disposalTracking = determineDisposalTracking(mode);
 
@@ -264,23 +219,7 @@ namespace BlueMilk.IoC.Instances
         
         
 
-        public void GenerateResolver(GeneratedAssembly generatedAssembly)
-        {
-            if (ResolverBaseType == null || ErrorMessages.Any()) return;
-            
-            var typeName = (ServiceType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
-                .Replace(',', '_').Replace('.', '_');
-            
-            _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType));
 
-            var method = _resolverType.MethodFor("Build");
-
-            var frame = CreateBuildFrame();
-
-            method.Frames.Add(frame);
-            
-            
-        }
 
 
     }
