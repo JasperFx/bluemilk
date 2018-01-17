@@ -37,11 +37,27 @@ namespace BlueMilk.IoC.Instances
             Name = Variable.DefaultArgName(implementationType);
         }
 
-        public CreationStyle CreationStyle { get; private set; }
-
         public ConstructorInfo Constructor { get; private set; }
 
-        public Type ResolverBaseType { get; private set; }
+        public Type ResolverBaseType
+        {
+            get
+            {
+                switch (Lifetime)
+                {
+                    case ServiceLifetime.Scoped:
+                        return typeof(ScopedResolver<>);
+
+                    case ServiceLifetime.Singleton:
+                        return typeof(SingletonResolver<>);
+
+                    case ServiceLifetime.Transient:
+                        return typeof(TransientResolver<>);
+                }
+
+                return null;
+            }
+        }
 
         public static ConstructorInstance For<T>(ServiceLifetime lifetime = ServiceLifetime.Transient)
         {
@@ -85,24 +101,6 @@ namespace BlueMilk.IoC.Instances
                 return (IResolver) rootScope.QuickBuild(_resolverType.CompiledType);
             }
             
-
-            if (CreationStyle == CreationStyle.NoArg)
-            {
-                switch (Lifetime)
-                {
-                        case ServiceLifetime.Transient:
-                            return typeof(NoArgTransientResolver<>).CloseAndBuildAs<IResolver>(ImplementationType);
-                            
-                        case ServiceLifetime.Scoped:
-                            return typeof(NoArgScopedResolver<>).CloseAndBuildAs<IResolver>(ImplementationType);
-                            
-                        case ServiceLifetime.Singleton:
-                            return typeof(NoArgSingletonResolver<>).CloseAndBuildAs<IResolver>(rootScope, ImplementationType);
-                }
-
-                return null;
-            }
-
             return null;
         }
         
@@ -189,13 +187,10 @@ namespace BlueMilk.IoC.Instances
                 _arguments = Constructor.GetParameters().Select(x => new CtorArg(x, services.FindDefault(x.ParameterType))).Where(x => x.Instance != null).ToArray();
 
 
-
                 foreach (var argument in _arguments)
                 {
                     argument.Instance.CreatePlan(services);
                 }
-
-                determineCreationStyleFromArguments();
             }
 
 
@@ -231,35 +226,6 @@ namespace BlueMilk.IoC.Instances
         }
 
 
-        private void determineCreationStyleFromArguments()
-        {
-            // Have to do this on parameters and not args because of optional parameters
-            // Thank you ASP.Net Core team!
-            if (Constructor.GetParameters().Any())
-            {
-                CreationStyle = CreationStyle.Generated;
-
-                switch (Lifetime)
-                {
-                    case ServiceLifetime.Scoped:
-                        ResolverBaseType = typeof(ScopedResolver<>);
-                        break;
-
-                    case ServiceLifetime.Singleton:
-                        ResolverBaseType = typeof(SingletonResolver<>);
-                        break;
-
-                    case ServiceLifetime.Transient:
-                        ResolverBaseType = typeof(TransientResolver<>);
-                        break;
-                }
-            }
-            else
-            {
-                CreationStyle = CreationStyle.NoArg;
-            }
-
-        }
 
         public override string ToString()
         {
@@ -300,11 +266,9 @@ namespace BlueMilk.IoC.Instances
 
         public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {
-            if (CreationStyle == CreationStyle.NoArg) return;
-
             if (ResolverBaseType == null || ErrorMessages.Any()) return;
             
-            var typeName = (ImplementationType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
+            var typeName = (ServiceType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
                 .Replace(',', '_').Replace('.', '_');
             
             _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType));

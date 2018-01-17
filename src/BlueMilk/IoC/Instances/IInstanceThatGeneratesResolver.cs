@@ -5,6 +5,5 @@ namespace BlueMilk.IoC.Instances
     public interface IInstanceThatGeneratesResolver
     {
         void GenerateResolver(GeneratedAssembly generatedAssembly);
-        CreationStyle CreationStyle { get; }
     }
 }

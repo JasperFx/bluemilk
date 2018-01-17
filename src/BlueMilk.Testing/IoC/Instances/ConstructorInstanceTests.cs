@@ -165,38 +165,7 @@ namespace BlueMilk.Testing.IoC.Instances
 
         }
         
-        [Fact]
-        public void creation_style_is_no_arg_for_transient()
-        {
-            var instance = ConstructorInstance.For<AWidget>();
-            instance.Lifetime = ServiceLifetime.Transient;
-            
-            instance.CreatePlan(ServiceGraph.Empty());
-            
-            instance.CreationStyle.ShouldBe(CreationStyle.NoArg);
 
-            instance.Initialize(null);
-            instance.Resolver.ShouldBeOfType<NoArgTransientResolver<AWidget>>();
-            instance.ResolverBaseType.ShouldBeNull();
-            instance.RequiresServiceProvider.ShouldBeFalse();
-        }
-        
-        [Fact]
-        public void creation_style_is_no_arg_for_scoped()
-        {
-            var instance = ConstructorInstance.For<AWidget>();
-            instance.Lifetime = ServiceLifetime.Scoped;
-            
-            instance.CreatePlan(ServiceGraph.Empty());
-            
-            instance.CreationStyle.ShouldBe(CreationStyle.NoArg);
-
-            instance.Initialize(null);
-            instance.Resolver.ShouldBeOfType<NoArgScopedResolver<AWidget>>();
-            instance.ResolverBaseType.ShouldBeNull();
-            instance.RequiresServiceProvider.ShouldBeFalse();
-        }
-        
 
         [Fact]
         public void requires_service_provider_with_dependencies_negative()
@@ -231,24 +200,7 @@ namespace BlueMilk.Testing.IoC.Instances
         }
         
 
-        [Fact]
-        public void singleton_can_not_be_inlined_if_there_are_service_provider_requirements()
-        {
-            var theServices = new ServiceRegistry();
-            theServices.AddSingleton<IWidget, AWidget>();
-            theServices.AddTransient<Rule>(x => new BlueRule());
-            
-            var theGraph = new ServiceGraph(theServices, Scope.Empty());
-            theGraph.Initialize();
-            
-            var instance = ConstructorInstance.For<GuyWithWidgetAndRule>();
-            instance.Lifetime = ServiceLifetime.Singleton;
-            
-            instance.CreatePlan(theGraph);
-            
-            instance.CreationStyle.ShouldBe(CreationStyle.Generated);
-        }
-        
+
         [Theory]
         [InlineData(ServiceLifetime.Transient, typeof(TransientResolver<>))]
         [InlineData(ServiceLifetime.Singleton, typeof(SingletonResolver<>))]

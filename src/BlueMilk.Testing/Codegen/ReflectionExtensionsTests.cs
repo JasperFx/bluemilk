@@ -14,6 +14,25 @@ namespace BlueMilk.Testing.Codegen
             typeof(Handler<Message1>).FullNameInCode()
                 .ShouldBe($"BlueMilk.Testing.Codegen.Handler<{typeof(Message1).FullName}>");
         }
+
+        public interface ISomeInterface<T>
+        {
+            
+        }
+        
+        [Fact]
+        public void get_full_name_in_code_for_inner_generic_type()
+        {
+            typeof(ISomeInterface<string>).FullNameInCode()
+                .ShouldBe("BlueMilk.Testing.Codegen.ReflectionExtensionsTests.ISomeInterface<string>");
+        }
+        
+        [Fact]
+        public void get_name_in_code_for_inner_generic_type()
+        {
+            typeof(ISomeInterface<string>).NameInCode()
+                .ShouldBe("ReflectionExtensionsTests.ISomeInterface<string>");
+        }
         
         [Theory]
         [InlineData(typeof(void), "void")]

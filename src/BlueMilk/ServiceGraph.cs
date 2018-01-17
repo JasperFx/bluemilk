@@ -190,7 +190,6 @@ namespace BlueMilk
         {
             var generatedResolvers = instancesWithoutResolver()
                 .OfType<IInstanceThatGeneratesResolver>()
-                .Where(x => x.CreationStyle == CreationStyle.Generated)
                 .ToArray();
 
 

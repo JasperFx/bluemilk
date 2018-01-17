@@ -47,7 +47,12 @@ namespace BlueMilk.Codegen
             
             if (type.IsGenericType && !type.IsGenericTypeDefinition)
             {
-                var cleanName = type.Name.Split('`').First().Replace("+", ".");
+                var cleanName = type.Name.Split('`').First();
+                if (type.IsNested)
+                {
+                    cleanName = $"{type.ReflectedType.NameInCode()}.{cleanName}";
+                }
+                
                 var args = type.GetGenericArguments().Select(x => x.FullNameInCode()).Join(", ");
 
                 return $"{type.Namespace}.{cleanName}<{args}>";
@@ -63,6 +68,11 @@ namespace BlueMilk.Codegen
             if (type.IsGenericType && !type.IsGenericTypeDefinition)
             {
                 var cleanName = type.Name.Split('`').First().Replace("+", ".");
+                if (type.IsNested)
+                {
+                    cleanName = $"{type.ReflectedType.NameInCode()}.{cleanName}";
+                }
+                
                 var args = type.GetGenericArguments().Select(x => x.FullNameInCode()).Join(", ");
 
                 return $"{cleanName}<{args}>";
