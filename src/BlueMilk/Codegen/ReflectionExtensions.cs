@@ -18,6 +18,7 @@ namespace BlueMilk.Codegen
             {typeof(double), "double"},
             {typeof(bool), "bool"},
             {typeof(Task), "Task"},
+            {typeof(object), "object"},
         };
         
         public static bool IsAsync(this MethodInfo method)
