@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using BlueMilk.Codegen;
+using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
+using BlueMilk.Compilation;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
@@ -14,11 +17,11 @@ namespace BlueMilk.Testing.IoC.Acceptance
         
     }
 
-    public class SessionInstance : Instance
+    public class SessionInstance : GeneratedInstance
     {
         private Instance _store;
 
-        public SessionInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(serviceType, implementationType, lifetime)
+        public SessionInstance() : base(typeof(ISession), typeof(ISession), ServiceLifetime.Scoped)
         {
         }
 
@@ -28,16 +31,36 @@ namespace BlueMilk.Testing.IoC.Acceptance
             yield return _store;
         }
 
-        public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
+        public override Frame CreateBuildFrame()
         {
             throw new NotImplementedException();
         }
 
-        protected override IResolver buildResolver(Scope rootScope)
+        protected override Variable generateVariableForBuilding(ResolverVariables variables, BuildMode mode, bool isRoot)
         {
             throw new NotImplementedException();
         }
     }
+
+    public class OpenSessionFrame : SyncFrame
+    {
+        public OpenSessionFrame(SessionInstance instance, Variable store)
+        {
+            Variable = new ServiceVariable(instance, this);
+            uses.Add(store);
+        }
+        
+        public Variable Variable { get; }
+
+        public bool ReturnCreated { get; set; }
+
+        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
     
     public interface ISession{}
     public class Session : ISession {}
