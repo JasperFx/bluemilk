@@ -130,8 +130,11 @@ namespace BlueMilk.Codegen
             writeDeclaration(writer);
 
             var args = Args();
-            writeFieldDeclarations(writer, args);
-            writeConstructorMethod(writer, args);
+            if (args.Any())
+            {
+                writeFieldDeclarations(writer, args);
+                writeConstructorMethod(writer, args);
+            }
 
 
             foreach (var method in _methods)
