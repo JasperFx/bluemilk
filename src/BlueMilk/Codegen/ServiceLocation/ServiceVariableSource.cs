@@ -23,7 +23,7 @@ namespace BlueMilk.Codegen.ServiceLocation
 
         public Variable Create(Type type)
         {
-            return new ServiceCreationFrame(type).Service;
+            return new ServiceResolutionFrame(type).Service;
         }
     }
 }

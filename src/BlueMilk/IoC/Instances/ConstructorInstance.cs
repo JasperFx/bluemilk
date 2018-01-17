@@ -215,7 +215,7 @@ namespace BlueMilk.IoC.Instances
 
             public Variable Resolve(ResolverVariables variables, BuildMode mode)
             {
-                var inner = Instance.CreateVariable(mode, variables, false);
+                var inner = variables.Resolve(Instance, mode);
                 if (Parameter.IsOptional)
                 {
                     var wrapped = new Variable(inner.VariableType, $"{Parameter.Name}: {inner.Usage}");

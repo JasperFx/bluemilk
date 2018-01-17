@@ -39,7 +39,7 @@ namespace BlueMilk.Compilation
 
         public void CompileAll()
         {
-            var code = GenerateCode(Generation);
+            var code = GenerateCode();
 
             var generator = buildGenerator(Generation);
 
@@ -53,11 +53,11 @@ namespace BlueMilk.Compilation
             }
         }
         
-        public string GenerateCode(GenerationRules generation)
+        public string GenerateCode(ServiceGraph services = null)
         {
             foreach (var generatedType in GeneratedTypes)
             {
-                generatedType.ArrangeFrames();
+                generatedType.ArrangeFrames(services);
             }
             
             var namespaces = GeneratedTypes
@@ -75,7 +75,7 @@ namespace BlueMilk.Compilation
 
             writer.BlankLine();
 
-            writer.Namespace(generation.ApplicationNamespace);
+            writer.Namespace(Generation.ApplicationNamespace);
 
             foreach (var @class in GeneratedTypes)
             {

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Baseline;
-using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Frames;
@@ -37,7 +35,6 @@ namespace BlueMilk.IoC.Instances
             }
         }
 
-        public virtual bool IsLazy { get; } = false;
         
         public Type ServiceType { get; }
         public Type ImplementationType { get; }
@@ -156,28 +153,5 @@ namespace BlueMilk.IoC.Instances
         {
             return null;
         }
-    }
-
-    public class ErrorMessageResolver : IResolver
-    {
-        private readonly string _message;
-
-        public ErrorMessageResolver(Instance instance)
-        {
-            ServiceType = instance.ServiceType;
-            Name = instance.Name;
-            Hash = instance.GetHashCode();
-
-            _message = instance.ErrorMessages.Join(Environment.NewLine);
-        }
-
-        public object Resolve(Scope scope)
-        {
-            throw new BlueMilkException($"Cannot build registered instance {Name} of '{ServiceType.FullNameInCode()}':{Environment.NewLine}{_message}");
-        }
-
-        public Type ServiceType { get; }
-        public string Name { get; set; }
-        public int Hash { get; set; }
     }
 }

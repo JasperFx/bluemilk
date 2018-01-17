@@ -17,7 +17,7 @@ namespace BlueMilk.Codegen.Variables
 
         public Type ArgType { get; }
 
-        public string CtorArg { get; }
+        public string CtorArg { get; protected set; }
 
         public virtual string CtorArgDeclaration => $"{ArgType.NameInCode()} {CtorArg}";
 

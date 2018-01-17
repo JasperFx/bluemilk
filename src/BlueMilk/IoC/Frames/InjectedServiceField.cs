@@ -6,13 +6,33 @@ namespace BlueMilk.IoC.Frames
 {
     public class InjectedServiceField : InjectedField, IServiceVariable
     {
-        public InjectedServiceField(Instance instance) : base(instance.ServiceType, DefaultArgName(instance.ServiceType) + instance.GetHashCode().ToString().Replace("-", "_"))
+        private bool _isOnlyOne;
+
+        public InjectedServiceField(Instance instance) : base(instance.ServiceType,
+            DefaultArgName(instance.ServiceType) + instance.GetHashCode().ToString().Replace("-", "_"))
         {
             Instance = instance;
         }
 
-        public Instance Instance { get; }
+        public bool IsOnlyOne
+        {
+            private get => _isOnlyOne;
+            set
+            {
+                _isOnlyOne = value;
+                if (value)
+                {
+                    var defaultArgName = DefaultArgName(VariableType);
+                    OverrideName("_" +defaultArgName);
+                    CtorArg = defaultArgName;
+                }
+            }
+        }
 
-        public override string CtorArgDeclaration => $"[BlueMilk.Named(\"{Instance.Name}\")] {ArgType.NameInCode()} {CtorArg}";
+        public override string CtorArgDeclaration => IsOnlyOne
+            ? $"{ArgType.NameInCode()} {CtorArg}"
+            : $"[BlueMilk.Named(\"{Instance.Name}\")] {ArgType.NameInCode()} {CtorArg}";
+
+        public Instance Instance { get; }
     }
 }

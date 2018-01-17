@@ -38,6 +38,5 @@ namespace BlueMilk.IoC.Lazy
 
         public int Hash { get; set; }
         
-        public override bool IsLazy { get; } = true;
     }
 }

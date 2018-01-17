@@ -123,14 +123,14 @@ namespace BlueMilk.Codegen
                 : ReturnType.FullNameInCode();
         }
 
-        public void ArrangeFrames(GeneratedType type)
+        public void ArrangeFrames(GeneratedType type, ServiceGraph services)
         {
             if (!Frames.Any())
             {
                 throw new ArgumentOutOfRangeException(nameof(Frames), "Cannot be an empty list");
             }
             
-            var compiler = new MethodFrameArranger(this, type);
+            var compiler = new MethodFrameArranger(this, type, services);
             compiler.Arrange(out _asyncMode, out _top);
         }
 

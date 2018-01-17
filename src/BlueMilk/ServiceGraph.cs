@@ -398,5 +398,14 @@ namespace BlueMilk
             _chain.Clear();
         }
 
+        public bool CouldResolve(Type type)
+        {
+            return FindDefault(type) != null;
+        }
+
+        public static ServiceGraph For(IServiceCollection services)
+        {
+            return new Scope(services).ServiceGraph;
+        }
     }
 }

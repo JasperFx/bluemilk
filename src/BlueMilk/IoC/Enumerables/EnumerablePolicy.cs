@@ -121,7 +121,7 @@ namespace BlueMilk.IoC.Enumerables
         
         public ListInstance(Type serviceType) : base(serviceType, typeof(List<T>), ServiceLifetime.Transient)
         {
-            Name = Variable.DefaultArgName(serviceType);
+            Name = Variable.DefaultArgName(typeof(List<T>));
         }
 
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)

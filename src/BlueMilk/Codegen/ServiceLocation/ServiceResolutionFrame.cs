@@ -7,27 +7,13 @@ using BlueMilk.Compilation;
 
 namespace BlueMilk.Codegen.ServiceLocation
 {
-
-
-    public class ServiceVariable : Variable
-    {
-        public ServiceVariable(Type variableType, string usage, ServiceCreationFrame creator) : base(variableType, usage, creator)
-        {
-
-        }
-
-        public ServiceVariable(Type variableType, ServiceCreationFrame creator) : base(variableType, creator)
-        {
-        }
-    }
-
-    public class ServiceCreationFrame : SyncFrame
+    public class ServiceResolutionFrame : SyncFrame
     {
         private Variable _provider;
 
-        public ServiceCreationFrame(Type serviceType)
+        public ServiceResolutionFrame(Type serviceType)
         {
-            Service = new ServiceVariable(serviceType, this);
+            Service = new Variable(serviceType, this);
             
         }
 

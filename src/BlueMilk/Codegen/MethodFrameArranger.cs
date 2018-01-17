@@ -9,12 +9,19 @@ using BlueMilk.Util;
 
 namespace BlueMilk.Codegen
 {
+
+    
     public class MethodFrameArranger : IMethodVariables
     {
         private readonly GeneratedMethod _method;
         private readonly GeneratedType _type;
         private readonly Dictionary<Type, Variable> _variables = new Dictionary<Type, Variable>();
-        
+        private ServiceVariableSource _services;
+
+        public MethodFrameArranger(GeneratedMethod method, GeneratedType type, ServiceGraph services) : this(method, type)
+        {
+            _services = new ServiceVariableSource(services);
+        }
 
         public MethodFrameArranger(GeneratedMethod method, GeneratedType type)
         {
@@ -64,7 +71,7 @@ namespace BlueMilk.Codegen
 
             // Step 1a;) -- figure out if you can switch to inline service
             // creation instead of the container.
-            // TODO -- new service inliner
+            _services?.ReplaceVariables();
             
             
             // Step 2, calculate dependencies
@@ -111,12 +118,10 @@ namespace BlueMilk.Codegen
             // To get injected fields
             yield return _type;
 
-            // TODO -- reevaluate if this is a good idea
-            yield return ServiceProviderVariableSource.Instance;
-
-            //yield return new NoArgConcreteCreator();
-
-
+            if (variableSource == VariableSource.All && _services != null)
+            {
+                yield return _services;
+            }
         }
 
 

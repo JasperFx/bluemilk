@@ -211,11 +211,11 @@ namespace BlueMilk.Codegen
             CompiledType = generated.Single(x => x.Name == TypeName);
         }
 
-        public void ArrangeFrames()
+        public void ArrangeFrames(ServiceGraph services = null)
         {
             foreach (var method in _methods)
             {
-                method.ArrangeFrames(this);
+                method.ArrangeFrames(this, services);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Baseline;
 using BlueMilk.Codegen.Variables;
@@ -7,33 +8,64 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Frames
 {
-    public class ResolverVariables
+    public class ResolverVariables : IEnumerable<Variable>
     {
-        private readonly IList<Variable> _variables = new List<Variable>();
+        private readonly IList<Variable> _cached = new List<Variable>();
+        private readonly IList<Variable> _all = new List<Variable>();
+        
         
         public ResolverVariables()
         {
         }
 
-        public ResolverVariables(IEnumerable<Variable> existing)
+  
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            _variables.AddRange(existing);
+            return GetEnumerator();
+        }
+
+        public IEnumerator<Variable> GetEnumerator()
+        {
+            return _all.GetEnumerator();
         }
 
         public Variable[] AllFor(Instance instance)
         {
-            return _variables.Where(x => x.RefersTo(instance)).ToArray();
+            return _cached.Where(x => x.RefersTo(instance)).ToArray();
         }
 
         public Variable Resolve(Instance instance, BuildMode mode)
         {
-            if (instance.Lifetime == ServiceLifetime.Transient) return instance.CreateVariable(mode, this, false);
+            if (instance.Lifetime == ServiceLifetime.Transient)
+            {
+                var transient = instance.CreateVariable(mode, this, false);
+
+
+                var sameNamed = _all.Where(x => x.Usage == transient.Usage).ToArray();
+                if (sameNamed.Length == 1)
+                {
+                    sameNamed.Single().OverrideName(transient.Usage + "1");
+                    transient.OverrideName(transient.Usage + "2");
+                }
+                else if (sameNamed.Length > 1)
+                {
+                    transient.OverrideName(transient.Usage + (sameNamed.Length + 1));
+                }
+                
+                _all.Add(transient);
+
+                
+                
+                
+                return transient;
+            }
             
             var variable = AllFor(instance).SingleOrDefault();
             if (variable == null)
             {
                 variable = instance.CreateVariable(mode, this, false);
-                _variables.Add(variable);
+                _all.Add(variable);
+                _cached.Add(variable);
             }
 
             return variable;
@@ -48,7 +80,7 @@ namespace BlueMilk.IoC.Frames
                 variable.OverrideName(variable.Usage + "_" + index);
             }
             
-            _variables.Add(variable);
+            _cached.Add(variable);
         }
     }
 }

@@ -70,7 +70,7 @@ namespace BlueMilk.Codegen.Frames
                 throw new InvalidOperationException($"Frame {this} could not resolve one of its variables");
             }
 
-            uses.AddRange(variables);
+            uses.AddRange(variables.Where(x => x != null));
 
             _hasResolved = true;
         }
