@@ -22,7 +22,7 @@ namespace BlueMilk.IoC.Instances
         
         public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {
-            if (ResolverBaseType == null || ErrorMessages.Any()) return;
+            if (ErrorMessages.Any() || Dependencies.SelectMany(x => x.ErrorMessages).Any()) return;
             
             var typeName = (ServiceType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
                 .Replace(',', '_').Replace('.', '_').Replace("[", "").Replace("]", "");

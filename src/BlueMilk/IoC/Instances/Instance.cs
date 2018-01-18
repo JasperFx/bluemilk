@@ -112,14 +112,7 @@ namespace BlueMilk.IoC.Instances
 
             if (Resolver == null)
             {
-                if (ErrorMessages.Any())
-                {
-                    Resolver = new ErrorMessageResolver(this);
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Instance {this} cannot build a valid resolver");
-                }
+                Resolver = new ErrorMessageResolver(this);
             }
 
             Resolver.Hash = GetHashCode();

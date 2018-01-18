@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Baseline;
 using Baseline.Reflection;
 using BlueMilk.IoC.Diagnostics;
 using BlueMilk.IoC.Instances;
+using BlueMilk.Scanning;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
@@ -192,6 +194,46 @@ namespace BlueMilk.IoC
                 ServiceType = serviceType,
                 TypeName = typeName
             });
+        }
+        
+        /// <summary>
+        /// Returns a textual report of all the assembly scanners used to build up this Container
+        /// </summary>
+        /// <returns></returns>
+        public string WhatDidIScan()
+        {
+            var scanners = Model.Scanners;
+
+            if (!scanners.Any()) return "No type scanning in this Container";
+
+            var writer = new StringWriter();
+            writer.WriteLine("All Scanners");
+            writer.WriteLine("================================================================");
+
+            scanners.Each(scanner =>
+            {
+                scanner.Describe(writer);
+
+                writer.WriteLine();
+                writer.WriteLine();
+            });
+
+            var failed = TypeRepository.FailedAssemblies();
+            if (failed.Any())
+            {
+                writer.WriteLine();
+                writer.WriteLine("Assemblies that failed in the call to Assembly.GetExportedTypes()");
+                failed.Each(assem =>
+                {
+                    writer.WriteLine("* " + assem.Record.Name);
+                });
+            }
+            else
+            {
+                writer.WriteLine("No problems were encountered in exporting types from Assemblies");
+            }
+
+            return writer.ToString();
         }
     }
 }

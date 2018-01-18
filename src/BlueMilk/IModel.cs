@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BlueMilk.IoC.Instances;
+using BlueMilk.Scanning.Conventions;
 
 namespace BlueMilk
 {
@@ -91,6 +92,11 @@ namespace BlueMilk
         /// <returns></returns>
         bool HasRegistrationFor<T>();
 
+        /// <summary>
+        /// All of the assembly scanning operations that were used to build this
+        /// Container
+        /// </summary>
+        IEnumerable<AssemblyScanner> Scanners { get; }
 
     }
 }

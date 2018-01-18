@@ -20,6 +20,11 @@ namespace BlueMilk.Scanning.Conventions
         private readonly List<AssemblyScanRecord> _records = new List<AssemblyScanRecord>();
         private Task<TypeSet> _typeFinder;
 
+        public AssemblyScanner()
+        {
+            Exclude(type => type.HasAttribute<BlueMilkIgnoreAttribute>());
+        }
+
         public int Count => _assemblies.Count;
 
         public string Description { get; set; }

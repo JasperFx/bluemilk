@@ -111,6 +111,7 @@ namespace BlueMilk.Testing.IoC
         }
     }
 
+    [BlueMilkIgnore]
     public class Singleton1 : SingletonResolver<IClock>
     {
         public Singleton1(Scope topLevelScope) : base(topLevelScope)
@@ -123,6 +124,7 @@ namespace BlueMilk.Testing.IoC
         }
     }
     
+    [BlueMilkIgnore]
     public class DisposableSingleton : SingletonResolver<IClock>
     {
         public DisposableSingleton(Scope topLevelScope) : base(topLevelScope)

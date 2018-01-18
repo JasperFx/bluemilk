@@ -68,10 +68,10 @@ namespace BlueMilk
 
         private async Task applyScanners(IServiceCollection services)
         {
-            var scanners = services.Select(x => x.ImplementationInstance).OfType<AssemblyScanner>().ToArray();
+            _scanners = services.Select(x => x.ImplementationInstance).OfType<AssemblyScanner>().ToArray();
             services.RemoveAll(x => x.ServiceType == typeof(AssemblyScanner));
 
-            foreach (var scanner in scanners)
+            foreach (var scanner in _scanners)
             {
                 await scanner.ApplyRegistrations(services);
             }
@@ -338,6 +338,7 @@ namespace BlueMilk
         }
 
         private readonly Stack<Instance> _chain = new Stack<Instance>();
+        private AssemblyScanner[] _scanners = new AssemblyScanner[0];
 
         internal void StartingToPlan(Instance instance)
         {
@@ -436,6 +437,8 @@ namespace BlueMilk
         {
             return FindDefault(typeof(T)) != null;
         }
+
+        IEnumerable<AssemblyScanner> IModel.Scanners => _scanners;
 
         internal void ClearPlanning()
         {

@@ -130,6 +130,11 @@ namespace BlueMilk
         string WhatDoIHave(Type serviceType = null, Assembly assembly = null, string @namespace = null,
             string typeName = null);
 
+        /// <summary>
+        /// Returns a textual report of all the assembly scanners used to build up this Container
+        /// </summary>
+        /// <returns></returns>
+        string WhatDidIScan();
     }
     
     public enum DisposalLock
