@@ -238,7 +238,7 @@ namespace BlueMilk
                 .GroupBy(x => x.ServiceType)
                 .Select(group =>
                 {
-                    if (group.Key.IsGenericType)
+                    if (group.Key.IsGenericType && !group.Key.IsOpenGeneric())
                     {
                         return buildClosedGenericType(group.Key, services);
                     }
@@ -338,6 +338,7 @@ namespace BlueMilk
         }
 
         private readonly Stack<Instance> _chain = new Stack<Instance>();
+
         internal void StartingToPlan(Instance instance)
         {
             if (_chain.Contains(instance))
@@ -390,6 +391,50 @@ namespace BlueMilk
         IServiceFamilyConfiguration IModel.For(Type type)
         {
             return ResolveFamily(type);
+        }
+
+        IEnumerable<IServiceFamilyConfiguration> IModel.ServiceTypes => _families.Values.ToArray();
+
+        IEnumerable<Instance> IModel.InstancesOf(Type serviceType)
+        {
+            return FindAll(serviceType);
+        }
+
+        IEnumerable<Instance> IModel.InstancesOf<T>()
+        {
+            return FindAll(typeof(T));
+        }
+
+        Type IModel.DefaultTypeFor<T>()
+        {
+            return FindDefault(typeof(T))?.ImplementationType;
+        }
+
+        Type IModel.DefaultTypeFor(Type serviceType)
+        {
+            return FindDefault(serviceType)?.ImplementationType;
+        }
+
+        IEnumerable<Instance> IModel.AllInstances => AllInstances().ToArray();
+
+        T[] IModel.GetAllPossible<T>()
+        {
+            return AllInstances().ToArray()
+                .Where(x => x.ImplementationType.CanBeCastTo(typeof(T)))
+                .Where(x => x.Resolver != null)
+                .Select(x => x.Resolver.Resolve(_rootScope))
+                .OfType<T>()
+                .ToArray();
+        }
+
+        bool IModel.HasRegistrationFor(Type serviceType)
+        {
+            return FindDefault(serviceType) != null;
+        }
+
+        bool IModel.HasRegistrationFor<T>()
+        {
+            return FindDefault(typeof(T)) != null;
         }
 
         internal void ClearPlanning()

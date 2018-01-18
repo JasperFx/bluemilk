@@ -77,6 +77,13 @@ namespace BlueMilk
 
                 return instance;
             }
+
+            public ConstructorInstance Add(Type implementationType)
+            {
+                var instance = new ConstructorInstance(_serviceType, implementationType, ServiceLifetime.Transient);
+                _parent.Add(instance);
+                return instance;
+            }
         }
 
         public class DescriptorExpression<T> where T : class

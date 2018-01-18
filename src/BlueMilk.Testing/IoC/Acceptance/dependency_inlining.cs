@@ -8,6 +8,7 @@ using BlueMilk.Codegen.Frames;
 using BlueMilk.Compilation;
 using BlueMilk.Testing.Codegen;
 using Microsoft.Extensions.DependencyInjection;
+using StructureMap.Testing.GenericWidgets;
 using StructureMap.Testing.Widget;
 using Xunit;
 
@@ -526,8 +527,6 @@ namespace BlueMilk.Testing.IoC.Acceptance
 
         }
     }
-
-    public interface IService<T>{}
 
     public class Service<T> : IService<T>
     {

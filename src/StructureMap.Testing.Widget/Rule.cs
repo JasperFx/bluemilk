@@ -15,6 +15,10 @@ namespace StructureMap.Testing.Widget
     {
         
     }
+    
+    public class ARule : Rule
+    {
+    }
 
     public class ComplexRule : Rule
     {
