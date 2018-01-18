@@ -125,8 +125,11 @@ namespace BlueMilk.IoC.Instances
         
 
         public bool IsDefault { get; set; } = false;
-        
 
+        /// <summary>
+        /// Tries to describe how this instance would be resolved at runtime
+        /// </summary>
+        public virtual string BuildPlan => ToString();
 
 
         public sealed override int GetHashCode()

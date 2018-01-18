@@ -16,7 +16,7 @@ namespace BlueMilk.Codegen
         private readonly GeneratedMethod _method;
         private readonly GeneratedType _type;
         private readonly Dictionary<Type, Variable> _variables = new Dictionary<Type, Variable>();
-        private ServiceVariableSource _services;
+        private readonly ServiceVariableSource _services;
 
         public MethodFrameArranger(GeneratedMethod method, GeneratedType type, ServiceGraph services) : this(method, type)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
@@ -71,7 +72,25 @@ namespace BlueMilk.IoC.Instances
             
             return null;
         }
-        
+
+        public override string BuildPlan
+        {
+            get
+            {
+                if (_resolverType != null)
+                {
+                    return _resolverType.SourceCode;
+                }
+
+                if (ErrorMessages.Any())
+                {
+                    return "Errors!" + Environment.NewLine + ErrorMessages.Join(Environment.NewLine);
+                }
+
+                return ToString();
+            }
+        }
+
         public Type ResolverBaseType
         {
             get

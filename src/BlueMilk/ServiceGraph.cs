@@ -208,6 +208,7 @@ namespace BlueMilk
                 instance.GenerateResolver(generatedAssembly);
             }
 
+            
             generatedAssembly.CompileAll();
 
             return generatedResolvers.OfType<Instance>().ToArray();
