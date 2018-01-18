@@ -1,4 +1,5 @@
-﻿using BlueMilk.Codegen.Variables;
+﻿using BlueMilk.Codegen;
+using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,5 +32,10 @@ namespace BlueMilk.IoC.Resolvers
         }
 
         public int Hash { get; set; }
+
+        public override string ToString()
+        {
+            return $"Current {typeof(T).NameInCode()}";
+        }
     }
 }

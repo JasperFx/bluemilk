@@ -40,6 +40,7 @@ namespace BlueMilk.Codegen
 
             return false;
         }
+        
 
         public static string FullNameInCode(this Type type)
         {

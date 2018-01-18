@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace BlueMilk
 {
@@ -115,6 +116,19 @@ namespace BlueMilk
         object TryGetInstance(Type serviceType, string name);
 
 
+        /// <summary>
+        /// Returns a report detailing the complete configuration of all PluginTypes and Instances
+        /// </summary>
+        /// <param name="serviceType">Optional parameter to filter the results down to just this plugin type.</param>
+        /// <param name="assembly">Optional parameter to filter the results down to only plugin types from this
+        /// <see cref="Assembly"/>.</param>
+        /// <param name="namespace">Optional parameter to filter the results down to only plugin types from this
+        /// namespace.</param>
+        /// <param name="typeName">Optional parameter to filter the results down to any plugin type whose name contains
+        ///  this text.</param>
+        /// <returns>The detailed report of the configuration.</returns>
+        string WhatDoIHave(Type serviceType = null, Assembly assembly = null, string @namespace = null,
+            string typeName = null);
 
     }
     

@@ -2,9 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Baseline;
 using Baseline.Reflection;
-using BlueMilk.Codegen;
+using BlueMilk.IoC.Diagnostics;
 using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -176,30 +177,21 @@ namespace BlueMilk.IoC
         {
             return new Scope(ServiceGraph);
         }
-    }
+        
 
-
-    public class BlueMilkException : Exception
-    {
-        public BlueMilkException(string message) : base(message)
+        public string WhatDoIHave(Type serviceType = null, Assembly assembly = null, string @namespace = null,
+            string typeName = null)
         {
-        }
+            //assertNotDisposed();
 
-        public BlueMilkException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-    }
-
-    public class BlueMilkMissingRegistrationException : BlueMilkException
-    {
-        public BlueMilkMissingRegistrationException(Type serviceType, string name) : base($"Unknown service registration '{name}' of {serviceType.FullNameInCode()}")
-        {
-        }
-
-        public BlueMilkMissingRegistrationException(Type serviceType) : base($"No service registrations exist or can be derived for {serviceType.FullNameInCode()}")
-        {
+            var writer = new WhatDoIHaveWriter(ServiceGraph);
+            return writer.GetText(new ModelQuery
+            {
+                Assembly = assembly,
+                Namespace = @namespace,
+                ServiceType = serviceType,
+                TypeName = typeName
+            });
         }
     }
-    
-    
 }

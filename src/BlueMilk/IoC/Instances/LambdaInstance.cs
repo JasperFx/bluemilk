@@ -19,10 +19,22 @@ namespace BlueMilk.IoC.Instances
             Name = serviceType.NameInCode();
         }
 
+        private LambdaInstance(Type serviceType, Type concreteType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime) : base(serviceType, concreteType, lifetime)
+        {
+            Factory = factory;
+            Name = concreteType.NameInCode();
+        }
+
         public static LambdaInstance For<T>(Func<IServiceProvider, T> factory,
             ServiceLifetime lifetime = ServiceLifetime.Transient)
         {
             return new LambdaInstance(typeof(T), s => factory(s), lifetime);
+        }
+        
+        public static LambdaInstance For<T, TConcrete>(Func<IServiceProvider, TConcrete> factory,
+            ServiceLifetime lifetime = ServiceLifetime.Transient)
+        {
+            return new LambdaInstance(typeof(T), typeof(TConcrete), s => factory(s), lifetime);
         }
 
         public override bool RequiresServiceProvider { get; } = true;
@@ -51,7 +63,7 @@ namespace BlueMilk.IoC.Instances
 
         public override string ToString()
         {
-            return $"Lambda Factory of {ServiceType.FullNameInCode()}";
+            return $"Lambda Factory of {ServiceType.NameInCode()}";
         }
     }
 }
