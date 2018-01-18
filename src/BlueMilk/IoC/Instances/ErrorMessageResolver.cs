@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.IoC.Resolvers;
@@ -15,7 +17,12 @@ namespace BlueMilk.IoC.Instances
             Name = instance.Name;
             Hash = instance.GetHashCode();
 
-            _message = instance.ErrorMessages.Join(Environment.NewLine);
+            var dependencyProblems = instance.Dependencies.SelectMany(dep =>
+                {
+                    return dep.ErrorMessages.Select(x => $"Dependency {dep}: {x}");
+                });
+            
+            _message = instance.ErrorMessages.Concat(dependencyProblems).Join(Environment.NewLine);
         }
 
         public object Resolve(Scope scope)
