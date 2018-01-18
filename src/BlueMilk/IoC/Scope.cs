@@ -15,6 +15,8 @@ namespace BlueMilk.IoC
 {
     public class Scope : IContainer, IServiceScope, IServiceProvider, ISupportRequiredService, IServiceScopeFactory
     {
+        protected bool _hasDisposed;
+        
         public static Scope Empty()
         {
             return new Scope(new ServiceRegistry());
@@ -32,6 +34,18 @@ namespace BlueMilk.IoC
         {
             ServiceGraph = serviceGraph;
         }
+        
+        /// <summary>
+        /// Asserts that this container is not disposed yet.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">If the container is disposed.</exception>
+        private void assertNotDisposed()
+        {
+            if (!_hasDisposed) return;
+
+            throw new ObjectDisposedException("This Container has been disposed");
+        }
+
 
         public DisposalLock DisposalLock { get; set; } = DisposalLock.Unlocked;
 
@@ -54,6 +68,13 @@ namespace BlueMilk.IoC
 
         public virtual void Dispose()
         {
+            if (DisposalLock == DisposalLock.Ignore) return;
+
+            if (DisposalLock == DisposalLock.ThrowOnDispose) throw new InvalidOperationException("This Container has DisposalLock = DisposalLock.ThrowOnDispose and cannot be disposed until the lock is cleared");
+
+            if (_hasDisposed) return;
+            _hasDisposed = true;
+
             foreach (var disposable in Disposables)
             {
                 disposable.SafeDispose();
@@ -69,8 +90,6 @@ namespace BlueMilk.IoC
         
         public T GetInstance<T>()
         {
-            // TODO -- sad path, not found
-            // TODO -- validate object disposed
             return (T) GetInstance(typeof(T));
         }
 
@@ -81,9 +100,9 @@ namespace BlueMilk.IoC
 
         public object GetInstance(Type serviceType)
         {
+            assertNotDisposed();
             var resolver = ServiceGraph.FindResolver(serviceType);
             
-            // TODO -- validate the existence of the resolver first
             if (resolver == null)
             {
                 throw new BlueMilkMissingRegistrationException(serviceType);
@@ -94,8 +113,8 @@ namespace BlueMilk.IoC
 
         public object GetInstance(Type serviceType, string name)
         {
-            // TODO -- sad path, not found
-            // TODO -- validate object disposed
+            assertNotDisposed();
+
             var resolver = ServiceGraph.FindResolver(serviceType, name);
             if (resolver == null)
             {
@@ -117,12 +136,14 @@ namespace BlueMilk.IoC
 
         public object TryGetInstance(Type serviceType)
         {
+            assertNotDisposed();
             var resolver = ServiceGraph.FindResolver(serviceType);
             return resolver?.Resolve(this) ?? null;
         }
 
         public object TryGetInstance(Type serviceType, string name)
         {
+            assertNotDisposed();
             var resolver = ServiceGraph.FindResolver(serviceType, name);
             return resolver?.Resolve(this) ?? null;
         }
@@ -135,6 +156,8 @@ namespace BlueMilk.IoC
 
         public object QuickBuild(Type objectType)
         {
+            assertNotDisposed();
+            
             if (!objectType.IsConcrete()) throw new InvalidOperationException("Type must be concrete");
 
             var ctor = ConstructorInstance.DetermineConstructor(ServiceGraph, objectType, out var message);
@@ -156,16 +179,19 @@ namespace BlueMilk.IoC
 
         public IContainer GetNestedContainer()
         {
+            assertNotDisposed();
             return new Scope(ServiceGraph);
         }
 
         public IReadOnlyList<T> GetAllInstances<T>()
         {
+            assertNotDisposed();
             return ServiceGraph.FindAll(typeof(T)).Select(x => x.Resolver.Resolve(this)).OfType<T>().ToList();
         }
 
         public IEnumerable GetAllInstances(Type serviceType)
         {
+            assertNotDisposed();
             return ServiceGraph.FindAll(serviceType).Select(x => x.Resolver.Resolve(this)).ToArray();
         }
 
@@ -177,6 +203,7 @@ namespace BlueMilk.IoC
 
         IServiceScope IServiceScopeFactory.CreateScope()
         {
+            assertNotDisposed();
             return new Scope(ServiceGraph);
         }
         
@@ -184,7 +211,7 @@ namespace BlueMilk.IoC
         public string WhatDoIHave(Type serviceType = null, Assembly assembly = null, string @namespace = null,
             string typeName = null)
         {
-            //assertNotDisposed();
+            assertNotDisposed();
 
             var writer = new WhatDoIHaveWriter(ServiceGraph);
             return writer.GetText(new ModelQuery
@@ -202,6 +229,8 @@ namespace BlueMilk.IoC
         /// <returns></returns>
         public string WhatDidIScan()
         {
+            assertNotDisposed();
+            
             var scanners = Model.Scanners;
 
             if (!scanners.Any()) return "No type scanning in this Container";

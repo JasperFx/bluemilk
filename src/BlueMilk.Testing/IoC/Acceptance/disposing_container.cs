@@ -206,6 +206,7 @@ namespace StructureMap.Testing.Pipeline
 
     public class C1Yes : Disposable, I1
     {
+        
     }
 
     public class C1No : NotDisposable, I1
