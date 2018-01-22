@@ -150,6 +150,8 @@ namespace BlueMilk
         /// <param name="assembly"></param>
         /// <returns></returns>
         string GenerateCodeWithInlineServices(GeneratedAssembly assembly);
+
+        object QuickBuild(Type objectType);
     }
     
     public enum DisposalLock
