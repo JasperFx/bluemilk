@@ -46,8 +46,8 @@ namespace BlueMilk.Testing.IoC.Acceptance
             {
                 if (_code.IsEmpty())
                 {
-                    var services = ServiceGraph.For(theServices);
-                    _code = theAssembly.GenerateCode(services);
+                    var container = new Container(theServices);
+                    _code = container.GenerateCodeWithInlineServices(theAssembly);
                 }
 
                 return _code;

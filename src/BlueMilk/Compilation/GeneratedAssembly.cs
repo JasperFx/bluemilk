@@ -37,9 +37,9 @@ namespace BlueMilk.Compilation
             return generatedType;
         }
 
-        public void CompileAll()
+        public void CompileAll(ServiceGraph services = null)
         {
-            var code = GenerateCode();
+            var code = GenerateCode(services);
 
             var generator = buildGenerator(Generation);
 

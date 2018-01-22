@@ -20,7 +20,7 @@ namespace BlueMilk.Codegen
 
         public MethodFrameArranger(GeneratedMethod method, GeneratedType type, ServiceGraph services) : this(method, type)
         {
-            _services = new ServiceVariableSource(services);
+            if (services != null) _services = new ServiceVariableSource(services);
         }
 
         public MethodFrameArranger(GeneratedMethod method, GeneratedType type)

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using BlueMilk.Compilation;
 
 namespace BlueMilk
 {
@@ -135,6 +136,20 @@ namespace BlueMilk
         /// </summary>
         /// <returns></returns>
         string WhatDidIScan();
+
+
+        /// <summary>
+        /// Use BlueMilk's inline object construction inside of the generated methods
+        /// </summary>
+        /// <param name="assembly"></param>
+        void CompileWithInlineServices(GeneratedAssembly assembly);
+
+        /// <summary>
+        /// Use BlueMilk's inline object construction inside of the generated methods
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
+        string GenerateCodeWithInlineServices(GeneratedAssembly assembly);
     }
     
     public enum DisposalLock

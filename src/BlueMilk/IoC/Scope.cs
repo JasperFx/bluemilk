@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using Baseline;
 using Baseline.Reflection;
+using BlueMilk.Compilation;
 using BlueMilk.IoC.Diagnostics;
 using BlueMilk.IoC.Instances;
 using BlueMilk.Scanning;
@@ -263,6 +264,16 @@ namespace BlueMilk.IoC
             }
 
             return writer.ToString();
+        }
+
+        public void CompileWithInlineServices(GeneratedAssembly assembly)
+        {
+            assembly.CompileAll(ServiceGraph);
+        }
+
+        public string GenerateCodeWithInlineServices(GeneratedAssembly assembly)
+        {
+            return assembly.GenerateCode(ServiceGraph);
         }
     }
 }

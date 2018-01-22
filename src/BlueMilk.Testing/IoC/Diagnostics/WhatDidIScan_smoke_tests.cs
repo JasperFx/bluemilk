@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using StructureMap.Testing.GenericWidgets;
 using StructureMap.Testing.Widget;
 using Xunit;
@@ -37,7 +38,7 @@ namespace BlueMilk.Testing.IoC.Diagnostics
                 });
             });
 
-            Debug.WriteLine(container.WhatDidIScan());
+            Console.WriteLine(container.WhatDidIScan());
             // ENDSAMPLE
         }
     }
