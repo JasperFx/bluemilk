@@ -13,12 +13,7 @@ namespace BlueMilk.IoC.Frames
         private readonly IList<Variable> _cached = new List<Variable>();
         private readonly IList<Variable> _all = new List<Variable>();
         
-        
-        public ResolverVariables()
-        {
-        }
 
-  
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

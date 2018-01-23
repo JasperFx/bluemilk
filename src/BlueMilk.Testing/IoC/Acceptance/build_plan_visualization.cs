@@ -18,7 +18,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
 
             var plan = container.Model.For<WidgetUser>().Default.BuildPlan;
             
-            plan.ShouldContain("public override object Build(BlueMilk.IoC.Scope scope)");
+            plan.ShouldContain("public override BlueMilk.Testing.IoC.Acceptance.WidgetUser Build(BlueMilk.IoC.Scope scope)");
         }    
     }
 }

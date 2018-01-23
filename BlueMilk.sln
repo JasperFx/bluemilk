@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructureMap.Testing.ExeWid
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructureMap.Testing.GenericWidgets", "src\StructureMap.Testing.GenericWidgets\StructureMap.Testing.GenericWidgets.csproj", "{BFC9380C-E94F-462B-96EA-0BCF5E431AB2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueMilk.Microsoft.DependencyInjection", "src\BlueMilk.Microsoft.DependencyInjection\BlueMilk.Microsoft.DependencyInjection.csproj", "{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{BFC9380C-E94F-462B-96EA-0BCF5E431AB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFC9380C-E94F-462B-96EA-0BCF5E431AB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFC9380C-E94F-462B-96EA-0BCF5E431AB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

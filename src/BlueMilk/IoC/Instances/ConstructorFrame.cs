@@ -89,5 +89,10 @@ namespace BlueMilk.IoC.Instances
                 yield return _scope;
             }
         }
+
+        public override string ToString()
+        {
+            return $"new {_implementationType.NameInCode()}({_arguments.Select(x => x.VariableType.NameInCode()).Join(", ")})";
+        }
     }
 }

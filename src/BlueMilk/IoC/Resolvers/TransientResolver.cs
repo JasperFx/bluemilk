@@ -15,7 +15,7 @@ namespace BlueMilk.IoC.Resolvers
             return service;
         }
         
-        public abstract object Build(Scope scope);
+        public abstract T Build(Scope scope);
 
         public Type ServiceType => typeof(T);
         

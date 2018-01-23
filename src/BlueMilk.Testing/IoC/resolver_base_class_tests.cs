@@ -80,7 +80,7 @@ namespace BlueMilk.Testing.IoC
 
     public class TransientClock : TransientResolver<IClock>
     {
-        public override object Build(Scope scope)
+        public override IClock Build(Scope scope)
         {
             return new Clock();
         }
@@ -88,7 +88,7 @@ namespace BlueMilk.Testing.IoC
 
     public class DisposableTransientClock : TransientResolver<IClock>
     {
-        public override object Build(Scope scope)
+        public override IClock Build(Scope scope)
         {
             return new DisposableClock();
         }
@@ -96,7 +96,7 @@ namespace BlueMilk.Testing.IoC
 
     public class ScopedClock : ScopedResolver<IClock>
     {
-        public override object Build(Scope scope)
+        public override IClock Build(Scope scope)
         {
             return new Clock();
         }
@@ -105,7 +105,7 @@ namespace BlueMilk.Testing.IoC
 
     public class DisposableScopedClock : ScopedResolver<IClock>
     {
-        public override object Build(Scope scope)
+        public override IClock Build(Scope scope)
         {
             return new DisposableClock();
         }

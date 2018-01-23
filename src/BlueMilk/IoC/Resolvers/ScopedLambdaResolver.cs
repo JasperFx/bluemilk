@@ -12,9 +12,10 @@ namespace BlueMilk.IoC.Resolvers
             _builder = builder;
         }
 
-        public override object Build(Scope scope)
+        public override T Build(Scope scope)
         {
-            return _builder(scope.ServiceProvider);
+            // TODO -- have an overload where you use Func<IServiceProvider, T>
+            return (T) _builder(scope.ServiceProvider);
         }
     }
 }

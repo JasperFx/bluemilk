@@ -124,7 +124,7 @@ namespace BlueMilk.Compilation
                         diagnostic.Severity == DiagnosticSeverity.Error);
 
 
-                    var message = GenericEnumerableExtensions.Join(failures.Select(x => $"{x.Id}: {x.GetMessage()}"), "\n");
+                    var message = failures.Select(x => $"{x.Id}: {x.GetMessage()}").Join("\n");
 
 
                     throw new InvalidOperationException("Compilation failures!\n\n" + message + "\n\nCode:\n\n" + code);

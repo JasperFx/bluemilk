@@ -47,7 +47,9 @@ namespace BlueMilk.IoC.Enumerables
                 var elementType = type.GetGenericArguments().First();
                 
                 var instanceType = typeof(ListInstance<>).MakeGenericType(elementType);
-                var instance = Activator.CreateInstance(instanceType, type).As<Instance>();
+                var ctor = instanceType.GetConstructors().Single();
+                var instance = ctor.Invoke(new object[]{type}).As<Instance>();
+                
                 return new ServiceFamily(type, instance);
             }
 

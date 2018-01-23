@@ -24,7 +24,7 @@ namespace BlueMilk.IoC.Resolvers
             return service;
         }
 
-        public abstract object Build(Scope scope);
+        public abstract T Build(Scope scope);
 
         public string Name { get; set; }
         public int Hash { get; set; }

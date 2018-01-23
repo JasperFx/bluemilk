@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Baseline;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +11,7 @@ namespace BlueMilk.Scanning.Conventions
         {
             foreach (var type in types.FindTypes(TypeClassification.Concretes).Where(x => x.GetConstructors().Any()))
             {
-                var interfaceType = type.GetInterfaces().FirstOrDefault();
+                var interfaceType = type.GetInterfaces().FirstOrDefault(x => x != typeof(IDisposable));
                 if (interfaceType != null && !interfaceType.HasAttribute<BlueMilkIgnoreAttribute>())
                 {
                     services.AddType(interfaceType, type);

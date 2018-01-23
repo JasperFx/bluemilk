@@ -27,11 +27,19 @@ namespace BlueMilk.Codegen.Frames
         protected internal readonly IList<Variable> creates = new List<Variable>();
         protected internal readonly IList<Variable> uses = new List<Variable>();
         private bool _hasResolved;
+        private Frame _next;
 
         public bool IsAsync { get; }
         public bool Wraps { get; protected set; } = false;
 
-        public Frame Next { get; set; }
+        public Frame Next
+        {
+            get { return _next; }
+            set { 
+            
+                if (_next != null) throw new InvalidOperationException("Frame chain is being re-arranged");
+                _next = value; }
+        }
 
         protected Frame(bool isAsync)
         {

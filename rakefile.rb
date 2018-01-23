@@ -36,6 +36,7 @@ end
 desc "Pack up the nupkg file"
 task :pack => [:compile] do
 	sh "dotnet pack src/BlueMilk/BlueMilk.csproj -o ./../../artifacts --configuration Release"
+	sh "dotnet pack src/BlueMilk.Microsoft.DependencyInjection/BlueMilk.Microsoft.DependencyInjection.csproj -o ./../../artifacts --configuration Release"
 end
 
 # TODO -- redo these tasks

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Baseline;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Frames;
@@ -82,9 +83,13 @@ namespace BlueMilk.IoC.Instances
                 return;
             }
             
-            var dependencies = createPlan(services) ?? Enumerable.Empty<Instance>();
+            // Can't do the planning on open generic types 'cause bad stuff happens
+            if (!ServiceType.IsOpenGeneric())
+            {
+                var dependencies = createPlan(services) ?? Enumerable.Empty<Instance>();
 
-            Dependencies = dependencies.Concat(dependencies.SelectMany(x => x.Dependencies)).Distinct().ToArray();
+                Dependencies = dependencies.Concat(dependencies.SelectMany(x => x.Dependencies)).Distinct().ToArray();
+            }
 
             services.ClearPlanning();
             HasPlanned = true;
