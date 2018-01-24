@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Baseline;
 using BlueMilk.Microsoft.DependencyInjection;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal;
@@ -51,14 +53,15 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
         }
         
         [Fact]
-        public async Task use_in_app()
+        public void use_in_app()
         {
             var builder = new WebHostBuilder();
             builder
-                .UseUrls("http://localhost:5002")
                 .UseBlueMilk()
+                .UseUrls("http://localhost:5002")
                 
-                .UseKestrel()
+                
+                .UseServer(new NulloServer())
                 
                 .UseStartup<Startup>();
 
@@ -67,7 +70,7 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
                 var container = host.Services.ShouldBeOfType<Container>();
 
                 var errors = container.Model.AllInstances.Where(x => x.ErrorMessages.Any())
-                    .SelectMany(x => x.ErrorMessages);
+                    .SelectMany(x => x.ErrorMessages).ToArray();
 
                 if (errors.Any())
                 {
@@ -86,6 +89,26 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
             
 
         }
+    }
+
+    public class NulloServer : IServer
+    {
+        public void Dispose()
+        {
+            
+        }
+
+        public Task StartAsync<TContext>(IHttpApplication<TContext> application, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public IFeatureCollection Features { get; } = new FeatureCollection();
     }
 
     public class Startup

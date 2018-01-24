@@ -267,7 +267,7 @@ namespace BlueMilk
                     {
                         return instance.CloseType(serviceType, arguments);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         return null;
                     }

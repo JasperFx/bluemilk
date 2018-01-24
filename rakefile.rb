@@ -31,6 +31,7 @@ task :test => [:compile] do
 	Dir.mkdir RESULTS_DIR
 
 	sh "dotnet test src/BlueMilk.Testing/BlueMilk.Testing.csproj"
+	sh "dotnet test src/BlueMilk.AspNetCoreTests/BlueMilk.AspNetCoreTests.csproj"
 end
 
 desc "Pack up the nupkg file"

@@ -12,7 +12,7 @@ namespace BlueMilk
 {
     public class Container : Scope, IServiceScopeFactory
     {
-        public static Container Empty()
+        public new static Container Empty()
         {
             return For(_ => { });
         }

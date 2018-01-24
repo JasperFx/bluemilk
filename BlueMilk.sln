@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructureMap.Testing.Generi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueMilk.Microsoft.DependencyInjection", "src\BlueMilk.Microsoft.DependencyInjection\BlueMilk.Microsoft.DependencyInjection.csproj", "{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueMilk.AspNetCoreTests", "src\BlueMilk.AspNetCoreTests\BlueMilk.AspNetCoreTests.csproj", "{EFFC9632-2B12-4A67-AE59-B9C4698AF0CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFFC9632-2B12-4A67-AE59-B9C4698AF0CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFFC9632-2B12-4A67-AE59-B9C4698AF0CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFFC9632-2B12-4A67-AE59-B9C4698AF0CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFFC9632-2B12-4A67-AE59-B9C4698AF0CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
