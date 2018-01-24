@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
+using BlueMilk.Compilation;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -212,7 +213,46 @@ namespace BlueMilk.Testing.Codegen
             MethodCall.For<MethodCallTarget>(x => x.Throw(null))
                 .DisposalMode.ShouldBe(DisposalMode.UsingBlock);
         }
+        
+        [Fact]
+        public void use_with_output_arguments_and_no_return_value()
+        {
+            var @call = new MethodCall(typeof(MethodCallTarget), nameof(MethodCallTarget.WithOuts));
+            
+            @call.ReturnVariable.ShouldBeNull();
 
+            @call.Arguments[0].ShouldBeNull();
+            @call.Arguments[1].ShouldBeOfType<OutArgument>();
+            @call.Arguments[2].ShouldBeOfType<OutArgument>();
+            
+            @call.Creates.Select(x => x.VariableType)
+                .ShouldHaveTheSameElementsAs(typeof(string), typeof(int));
+        }
+        
+        
+        [Fact]
+        public void use_with_output_arguments_and_return_value()
+        {
+            var @call = new MethodCall(typeof(MethodCallTarget), nameof(MethodCallTarget.ReturnAndOuts));
+            
+            @call.ReturnVariable.VariableType.ShouldBe(typeof(bool));
+            
+            @call.Creates.Select(x => x.VariableType)
+                .ShouldHaveTheSameElementsAs(typeof(bool),typeof(string), typeof(int));
+        }
+        
+        [Fact]
+        public void generate_code_with_output_variables()
+        {
+            var @call = new MethodCall(typeof(MethodCallTarget), nameof(MethodCallTarget.ReturnAndOuts));
+            @call.Arguments[0] = new Variable(typeof(string), "input");
+            @call.IsLocal = true;
+            
+            var writer = new SourceWriter();
+            @call.GenerateCode(new GeneratedMethod("Go", typeof(void)), writer);
+            
+            writer.Code().Trim().ShouldBe("var result_of_ReturnAndOuts = ReturnAndOuts(input, out var string, out var int32);");
+        }
     }
 
     public class Ball
@@ -230,6 +270,20 @@ namespace BlueMilk.Testing.Codegen
         public void Throw(Ball ball)
         {
             
+        }
+
+        public void WithOuts(string in1, out string out1, out int out2)
+        {
+            out1 = "foo";
+            out2 = 2;
+        }
+
+        public bool ReturnAndOuts(string in1, out string out1, out int out2)
+        {
+            out1 = "foo";
+            out2 = 2;
+
+            return true;
         }
         
         public string GetValue()

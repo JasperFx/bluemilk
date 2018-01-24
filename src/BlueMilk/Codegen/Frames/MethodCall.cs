@@ -57,7 +57,18 @@ namespace BlueMilk.Codegen.Frames
                 ReturnVariable = new Variable(variableType, name, this);
             }
 
-            Arguments = new Variable[method.GetParameters().Length];
+            var parameters = method.GetParameters();
+            Arguments = new Variable[parameters.Length];
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var param = parameters[i];
+                if (param.IsOut)
+                {
+                    var paramType = param.ParameterType.IsByRef ? param.ParameterType.GetElementType() : param.ParameterType;
+                    Arguments[i] = new OutArgument(paramType, this);
+                }
+            }
+            
         }
         
         
@@ -195,7 +206,7 @@ namespace BlueMilk.Codegen.Frames
                 methodName += $"<{Method.GetGenericArguments().Select(x => x.FullName).Join(", ")}>";
             }
 
-            var callingCode = $"{methodName}({Arguments.Select(x => x.Usage).Join(", ")})";
+            var callingCode = $"{methodName}({Arguments.Select(x => x.ArgumentDeclaration).Join(", ")})";
             var target = determineTarget();
             var invokeMethod = $"{target}{callingCode}";
             return invokeMethod;

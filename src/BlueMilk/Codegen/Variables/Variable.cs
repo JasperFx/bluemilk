@@ -67,6 +67,7 @@ namespace BlueMilk.Codegen.Variables
         public Type VariableType { get; }
         public string Usage { get; protected set; }
 
+        public virtual string ArgumentDeclaration => Usage;
 
         /// <summary>
         /// On rare occasions you may need to override the variable name

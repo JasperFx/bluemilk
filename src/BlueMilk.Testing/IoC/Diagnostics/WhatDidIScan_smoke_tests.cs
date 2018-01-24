@@ -6,6 +6,7 @@ using Xunit;
 
 namespace BlueMilk.Testing.IoC.Diagnostics
 {
+    [Collection("scanning")]
     public class WhatDidIScan_smoke_tester
     {
         [Fact]
