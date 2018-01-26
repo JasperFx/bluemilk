@@ -275,5 +275,54 @@ namespace BlueMilk.IoC
         {
             return assembly.GenerateCode(ServiceGraph);
         }
+
+        public void AssertConfigurationIsValid(AssertMode mode = AssertMode.Full)
+        {
+            var writer = new StringWriter();
+            bool hasErrors = validateConfiguration(writer);
+            
+
+            if (hasErrors)
+            {
+                writer.WriteLine();
+                writer.WriteLine();
+                writer.WriteLine("The known registrations are:");
+                writer.WriteLine(WhatDoIHave());
+                
+                throw new ContainerValidationException(writer.ToString());
+            }
+            
+            
+            
+        }
+
+        private bool validateConfiguration(StringWriter writer)
+        {
+            var invalids = Model.AllInstances.Where(x => x.ErrorMessages.Any()).ToArray();
+
+            if (!invalids.Any()) return false;
+            
+
+            foreach (var instance in invalids)
+            {
+                writer.WriteLine(instance);
+                foreach (var message in instance.ErrorMessages)
+                {
+                    writer.WriteLine(message);
+                }
+                
+                writer.WriteLine();
+                writer.WriteLine();
+            }
+
+            return true;
+        }
+    }
+
+    public class ContainerValidationException : Exception
+    {
+        public ContainerValidationException(string message) : base(message)
+        {
+        }
     }
 }

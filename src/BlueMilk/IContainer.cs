@@ -18,6 +18,13 @@ namespace BlueMilk
         T QuickBuild<T>();
         
         /// <summary>
+        /// Suitable for building concrete types that will be resolved only a few times
+        /// to avoid the cost of having to register or build out a pre-compiled "build plan"
+        /// internally
+        /// </summary>
+        object QuickBuild(Type objectType);
+        
+        /// <summary>
         /// Creates or finds the default instance of <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The type which instance is to be created or found.</typeparam>
@@ -151,7 +158,29 @@ namespace BlueMilk
         /// <returns></returns>
         string GenerateCodeWithInlineServices(GeneratedAssembly assembly);
 
-        object QuickBuild(Type objectType);
+        
+        
+        
+        /// <summary>
+        /// Use with caution!  Does a full environment test of the configuration of this container.  Will try to create
+        /// every configured instance and afterward calls any methods marked with
+        /// <see cref="ValidationMethodAttribute"/>.
+        /// </summary>
+        void AssertConfigurationIsValid(AssertMode mode = AssertMode.Full);
+
+    }
+
+    public enum AssertMode
+    {
+        /// <summary>
+        /// Only validate on the known configuration of dependencies without trying to build services
+        /// </summary>
+        ConfigOnly,
+        
+        /// <summary>
+        /// Validate configuration, try to build all services, and execute any environment tests
+        /// </summary>
+        Full
     }
     
     public enum DisposalLock
