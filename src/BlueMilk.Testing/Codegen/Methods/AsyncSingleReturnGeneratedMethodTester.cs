@@ -31,6 +31,11 @@ namespace BlueMilk.Testing.Codegen.Methods
 
     public class ReturnFive : AsyncFrame
     {
+        public override bool CanReturnTask()
+        {
+            return true;
+        }
+
         public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             writer.Write("return Task.FromResult(5);");

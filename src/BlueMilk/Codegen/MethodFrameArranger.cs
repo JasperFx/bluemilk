@@ -34,8 +34,10 @@ namespace BlueMilk.Codegen
         public void Arrange(out AsyncMode asyncMode, out Frame topFrame)
         {
             var compiled = compileFrames(_method.Frames);
+            
+            
 
-            asyncMode = AsyncMode.ReturnCompletedTask;
+            asyncMode = AsyncMode.AsyncTask;
             
             if (compiled.All(x => !x.IsAsync))
             {
