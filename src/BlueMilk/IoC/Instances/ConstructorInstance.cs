@@ -208,7 +208,18 @@ namespace BlueMilk.IoC.Instances
                     .OrderByDescending(x => x.GetParameters().Length)
                     .FirstOrDefault(services.CouldBuild);
 
-                if (ctor == null) message = NoPublicConstructorCanBeFilled;
+                if (ctor == null)
+                {
+                    message = NoPublicConstructorCanBeFilled;
+                    message += $"{Environment.NewLine}Available constructors:";
+
+                    foreach (var constructor in constructors)
+                    {
+                        message += explainWhyConstructorCannotBeUsed(implementationType, constructor, services);
+                        message += Environment.NewLine;
+                    }
+
+                }
 
                 return ctor;
             }
@@ -217,11 +228,36 @@ namespace BlueMilk.IoC.Instances
 
             return null;
         }
-        
-        
+
+        private static string explainWhyConstructorCannotBeUsed(Type implementationType, ConstructorInfo constructor,
+            ServiceGraph services)
+        {
+
+            var args = constructor.GetParameters().Select(x => $"{x.ParameterType.NameInCode()} {x.Name}").Join(", ");
+            var declaration = $"new {implementationType.NameInCode()}({args})";
+
+            foreach (var parameter in constructor.GetParameters())
+            {
+                // TODO -- this will change with inline dependencies
+                if (parameter.ParameterType.IsSimple())
+                {
+                    declaration +=
+                        $"{Environment.NewLine}* {parameter.ParameterType.NameInCode()} {parameter.Name} is a 'simple' type that cannot be auto-filled";
+                }
+                else
+                {
+                    var @default = services.FindDefault(parameter.ParameterType);
+                    if (@default == null)
+                    {
+                        declaration +=
+                            $"{Environment.NewLine}* {parameter.ParameterType.NameInCode()} is not registered within this container and cannot be auto discovered by any missing family policy";
+                    }
+                }
+            }
 
 
 
-
+            return declaration;
+        }
     }
 }

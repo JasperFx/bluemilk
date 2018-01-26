@@ -59,6 +59,11 @@ namespace BlueMilk.Codegen
                 return $"{type.Namespace}.{cleanName}<{args}>";
             }
 
+            if (type.FullName == null)
+            {
+                return type.Name;
+            }
+            
             return type.FullName.Replace("+", ".");
         }
 

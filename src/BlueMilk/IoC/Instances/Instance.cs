@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Baseline;
+using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Frames;
@@ -50,9 +51,35 @@ namespace BlueMilk.IoC.Instances
 
             return new ConstructorInstance(service.ServiceType, service.ImplementationType, service.Lifetime);
         }
+        
+        public static bool CanBeCastTo(Type implementationType, Type serviceType)
+        {
+            if (implementationType == null) return false;
+
+            if (implementationType == serviceType) return true;
+
+
+            if (serviceType.IsOpenGeneric())
+            {
+                return GenericsPluginGraph.CanBeCast(serviceType, implementationType);
+            }
+
+            if (implementationType.IsOpenGeneric())
+            {
+                return false;
+            }
+
+
+            return serviceType.GetTypeInfo().IsAssignableFrom(implementationType.GetTypeInfo());
+        }
 
         protected Instance(Type serviceType, Type implementationType, ServiceLifetime lifetime)
         {
+            if (!CanBeCastTo(implementationType, serviceType))
+            {
+                throw new ArgumentOutOfRangeException(nameof(implementationType), $"{implementationType.FullNameInCode()} cannot be cast to {serviceType.FullNameInCode()}");
+            }
+            
             ServiceType = serviceType;
             Lifetime = lifetime;
             ImplementationType = implementationType;

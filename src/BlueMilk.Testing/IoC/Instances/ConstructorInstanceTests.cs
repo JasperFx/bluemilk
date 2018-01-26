@@ -100,7 +100,8 @@ namespace BlueMilk.Testing.IoC.Instances
             instance.CreatePlan(theGraph);
             
             instance.Constructor.ShouldBeNull();
-            instance.ErrorMessages.ShouldContain(ConstructorInstance.NoPublicConstructorCanBeFilled);
+            instance.ErrorMessages.Any(x => x.Contains(ConstructorInstance.NoPublicConstructorCanBeFilled))
+                .ShouldBeTrue();
         }
         
         [Fact]
