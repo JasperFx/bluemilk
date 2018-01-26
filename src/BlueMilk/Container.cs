@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
 {
-    public class Container : Scope, IServiceScopeFactory
+    public class Container : Scope, IContainer, IServiceScopeFactory
     {
         public new static Container Empty()
         {
@@ -40,7 +40,11 @@ namespace BlueMilk
         {
             
         }
-        
+
+        private Container(ServiceGraph serviceGraph) : base(serviceGraph)
+        {
+        }
+
 
         public IServiceScope CreateScope()
         {
@@ -48,7 +52,11 @@ namespace BlueMilk
         }
         
         
-        
+        public IContainer GetNestedContainer()
+        {
+            assertNotDisposed();
+            return new Container(ServiceGraph);
+        }
 
         public override void Dispose()
         {
@@ -59,7 +67,99 @@ namespace BlueMilk
         }
         
 
-        
+        public void AssertConfigurationIsValid(AssertMode mode = AssertMode.Full)
+        {
+            var writer = new StringWriter();
+            bool hasErrors = validateConfiguration(writer);
+
+            if (!hasErrors && mode == AssertMode.Full)
+            {
+                hasErrors = buildAndValidateAll(writer);
+            }
+
+            if (hasErrors)
+            {
+                writer.WriteLine();
+                writer.WriteLine();
+                writer.WriteLine("The known registrations are:");
+                writer.WriteLine(WhatDoIHave());
+                
+                throw new ContainerValidationException(writer.ToString());
+            }
+            
+            
+            
+        }
+
+        private bool buildAndValidateAll(StringWriter writer)
+        {
+            bool hasErrors = false;
+            
+            foreach (var instance in Model.AllInstances.Where(x => x.Lifetime == ServiceLifetime.Singleton))
+            {
+                try
+                {
+                    var o = instance.Resolver.Resolve(this);
+                    
+                    // TODO -- add validations here
+                }
+                catch (Exception e)
+                {
+                    hasErrors = true;
+                    
+                    writer.WriteLine("Error in " + instance);
+                    writer.WriteLine(e.ToString());
+                    writer.WriteLine();
+                    writer.WriteLine();
+                }
+            }
+
+            using (var scope = new Scope(ServiceGraph))
+            {
+                foreach (var instance in Model.AllInstances.Where(x => x.Lifetime != ServiceLifetime.Singleton))
+                {
+                    try
+                    {
+                        var o = instance.Resolver.Resolve(this);
+                    
+                        // TODO -- add validations here
+                    }
+                    catch (Exception e)
+                    {
+                        hasErrors = true;
+                    
+                        writer.WriteLine("Error in " + instance);
+                        writer.WriteLine(e.ToString());
+                        writer.WriteLine();
+                        writer.WriteLine();
+                    }
+                }
+            }
+
+            return hasErrors;
+        }
+
+        private bool validateConfiguration(StringWriter writer)
+        {
+            var invalids = Model.AllInstances.Where(x => x.ErrorMessages.Any()).ToArray();
+
+            if (!invalids.Any()) return false;
+            
+
+            foreach (var instance in invalids)
+            {
+                writer.WriteLine(instance);
+                foreach (var message in instance.ErrorMessages)
+                {
+                    writer.WriteLine(message);
+                }
+                
+                writer.WriteLine();
+                writer.WriteLine();
+            }
+
+            return true;
+        }
         
     }
 
