@@ -66,6 +66,34 @@ namespace BlueMilk.Testing.IoC.Acceptance
             ex.Message.ShouldContain("Error in new ThingThatBlowsUp(IWidget)");
             ex.Message.ShouldContain("DivideByZeroException");
         }
+        
+        [Fact]
+        public void using_validation_method_happy_path()
+        {
+            var container = new Container(_ =>
+            {
+                _.AddTransient<IWidget, BlueWidget>();
+                _.AddTransient<WidgetUserThatOnlyLikesBlue>();
+            });
+            
+            container.AssertConfigurationIsValid();
+        }
+        
+        [Fact]
+        public void using_validation_method_sad_path()
+        {
+            var container = new Container(_ =>
+            {
+                _.AddTransient<IWidget, RedWidget>();
+                _.AddTransient<WidgetUserThatOnlyLikesBlue>();
+            });
+
+            Exception<ContainerValidationException>.ShouldBeThrownBy(() =>
+            {
+                container.AssertConfigurationIsValid();
+            }).Message.ShouldContain("Only Blue");
+            
+        }
     }
 
     public class ThingThatBlowsUp
@@ -73,6 +101,24 @@ namespace BlueMilk.Testing.IoC.Acceptance
         public ThingThatBlowsUp(IWidget widget)
         {
             throw new DivideByZeroException();
+        }
+    }
+
+    public class WidgetUserThatOnlyLikesBlue
+    {
+        private readonly IWidget _widget;
+
+        public WidgetUserThatOnlyLikesBlue(IWidget widget)
+        {
+            _widget = widget;
+        }
+
+        [ValidationMethod]
+        public void OnlyBlue()
+        {
+            if (_widget is BlueWidget) return;
+            
+            throw new Exception("Only Blue");
         }
     }
 }

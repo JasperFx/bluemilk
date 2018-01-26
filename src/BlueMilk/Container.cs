@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using Baseline;
+using BlueMilk.Codegen;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.Scanning;
@@ -100,8 +101,26 @@ namespace BlueMilk
                 try
                 {
                     var o = instance.Resolver.Resolve(this);
-                    
-                    // TODO -- add validations here
+
+                    if (o != null)
+                    {
+                        foreach (var method in ValidationMethodAttribute.GetValidationMethods(o.GetType()))
+                        {
+                            try
+                            {
+                                method.Invoke(o, new object[0]);
+                            }
+                            catch (Exception e)
+                            {
+                                hasErrors = true;
+
+                                writer.WriteLine($"Error in {o.GetType().FullNameInCode()}.{method.Name}()");
+                                writer.WriteLine(e.ToString());
+                                writer.WriteLine();
+                                writer.WriteLine();
+                            }
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -122,7 +141,25 @@ namespace BlueMilk
                     {
                         var o = instance.Resolver.Resolve(this);
                     
-                        // TODO -- add validations here
+                        if (o != null)
+                        {
+                            foreach (var method in ValidationMethodAttribute.GetValidationMethods(o.GetType()))
+                            {
+                                try
+                                {
+                                    method.Invoke(o, new object[0]);
+                                }
+                                catch (Exception e)
+                                {
+                                    hasErrors = true;
+
+                                    writer.WriteLine($"Error in {o.GetType().FullNameInCode()}.{method.Name}()");
+                                    writer.WriteLine(e.ToString());
+                                    writer.WriteLine();
+                                    writer.WriteLine();
+                                }
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
