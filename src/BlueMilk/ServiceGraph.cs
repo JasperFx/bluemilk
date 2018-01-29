@@ -91,9 +91,6 @@ namespace BlueMilk
             organizeIntoFamilies(Services);
 
 
-            // TODO -- any validations
-
-
             buildOutMissingResolvers();
         }
         
@@ -229,27 +226,25 @@ namespace BlueMilk
 
         private void organizeIntoFamilies(IServiceCollection services)
         {
-
-
-
-            
             services
                 .Where(x => !x.ServiceType.HasAttribute<BlueMilkIgnoreAttribute>())
                 
                 .GroupBy(x => x.ServiceType)
-                .Select(group =>
-                {
-                    if (group.Key.IsGenericType && !group.Key.IsOpenGeneric())
-                    {
-                        return buildClosedGenericType(group.Key, services);
-                    }
-
-                    var instances = group.Select(Instance.For).ToArray();
-                    return new ServiceFamily(group.Key, instances);
-                })
+                .Select(group => buildFamilyForInstanceGroup(services, @group))
                 .Each(family => _families.Add(family.ServiceType, family));
 
 
+        }
+
+        private ServiceFamily buildFamilyForInstanceGroup(IServiceCollection services, IGrouping<Type, ServiceDescriptor> @group)
+        {
+            if (@group.Key.IsGenericType && !@group.Key.IsOpenGeneric())
+            {
+                return buildClosedGenericType(@group.Key, services);
+            }
+
+            var instances = @group.Select(Instance.For).ToArray();
+            return new ServiceFamily(@group.Key, instances);
         }
 
         private ServiceFamily buildClosedGenericType(Type serviceType, IServiceCollection services)
@@ -454,6 +449,51 @@ namespace BlueMilk
         public static ServiceGraph For(IServiceCollection services)
         {
             return new Scope(services).ServiceGraph;
+        }
+
+        public void AppendServices(IServiceCollection services)
+        {
+            applyScanners(services).Wait(2.Seconds());
+
+            services
+                .Where(x => !x.ServiceType.HasAttribute<BlueMilkIgnoreAttribute>())
+
+                .GroupBy(x => x.ServiceType)
+                .Each(group =>
+                {
+                    if (_families.ContainsKey(group.Key))
+                    {
+                        var family = _families[group.Key];
+                        family.Append(group);
+                    }
+                    else
+                    {
+                        var family = buildFamilyForInstanceGroup(services, @group);
+                        _families.Add(@group.Key, family);
+                    }
+                });
+
+            buildOutMissingResolvers();
+
+            var serviceTypes = services
+                .Select(x => x.ServiceType)
+                .Where(x => !x.IsOpenGeneric())
+                .Distinct();
+
+            foreach (var serviceType in serviceTypes)
+            {
+                var family = _families[serviceType];
+                
+                if (ByType.ContainsKey(family.ServiceType))
+                {
+                    ByType[serviceType] = family.Default.Resolver;
+                }
+                else
+                {
+                    ByType.Add(serviceType, family.Default.Resolver);
+                }
+            }
+
         }
     }
 }

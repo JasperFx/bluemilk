@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using BlueMilk.Compilation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
 {
@@ -167,6 +168,18 @@ namespace BlueMilk
         /// <see cref="ValidationMethodAttribute"/>.
         /// </summary>
         void AssertConfigurationIsValid(AssertMode mode = AssertMode.Full);
+
+        /// <summary>
+        /// Add additional registrations to a running service. USE WITH CAUTION.
+        /// </summary>
+        /// <param name="services"></param>
+        void Configure(IServiceCollection services);
+
+        /// <summary>
+        /// Add additional registrations to a running service. USE WITH CAUTION.
+        /// </summary>
+        /// <param name="configure"></param>
+        void Configure(Action<IServiceCollection> configure);
 
     }
 

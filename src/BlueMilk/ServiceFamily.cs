@@ -42,6 +42,33 @@ namespace BlueMilk
 
             All = instances;
         }
+        
+        public void Append(IEnumerable<ServiceDescriptor> services)
+        {
+            var instances = services.Select(Instance.For).ToArray();
+            foreach (var instance in instances)
+            {
+                instance.IsDefault = false;
+            }
+
+            if (instances.Any())
+            {
+                instances.Last().IsDefault = true;
+            }
+            
+            Default = instances.LastOrDefault();
+
+
+            var all = All.Concat(instances).ToArray();
+            makeNamesUnique(all);
+
+            foreach (var instance in instances)
+            {
+                _instances.Add(instance.Name, instance);
+            }
+
+            All = all;
+        }
 
         public override string ToString()
         {
@@ -49,7 +76,7 @@ namespace BlueMilk
         }
 
         // Has to be in order here
-        public Instance[] All { get; }
+        public Instance[] All { get; private set; }
 
         public IResolver ResolverFor(string name)
         {
@@ -104,7 +131,8 @@ namespace BlueMilk
 
             return new ServiceFamily(serviceType, instances);
         }
-        
-        
+
+
+
     }
 }

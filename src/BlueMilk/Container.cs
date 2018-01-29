@@ -197,7 +197,22 @@ namespace BlueMilk
 
             return true;
         }
-        
+
+        public void Configure(IServiceCollection services)
+        {
+            if (services.Any(x => x.ServiceType == typeof(IFamilyPolicy))) throw new InvalidOperationException("Cannot register any IFamilyPolicy objects in Configure()");
+            if (services.Any(x => x.ServiceType == typeof(IFamilyPolicy))) throw new InvalidOperationException("Cannot register any IFamilyPolicy objects in Configure()");
+
+            ServiceGraph.AppendServices(services);
+        }
+
+        public void Configure(Action<IServiceCollection> configure)
+        {
+            var services = new ServiceRegistry();
+            configure(services);
+            
+            Configure(services);
+        }
     }
 
 }
