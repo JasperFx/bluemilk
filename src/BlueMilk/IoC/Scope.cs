@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -29,11 +30,16 @@ namespace BlueMilk.IoC
         {
             ServiceGraph = new ServiceGraph(services, this);
             ServiceGraph.Initialize();
+
+            Root = this;
         }
 
-        public Scope(ServiceGraph serviceGraph)
+        public Scope Root { get; }
+
+        public Scope(ServiceGraph serviceGraph, Scope root)
         {
             ServiceGraph = serviceGraph;
+            Root = root;
         }
         
         /// <summary>
@@ -201,7 +207,7 @@ namespace BlueMilk.IoC
         IServiceScope IServiceScopeFactory.CreateScope()
         {
             assertNotDisposed();
-            return new Scope(ServiceGraph);
+            return new Scope(ServiceGraph, this);
         }
         
 

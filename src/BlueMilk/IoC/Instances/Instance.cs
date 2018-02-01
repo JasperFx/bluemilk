@@ -83,13 +83,28 @@ namespace BlueMilk.IoC.Instances
             ServiceType = serviceType;
             Lifetime = lifetime;
             ImplementationType = implementationType;
+            Name = "default";
+            
         }
+
+        public abstract object Resolve(Scope scope, ServiceGraph services);
+        
+        public int Hash { get; private set; }
 
         public virtual bool RequiresServiceProvider => Dependencies.Any(x => x.RequiresServiceProvider);
 
         public ServiceLifetime Lifetime { get; set; } = ServiceLifetime.Transient;
-        public string Name { get; set; } = "default";
-        
+
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                Hash = GetHashCode();
+            }
+        }
+
         public bool HasPlanned { get; protected internal set; }
 
         public void CreatePlan(ServiceGraph services)
@@ -131,11 +146,13 @@ namespace BlueMilk.IoC.Instances
         }
 
         public readonly IList<string> ErrorMessages = new List<string>();
+        private string _name = "default";
 
-        
+
         public Instance[] Dependencies { get; protected set; } = new Instance[0];
 
 
+        [Obsolete("Make this go away")]
         public void Initialize(Scope rootScope)
         {
             if (Resolver != null) throw new InvalidOperationException("The Resolver has already been built for this Instance");
@@ -151,8 +168,10 @@ namespace BlueMilk.IoC.Instances
             Resolver.Name = Name;
         }
 
+        [Obsolete("Going to eliminate this")]
         public IResolver Resolver { get; protected set; }
 
+        [Obsolete("Going to eliminate this")]
         protected abstract IResolver buildResolver(Scope rootScope);
         
 

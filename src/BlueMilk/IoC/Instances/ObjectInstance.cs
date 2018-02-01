@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
+    // TODO -- eliminate the Resolver implementation
     public class ObjectInstance : Instance, IResolver, IDisposable
     {
         public static ObjectInstance For<T>(T @object)
@@ -25,6 +26,11 @@ namespace BlueMilk.IoC.Instances
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
         {
             return new InjectedServiceField(this);
+        }
+
+        public override object Resolve(Scope scope, ServiceGraph services)
+        {
+            return Service;
         }
 
         protected override IResolver buildResolver(Scope rootScope)

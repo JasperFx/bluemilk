@@ -44,6 +44,12 @@ namespace BlueMilk.IoC.Instances
             return new GetInstanceFrame(this).Variable;
         }
 
+
+        public override object Resolve(Scope scope, ServiceGraph services)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override IResolver buildResolver(Scope rootScope)
         {
             switch (Lifetime)

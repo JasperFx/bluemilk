@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Lazy
 {
+    // TODO -- remove the IResolver implementation
     public class LazyInstance<T> : Instance, IResolver
     {
 
@@ -27,6 +28,11 @@ namespace BlueMilk.IoC.Lazy
         protected override IResolver buildResolver(Scope rootScope)
         {
             return this;
+        }
+
+        public override object Resolve(Scope scope, ServiceGraph services)
+        {
+            return new Lazy<T>(scope.GetInstance<T>);
         }
 
         public object Resolve(Scope scope)

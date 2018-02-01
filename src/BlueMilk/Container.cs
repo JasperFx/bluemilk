@@ -42,21 +42,21 @@ namespace BlueMilk
             
         }
 
-        private Container(ServiceGraph serviceGraph) : base(serviceGraph)
+        private Container(ServiceGraph serviceGraph, Container container) : base(serviceGraph, container)
         {
         }
 
 
         public IServiceScope CreateScope()
         {
-            return new Scope(ServiceGraph);
+            return new Scope(ServiceGraph, this);
         }
         
         
         public IContainer GetNestedContainer()
         {
             assertNotDisposed();
-            return new Container(ServiceGraph);
+            return new Container(ServiceGraph, this);
         }
 
         public override void Dispose()
@@ -133,7 +133,7 @@ namespace BlueMilk
                 }
             }
 
-            using (var scope = new Scope(ServiceGraph))
+            using (var scope = new Scope(ServiceGraph, this))
             {
                 foreach (var instance in Model.AllInstances.Where(x => x.Lifetime != ServiceLifetime.Singleton))
                 {

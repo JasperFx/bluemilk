@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Resolvers
 {
+    // TODO -- get rid of IResolver implementation
     public class ScopeInstance<T> : Instance, IResolver
     {
         public ScopeInstance() : base(typeof(T), typeof(T), ServiceLifetime.Scoped)
@@ -17,6 +18,11 @@ namespace BlueMilk.IoC.Resolvers
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
         {
             return new CastScopeFrame(typeof(T)).Variable;
+        }
+
+        public override object Resolve(Scope scope, ServiceGraph services)
+        {
+            return scope;
         }
 
         protected override IResolver buildResolver(Scope rootScope)

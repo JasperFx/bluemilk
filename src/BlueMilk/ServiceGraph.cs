@@ -183,6 +183,7 @@ namespace BlueMilk
             return AllInstances().Where(x => x.Resolver == null && !x.ServiceType.IsOpenGeneric());
         }
 
+        [Obsolete("Get rid of this")]
         private Instance[] generateDynamicAssembly()
         {
             var generatedResolvers = instancesWithoutResolver()
@@ -190,15 +191,8 @@ namespace BlueMilk
                 .ToArray();
 
 
-            // TODO -- will need to get at the GenerationRules from somewhere
-            var generatedAssembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
-            AllInstances().SelectMany(x => x.ReferencedAssemblies())
-                .Distinct()
-                .Each(a => generatedAssembly.Generation.Assemblies.Fill(a));
-            
-            
-            
-            
+            var generatedAssembly = ToGeneratedAssembly();
+
 
             foreach (var instance in generatedResolvers)
             {
@@ -209,6 +203,16 @@ namespace BlueMilk
             generatedAssembly.CompileAll();
 
             return generatedResolvers.OfType<Instance>().ToArray();
+        }
+
+        internal GeneratedAssembly ToGeneratedAssembly()
+        {
+            // TODO -- will need to get at the GenerationRules from somewhere
+            var generatedAssembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
+            AllInstances().SelectMany(x => x.ReferencedAssemblies())
+                .Distinct()
+                .Each(a => generatedAssembly.Generation.Assemblies.Fill(a));
+            return generatedAssembly;
         }
 
         private bool _inPlanning = false;

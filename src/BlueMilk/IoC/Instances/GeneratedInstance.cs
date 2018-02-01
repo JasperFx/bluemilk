@@ -61,8 +61,29 @@ namespace BlueMilk.IoC.Instances
 
         public abstract Frame CreateBuildFrame();
         protected abstract Variable generateVariableForBuilding(ResolverVariables variables, BuildMode mode, bool isRoot);
-        
-        
+
+        private readonly object _locker = new object();
+        public override object Resolve(Scope scope, ServiceGraph services)
+        {
+            if (Resolver == null)
+            {
+                lock (_locker)
+                {
+                    if (Resolver == null)
+                    {
+                        var assembly = services.ToGeneratedAssembly();
+                        GenerateResolver(assembly);
+                        assembly.CompileAll();
+                        
+                        Resolver = (IResolver) scope.Root.QuickBuild(_resolverType.CompiledType);
+                    }
+                }
+            }
+
+
+            return Resolver.Resolve(scope);
+        }
+
         protected sealed override IResolver buildResolver(Scope rootScope)
         {
             if (_resolverType != null)
