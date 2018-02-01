@@ -59,6 +59,7 @@ namespace BlueMilk
             
             services.RemoveAll(x => x.ServiceType == typeof(IFamilyPolicy));
             
+            addScopeResolver<Scope>(services);
             addScopeResolver<IServiceProvider>(services);
             addScopeResolver<IContainer>(services);
             addScopeResolver<IServiceScopeFactory>(services);
@@ -119,40 +120,7 @@ namespace BlueMilk
         private readonly object _locker = new object();
 
         
-        public IResolver FindResolver(Type serviceType)
-        {
-            if (ByType.TryGetValue(serviceType, out var resolver))
-            {
-                return resolver;
-            }
 
-            lock (_locker)
-            {
-                if (_families.ContainsKey(serviceType)) return _families[serviceType].Default?.Resolver;
-
-                var family = TryToCreateMissingFamily(serviceType);
-
-                return family.Default?.Resolver;
-            }
-
-        }
-        
-        public IResolver FindResolver(Type serviceType, string name)
-        {
-            if (_families.TryGetValue(serviceType, out var family))
-            {
-                return family.ResolverFor(name);
-            }
-
-            lock (_locker)
-            {
-                if (_families.ContainsKey(serviceType)) return _families[serviceType].ResolverFor(name);
-                
-                family = TryToCreateMissingFamily(serviceType);
-                
-                return family.ResolverFor(name);
-            }
-        }
         
 
         private void buildOutMissingResolvers()
@@ -292,6 +260,16 @@ namespace BlueMilk
         public bool HasFamily(Type serviceType)
         {
             return _families.ContainsKey(serviceType);
+        }
+        
+        public IResolver FindResolver(Type serviceType)
+        {
+            return ResolveFamily(serviceType).Default?.Resolver;
+        }
+        
+        public IResolver FindResolver(Type serviceType, string name)
+        {
+            return ResolveFamily(serviceType).ResolverFor(name);
         }
         
         public ServiceFamily ResolveFamily(Type serviceType)
