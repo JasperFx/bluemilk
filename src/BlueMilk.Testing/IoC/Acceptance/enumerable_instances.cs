@@ -121,7 +121,9 @@ namespace StructureMap.Testing.Acceptance
         [Fact]
         public void retrieve_as_array()
         {
-            container.GetInstance<IWidget[]>()
+            var widgets = container.GetInstance<IWidget[]>();
+
+            widgets
                 .Select(x => x.GetType())
                 .ShouldHaveTheSameElementsAs(typeof(AWidget), typeof(BWidget), typeof(CWidget));
         }

@@ -139,7 +139,7 @@ namespace BlueMilk
                 {
                     try
                     {
-                        var o = instance.Resolver.Resolve(this);
+                        var o = instance.Resolve(this);
                     
                         if (o != null)
                         {

@@ -20,7 +20,7 @@ namespace BlueMilk.IoC.Resolvers
             return new CastScopeFrame(typeof(T)).Variable;
         }
 
-        public override object Resolve(Scope scope, ServiceGraph services)
+        public override object Resolve(Scope scope)
         {
             return scope;
         }
@@ -28,11 +28,6 @@ namespace BlueMilk.IoC.Resolvers
         protected override IResolver buildResolver(Scope rootScope)
         {
             return this;
-        }
-
-        public object Resolve(Scope scope)
-        {
-            return scope;
         }
 
         public int Hash { get; set; }

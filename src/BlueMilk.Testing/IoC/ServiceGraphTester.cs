@@ -99,9 +99,8 @@ namespace BlueMilk.Testing.IoC
                 _.AddSingleton(new Clock());
             });
 
-            graph.ByType[instance.ServiceType].ShouldNotBe(instance);
             
-            graph.FindResolver(instance.ServiceType, instance.Name)
+            graph.FindInstance(instance.ServiceType, instance.Name)
                 .ShouldBeSameAs(instance);
 
 
@@ -117,9 +116,8 @@ namespace BlueMilk.Testing.IoC
             });
             
 
-            graph.ByType[instance.ServiceType].ShouldBeSameAs(instance);
             
-            graph.FindResolver(instance.ServiceType, instance.Name)
+            graph.FindInstance(instance.ServiceType, instance.Name)
                 .ShouldBeSameAs(instance);
 
 

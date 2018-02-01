@@ -44,7 +44,10 @@ namespace BlueMilk.Testing.IoC.Acceptance
         [Fact]
         public void get_the_default_instance()
         {
-            var container = new Container(x => { x.For<IWidget>().Use<AWidget>(); });
+            var container = new Container(x =>
+            {
+                x.For<IWidget>().Use<AWidget>();
+            });
 
             container.GetInstance<IWidget>()
                 .ShouldBeOfType<AWidget>();

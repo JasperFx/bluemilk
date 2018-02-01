@@ -108,27 +108,27 @@ namespace BlueMilk.IoC
         public object GetInstance(Type serviceType)
         {
             assertNotDisposed();
-            var resolver = ServiceGraph.FindResolver(serviceType);
+            var instance = ServiceGraph.FindDefault(serviceType);
             
-            if (resolver == null)
+            if (instance == null)
             {
                 throw new BlueMilkMissingRegistrationException(serviceType);
             }
             
-            return resolver.Resolve(this);
+            return instance.Resolve(this);
         }
 
         public object GetInstance(Type serviceType, string name)
         {
             assertNotDisposed();
 
-            var resolver = ServiceGraph.FindResolver(serviceType, name);
-            if (resolver == null)
+            var instance = ServiceGraph.FindInstance(serviceType, name);
+            if (instance == null)
             {
                 throw new BlueMilkMissingRegistrationException(serviceType, name);
             }
-            
-            return resolver.Resolve(this);
+
+            return instance.Resolve(this);
         }
         
         public T TryGetInstance<T>()
@@ -144,15 +144,14 @@ namespace BlueMilk.IoC
         public object TryGetInstance(Type serviceType)
         {
             assertNotDisposed();
-            var resolver = ServiceGraph.FindResolver(serviceType);
-            return resolver?.Resolve(this) ?? null;
+            return ServiceGraph.FindDefault(serviceType)?.Resolve(this);
         }
 
         public object TryGetInstance(Type serviceType, string name)
         {
             assertNotDisposed();
-            var resolver = ServiceGraph.FindResolver(serviceType, name);
-            return resolver?.Resolve(this) ?? null;
+            var instance = ServiceGraph.FindInstance(serviceType, name);
+            return instance?.Resolve(this);
         }
 
         public T QuickBuild<T>()
@@ -189,13 +188,13 @@ namespace BlueMilk.IoC
         public IReadOnlyList<T> GetAllInstances<T>()
         {
             assertNotDisposed();
-            return ServiceGraph.FindAll(typeof(T)).Select(x => x.Resolver.Resolve(this)).OfType<T>().ToList();
+            return ServiceGraph.FindAll(typeof(T)).Select(x => x.Resolve(this)).OfType<T>().ToList();
         }
 
         public IEnumerable GetAllInstances(Type serviceType)
         {
             assertNotDisposed();
-            return ServiceGraph.FindAll(serviceType).Select(x => x.Resolver.Resolve(this)).ToArray();
+            return ServiceGraph.FindAll(serviceType).Select(x => x.Resolve(this)).ToArray();
         }
 
 

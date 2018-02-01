@@ -28,9 +28,8 @@ namespace BlueMilk
         
         
         private readonly Dictionary<Type, ServiceFamily> _families = new Dictionary<Type, ServiceFamily>();
-        public readonly IDictionary<Type, IResolver> ByType = new ConcurrentDictionary<Type, IResolver>();
         
-        
+       
         public ServiceGraph(IServiceCollection services, Scope rootScope)
         {
             Services = services;
@@ -63,7 +62,6 @@ namespace BlueMilk
             addScopeResolver<IServiceProvider>(services);
             addScopeResolver<IContainer>(services);
             addScopeResolver<IServiceScopeFactory>(services);
-            ByType[typeof(Scope)] = new ScopeResolver();
             
         }
 
@@ -95,33 +93,9 @@ namespace BlueMilk
             buildOutMissingResolvers();
         }
         
-        
-        
-        public void RegisterResolver(Instance instance, IResolver resolver)
-        {
-            if (instance.IsDefault)
-            {
-                ByType[instance.ServiceType] = resolver;
-            }
-        }
-        
-        public void RegisterResolver(Scope rootScope, IEnumerable<Instance> instances)
-        {
-            // Yes, you really have to filter twice, because the TopologicalSort will throw back
-            // in dependencies that might already have a resolver
-            foreach (var instance in instances.Where(x => x.Resolver == null).TopologicalSort(x => x.Dependencies, false).Where(x => x.Resolver == null))
-            {
-                instance.Initialize(rootScope);
-                
-                RegisterResolver(instance, instance.Resolver);
-            }
-        }
-        
+
         private readonly object _locker = new object();
 
-        
-
-        
 
         private void buildOutMissingResolvers()
         {
@@ -136,9 +110,6 @@ namespace BlueMilk
                 var requiresGenerated = generateDynamicAssembly();
 
                 var noGeneration = instancesWithoutResolver().Where(x => !requiresGenerated.Contains(x));
-
-                RegisterResolver(_rootScope, noGeneration);
-                RegisterResolver(_rootScope, requiresGenerated);
             }
             finally
             {
@@ -261,15 +232,10 @@ namespace BlueMilk
         {
             return _families.ContainsKey(serviceType);
         }
-        
-        public IResolver FindResolver(Type serviceType)
+
+        public Instance FindInstance(Type serviceType, string name)
         {
-            return ResolveFamily(serviceType).Default?.Resolver;
-        }
-        
-        public IResolver FindResolver(Type serviceType, string name)
-        {
-            return ResolveFamily(serviceType).ResolverFor(name);
+            return ResolveFamily(serviceType).InstanceFor(name);
         }
         
         public ServiceFamily ResolveFamily(Type serviceType)
@@ -293,12 +259,12 @@ namespace BlueMilk
 
         public Instance[] FindAll(Type serviceType)
         {
-            return ResolveFamily(serviceType)?.Instances.Values.ToArray() ?? new Instance[0];
+            return ResolveFamily(serviceType)?.All ?? new Instance[0];
         }
         
         public bool CouldBuild(ConstructorInfo ctor)
         {
-            return ctor.GetParameters().All(x => ByType.ContainsKey(x.ParameterType) || FindDefault(x.ParameterType) != null || x.IsOptional);
+            return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null || x.IsOptional);
         }
 
         public bool CouldBuild(Type concreteType)
@@ -400,8 +366,7 @@ namespace BlueMilk
         {
             return AllInstances().ToArray()
                 .Where(x => x.ImplementationType.CanBeCastTo(typeof(T)))
-                .Where(x => x.Resolver != null)
-                .Select(x => x.Resolver.Resolve(_rootScope))
+                .Select(x => x.Resolve(_rootScope))
                 .OfType<T>()
                 .ToArray();
         }
@@ -456,25 +421,6 @@ namespace BlueMilk
                 });
 
             buildOutMissingResolvers();
-
-            var serviceTypes = services
-                .Select(x => x.ServiceType)
-                .Where(x => !x.IsOpenGeneric())
-                .Distinct();
-
-            foreach (var serviceType in serviceTypes)
-            {
-                var family = _families[serviceType];
-                
-                if (ByType.ContainsKey(family.ServiceType))
-                {
-                    ByType[serviceType] = family.Default.Resolver;
-                }
-                else
-                {
-                    ByType.Add(serviceType, family.Default.Resolver);
-                }
-            }
 
         }
     }

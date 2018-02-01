@@ -30,12 +30,7 @@ namespace BlueMilk.IoC.Lazy
             return this;
         }
 
-        public override object Resolve(Scope scope, ServiceGraph services)
-        {
-            return new Lazy<T>(scope.GetInstance<T>);
-        }
-
-        public object Resolve(Scope scope)
+        public override object Resolve(Scope scope)
         {
             return new Lazy<T>(scope.GetInstance<T>);
         }

@@ -87,7 +87,7 @@ namespace BlueMilk.IoC.Instances
             
         }
 
-        public abstract object Resolve(Scope scope, ServiceGraph services);
+        public abstract object Resolve(Scope scope);
         
         public int Hash { get; private set; }
 

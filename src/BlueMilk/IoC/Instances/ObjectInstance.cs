@@ -28,7 +28,7 @@ namespace BlueMilk.IoC.Instances
             return new InjectedServiceField(this);
         }
 
-        public override object Resolve(Scope scope, ServiceGraph services)
+        public override object Resolve(Scope scope)
         {
             return Service;
         }

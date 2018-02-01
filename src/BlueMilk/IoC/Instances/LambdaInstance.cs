@@ -44,10 +44,23 @@ namespace BlueMilk.IoC.Instances
             return new GetInstanceFrame(this).Variable;
         }
 
+        private IResolver _resolver;
+        private readonly object _locker = new object();
 
-        public override object Resolve(Scope scope, ServiceGraph services)
+        public override object Resolve(Scope scope)
         {
-            throw new NotImplementedException();
+            if (_resolver == null)
+            {
+                lock (_locker)
+                {
+                    if (_resolver == null)
+                    {
+                        _resolver = buildResolver(scope.Root);
+                    }
+                }
+            }
+
+            return _resolver.Resolve(scope);
         }
 
         protected override IResolver buildResolver(Scope rootScope)

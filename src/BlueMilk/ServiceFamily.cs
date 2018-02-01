@@ -78,9 +78,9 @@ namespace BlueMilk
         // Has to be in order here
         public Instance[] All { get; private set; }
 
-        public IResolver ResolverFor(string name)
+        public Instance InstanceFor(string name)
         {
-            return Instances.ContainsKey(name) ? Instances[name].Resolver : null;
+            return Instances.ContainsKey(name) ? Instances[name] : null;
         }
 
         private void makeNamesUnique(IEnumerable<Instance> instances)
