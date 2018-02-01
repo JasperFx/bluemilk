@@ -23,11 +23,8 @@ namespace BlueMilk.Testing.IoC.Instances
             var clock = new Clock();
             var instance = ObjectInstance.For<IClock>(clock);
 
-            instance.Initialize(null);
-            instance.Resolver
-                .ShouldBeSameAs(instance);
-            
-            instance.As<IResolver>().Resolve(null).ShouldBeSameAs(clock);
+
+            instance .Resolve(null).ShouldBeSameAs(clock);
         }
         
         [Theory]

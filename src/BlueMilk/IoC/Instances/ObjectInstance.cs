@@ -7,8 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
-    // TODO -- eliminate the Resolver implementation
-    public class ObjectInstance : Instance, IResolver, IDisposable
+    public class ObjectInstance : Instance, IDisposable
     {
         public static ObjectInstance For<T>(T @object)
         {
@@ -32,18 +31,6 @@ namespace BlueMilk.IoC.Instances
         {
             return Service;
         }
-
-        protected override IResolver buildResolver(Scope rootScope)
-        {
-            return this;
-        }
-
-        object IResolver.Resolve(Scope scope)
-        {
-            return Service;
-        }
-
-        public int Hash { get; set; }
 
         public void Dispose()
         {

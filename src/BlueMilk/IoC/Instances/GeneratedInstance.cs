@@ -20,23 +20,22 @@ namespace BlueMilk.IoC.Instances
         }
 
         
-        
-        public void GenerateResolver(GeneratedAssembly generatedAssembly)
+        public GeneratedType GenerateResolver(GeneratedAssembly generatedAssembly)
         {
-            if (ErrorMessages.Any() || Dependencies.SelectMany(x => x.ErrorMessages).Any()) return;
+            if (ErrorMessages.Any() || Dependencies.SelectMany(x => x.ErrorMessages).Any()) return null;
             
             var typeName = (ServiceType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
                 .Replace(',', '_').Replace('.', '_').Replace("[", "").Replace("]", "");
             
-            _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType));
+            var resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType));
 
-            var method = _resolverType.MethodFor("Build");
+            var method = resolverType.MethodFor("Build");
 
             var frame = CreateBuildFrame();
 
             method.Frames.Add(frame);
-            
-            
+
+            return resolverType;
         }
         
         public sealed override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
@@ -80,10 +79,18 @@ namespace BlueMilk.IoC.Instances
                         else
                         {
                             var assembly = scope.ServiceGraph.ToGeneratedAssembly();
-                            GenerateResolver(assembly);
-                            assembly.CompileAll();
+                            _resolverType = GenerateResolver(assembly);
+
+                            if (_resolverType == null)
+                            {
+                                _resolver = new ErrorMessageResolver(this);
+                            }
+                            else
+                            {
+                                assembly.CompileAll();
                         
-                            _resolver = (IResolver) scope.Root.QuickBuild(_resolverType.CompiledType);
+                                _resolver = (IResolver) scope.Root.QuickBuild(_resolverType.CompiledType);
+                            }
                         }
                         
                         _resolver.Hash = GetHashCode();
@@ -96,32 +103,19 @@ namespace BlueMilk.IoC.Instances
             return _resolver.Resolve(scope);
         }
 
-        protected sealed override IResolver buildResolver(Scope rootScope)
+        public override string GetBuildPlan()
         {
             if (_resolverType != null)
             {
-                return (IResolver) rootScope.QuickBuild(_resolverType.CompiledType);
+                return _resolverType.SourceCode;
             }
-            
-            return null;
-        }
 
-        public override string BuildPlan
-        {
-            get
+            if (ErrorMessages.Any())
             {
-                if (_resolverType != null)
-                {
-                    return _resolverType.SourceCode;
-                }
-
-                if (ErrorMessages.Any())
-                {
-                    return "Errors!" + Environment.NewLine + ErrorMessages.Join(Environment.NewLine);
-                }
-
-                return ToString();
+                return "Errors!" + Environment.NewLine + ErrorMessages.Join(Environment.NewLine);
             }
+
+            return ToString();
         }
 
         public Type ResolverBaseType

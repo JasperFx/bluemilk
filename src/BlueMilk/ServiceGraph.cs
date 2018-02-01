@@ -106,10 +106,6 @@ namespace BlueMilk
             try
             {
                 planResolutionStrategies();
-
-                var requiresGenerated = generateDynamicAssembly();
-
-                var noGeneration = instancesWithoutResolver().Where(x => !requiresGenerated.Contains(x));
             }
             finally
             {
@@ -117,32 +113,6 @@ namespace BlueMilk
             }
         }
 
-        private IEnumerable<Instance> instancesWithoutResolver()
-        {
-            return AllInstances().Where(x => x.Resolver == null && !x.ServiceType.IsOpenGeneric());
-        }
-
-        [Obsolete("Get rid of this")]
-        private Instance[] generateDynamicAssembly()
-        {
-            var generatedResolvers = instancesWithoutResolver()
-                .OfType<GeneratedInstance>()
-                .ToArray();
-
-
-            var generatedAssembly = ToGeneratedAssembly();
-
-
-            foreach (var instance in generatedResolvers)
-            {
-                instance.GenerateResolver(generatedAssembly);
-            }
-
-            
-            generatedAssembly.CompileAll();
-
-            return generatedResolvers.OfType<Instance>().ToArray();
-        }
 
         internal GeneratedAssembly ToGeneratedAssembly()
         {

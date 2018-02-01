@@ -78,9 +78,9 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
                 }
                     
                 
-                foreach (var instance in container.Model.AllInstances.Where(x => x.Resolver != null))
+                foreach (var instance in container.Model.AllInstances)
                 {
-                    instance.Resolver.Resolve(container).ShouldNotBeNull();
+                    instance.Resolve(container).ShouldNotBeNull();
                 }
 
                    

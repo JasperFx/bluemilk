@@ -8,8 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Lazy
 {
-    // TODO -- remove the IResolver implementation
-    public class LazyInstance<T> : Instance, IResolver
+    public class LazyInstance<T> : Instance
     {
 
         public LazyInstance() : base(typeof(Lazy<T>), typeof(Lazy<T>), ServiceLifetime.Transient)
@@ -25,17 +24,11 @@ namespace BlueMilk.IoC.Lazy
 
         public override bool RequiresServiceProvider { get; } = true;
 
-        protected override IResolver buildResolver(Scope rootScope)
-        {
-            return this;
-        }
-
         public override object Resolve(Scope scope)
         {
             return new Lazy<T>(scope.GetInstance<T>);
         }
 
-        public int Hash { get; set; }
 
     }
 }

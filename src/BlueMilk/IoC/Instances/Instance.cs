@@ -152,35 +152,12 @@ namespace BlueMilk.IoC.Instances
         public Instance[] Dependencies { get; protected set; } = new Instance[0];
 
 
-        [Obsolete("Make this go away")]
-        public void Initialize(Scope rootScope)
-        {
-            if (Resolver != null) throw new InvalidOperationException("The Resolver has already been built for this Instance");
-            
-            Resolver = buildResolver(rootScope);
-
-            if (Resolver == null)
-            {
-                Resolver = new ErrorMessageResolver(this);
-            }
-
-            Resolver.Hash = GetHashCode();
-            Resolver.Name = Name;
-        }
-
-        [Obsolete("Going to eliminate this")]
-        public IResolver Resolver { get; protected set; }
-
-        [Obsolete("Going to eliminate this")]
-        protected abstract IResolver buildResolver(Scope rootScope);
-        
-
         public bool IsDefault { get; set; } = false;
 
         /// <summary>
         /// Tries to describe how this instance would be resolved at runtime
         /// </summary>
-        public virtual string BuildPlan => ToString();
+        public virtual string GetBuildPlan() => ToString();
 
 
         public sealed override int GetHashCode()

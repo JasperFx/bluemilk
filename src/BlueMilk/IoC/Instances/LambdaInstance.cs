@@ -63,7 +63,7 @@ namespace BlueMilk.IoC.Instances
             return _resolver.Resolve(scope);
         }
 
-        protected override IResolver buildResolver(Scope rootScope)
+        protected IResolver buildResolver(Scope rootScope)
         {
             switch (Lifetime)
             {

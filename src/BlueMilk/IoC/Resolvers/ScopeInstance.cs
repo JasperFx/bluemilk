@@ -6,12 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Resolvers
 {
-    // TODO -- get rid of IResolver implementation
-    public class ScopeInstance<T> : Instance, IResolver
+    public class ScopeInstance<T> : Instance
     {
         public ScopeInstance() : base(typeof(T), typeof(T), ServiceLifetime.Scoped)
         {
-            
             Name = typeof(T).Name;
         }
 
@@ -24,13 +22,6 @@ namespace BlueMilk.IoC.Resolvers
         {
             return scope;
         }
-
-        protected override IResolver buildResolver(Scope rootScope)
-        {
-            return this;
-        }
-
-        public int Hash { get; set; }
 
         public override string ToString()
         {
