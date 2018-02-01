@@ -78,7 +78,7 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
                 }
                     
                 
-                foreach (var instance in container.Model.AllInstances)
+                foreach (var instance in container.Model.AllInstances.Where(x => !x.ServiceType.IsOpenGeneric()))
                 {
                     instance.Resolve(container).ShouldNotBeNull();
                 }
