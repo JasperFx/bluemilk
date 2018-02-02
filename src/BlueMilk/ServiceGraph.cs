@@ -210,7 +210,7 @@ namespace BlueMilk
 
         public IEnumerable<Instance> AllInstances()
         {
-            return _families.Values.SelectMany(x => x.All);
+            return _families.Values.ToArray().SelectMany(x => x.All).ToArray();
         }
 
         public IReadOnlyDictionary<Type, ServiceFamily> Families => _families;
