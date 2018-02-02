@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BlueMilk.IoC.Instances;
 using BlueMilk.Testing.IoC.Acceptance;
 using Microsoft.Extensions.DependencyInjection;
@@ -95,6 +96,50 @@ namespace BlueMilk.Testing.IoC
 
             Exception<InvalidOperationException>.ShouldBeThrownBy(() => { container.QuickBuild<IWidget>(); });
         }
+        
+        [Fact]
+        public void with_dependency_on_list()
+        {
+            var container = new Container(_ =>
+            {
+                _.For<IWidget>().Use<GreenWidget>();
+                _.For<IWidget>().Use<BlueWidget>().Singleton();
+                _.For<IWidget>().Use<RedWidget>().Scoped();
+                
+            });
+
+            var user1 = container.QuickBuild<WidgetListUser>();
+            var user2 = container.QuickBuild<WidgetListUser>();
+
+            user1.Widgets[0].ShouldBeOfType<GreenWidget>();
+            user1.Widgets[1].ShouldBeOfType<BlueWidget>();
+            user1.Widgets[2].ShouldBeOfType<RedWidget>();
+            
+            user1.Widgets[1].ShouldBeSameAs(user2.Widgets[1]);
+            user1.Widgets[2].ShouldBeSameAs(user2.Widgets[2]);
+        }
+        
+        [Fact]
+        public void with_dependency_on_array()
+        {
+            var container = new Container(_ =>
+            {
+                _.For<IWidget>().Use<GreenWidget>();
+                _.For<IWidget>().Use<BlueWidget>().Singleton();
+                _.For<IWidget>().Use<RedWidget>().Scoped();
+                
+            });
+
+            var user1 = container.QuickBuild<WidgetArrayUser>();
+            var user2 = container.QuickBuild<WidgetArrayUser>();
+
+            user1.Widgets[0].ShouldBeOfType<GreenWidget>();
+            user1.Widgets[1].ShouldBeOfType<BlueWidget>();
+            user1.Widgets[2].ShouldBeOfType<RedWidget>();
+            
+            user1.Widgets[1].ShouldBeSameAs(user2.Widgets[1]);
+            user1.Widgets[2].ShouldBeSameAs(user2.Widgets[2]);
+        }
 
         public class GreenWidget : IWidget
         {
@@ -149,6 +194,26 @@ namespace BlueMilk.Testing.IoC
         public SelectiveWidgetUser([Named("green")]IWidget widget)
         {
             Widget = widget;
+        }
+    }
+    
+    public class WidgetArrayUser
+    {
+        public IWidget[] Widgets { get; }
+
+        public WidgetArrayUser(IWidget[] widgets)
+        {
+            Widgets = widgets;
+        }
+    }
+
+    public class WidgetListUser
+    {
+        public IList<IWidget> Widgets { get; }
+
+        public WidgetListUser(IList<IWidget> widgets)
+        {
+            Widgets = widgets;
         }
     }
     

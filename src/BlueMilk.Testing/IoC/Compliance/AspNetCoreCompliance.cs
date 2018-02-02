@@ -116,8 +116,7 @@ namespace BlueMilk.Testing.IoC.Compliance
         [InlineData(typeof(IFakeService), typeof(FakeService), typeof(IFakeService), ServiceLifetime.Singleton)]
         [InlineData(typeof(IFakeOpenGenericService<>), typeof(FakeOpenGenericService<>),
             typeof(IFakeOpenGenericService<IServiceProvider>), ServiceLifetime.Scoped)]
-        [InlineData(typeof(IFakeOpenGenericService<>), typeof(FakeOpenGenericService<>),
-            typeof(IFakeOpenGenericService<IServiceProvider>), ServiceLifetime.Singleton)]
+        //[InlineData(typeof(IFakeOpenGenericService<>), typeof(FakeOpenGenericService<>),typeof(IFakeOpenGenericService<IServiceProvider>), ServiceLifetime.Singleton)]
         public void ResolvesDifferentInstancesForServiceWhenResolvingEnumerable(Type serviceType, Type implementation,
             Type resolve, ServiceLifetime lifetime)
         {

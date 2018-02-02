@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
@@ -47,6 +48,11 @@ namespace BlueMilk.IoC.Enumerables
         {
             _elements = services.FindAll(typeof(T));
             return _elements;
+        }
+
+        public override object QuickResolve(Scope scope)
+        {
+            return _elements.Select(x => x.QuickResolve(scope).As<T>()).ToArray();
         }
     }
 }
