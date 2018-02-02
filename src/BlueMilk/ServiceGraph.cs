@@ -92,7 +92,7 @@ namespace BlueMilk
 
             buildOutMissingResolvers();
 
-            var generatedSingletons = AllInstances().OfType<GeneratedInstance>().Where(x => x.Lifetime == ServiceLifetime.Singleton && !x.ServiceType.IsOpenGeneric()).ToArray();
+            var generatedSingletons = AllInstances().OfType<GeneratedInstance>().Where(x => x.Lifetime != ServiceLifetime.Transient && !x.ServiceType.IsOpenGeneric()).ToArray();
             if (generatedSingletons.Any())
             {
                 var assembly = ToGeneratedAssembly();
@@ -112,7 +112,6 @@ namespace BlueMilk
         }
         
 
-        private readonly object _locker = new object();
 
 
         private void buildOutMissingResolvers()
