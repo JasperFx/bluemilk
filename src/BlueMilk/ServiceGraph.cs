@@ -91,6 +91,24 @@ namespace BlueMilk
 
 
             buildOutMissingResolvers();
+
+            var generatedSingletons = AllInstances().OfType<GeneratedInstance>().Where(x => x.Lifetime == ServiceLifetime.Singleton && !x.ServiceType.IsOpenGeneric()).ToArray();
+            if (generatedSingletons.Any())
+            {
+                var assembly = ToGeneratedAssembly();
+                foreach (var instance in generatedSingletons)
+                {
+                    instance.GenerateResolver(assembly);
+                }
+                
+                assembly.CompileAll();
+
+                foreach (var instance in generatedSingletons)
+                {
+                    instance.AttachResolver(_rootScope);
+                }
+            }
+
         }
         
 

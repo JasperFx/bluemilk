@@ -28,10 +28,10 @@ namespace BlueMilk.IoC
 
         public Scope(IServiceCollection services)
         {
-            ServiceGraph = new ServiceGraph(services, this);
-            ServiceGraph.Initialize();
-
             Root = this;
+            ServiceGraph = new ServiceGraph(services, this);
+            
+            ServiceGraph.Initialize();
         }
 
         public Scope Root { get; }
@@ -39,7 +39,7 @@ namespace BlueMilk.IoC
         public Scope(ServiceGraph serviceGraph, Scope root)
         {
             ServiceGraph = serviceGraph;
-            Root = root;
+            Root = root ?? throw new ArgumentNullException(nameof(root));
         }
         
         /// <summary>

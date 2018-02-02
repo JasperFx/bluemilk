@@ -32,6 +32,11 @@ namespace BlueMilk.IoC.Instances
             return Service;
         }
 
+        public override object QuickResolve(Scope scope)
+        {
+            return Service;
+        }
+
         public void Dispose()
         {
             (Service as IDisposable)?.Dispose();

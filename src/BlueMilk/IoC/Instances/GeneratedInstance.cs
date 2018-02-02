@@ -20,22 +20,28 @@ namespace BlueMilk.IoC.Instances
         }
 
         
-        public GeneratedType GenerateResolver(GeneratedAssembly generatedAssembly)
+        public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {
-            if (ErrorMessages.Any() || Dependencies.SelectMany(x => x.ErrorMessages).Any()) return null;
+            if (ErrorMessages.Any() || Dependencies.SelectMany(x => x.ErrorMessages).Any()) return;
             
             var typeName = (ServiceType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
                 .Replace(',', '_').Replace('.', '_').Replace("[", "").Replace("]", "");
             
-            var resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType));
+            _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType));
 
-            var method = resolverType.MethodFor("Build");
+            var method = _resolverType.MethodFor("Build");
 
             var frame = CreateBuildFrame();
 
             method.Frames.Add(frame);
+        }
 
-            return resolverType;
+        public void AttachResolver(Scope root)
+        {
+            _resolver = (IResolver) root.QuickBuild(_resolverType.CompiledType);
+            
+            _resolver.Hash = GetHashCode();
+            _resolver.Name = Name;
         }
         
         public sealed override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
@@ -62,7 +68,7 @@ namespace BlueMilk.IoC.Instances
         protected abstract Variable generateVariableForBuilding(ResolverVariables variables, BuildMode mode, bool isRoot);
 
         private readonly object _locker = new object();
-        private IResolver _resolver;
+        protected IResolver _resolver;
         
         public override object Resolve(Scope scope)
         {
@@ -79,7 +85,7 @@ namespace BlueMilk.IoC.Instances
                         else
                         {
                             var assembly = scope.ServiceGraph.ToGeneratedAssembly();
-                            _resolverType = GenerateResolver(assembly);
+                            GenerateResolver(assembly);
 
                             if (_resolverType == null)
                             {

@@ -52,6 +52,16 @@ namespace BlueMilk.IoC.Instances
             return new ConstructorInstance<TConcrete>(typeof(T), lifetime);
         }
 
+        public override object QuickResolve(Scope scope)
+        {
+            if (_resolver != null) return Resolve(scope);
+            
+            var values = _arguments.Select(x => x.Instance.QuickResolve(scope)).ToArray();
+            var service = Activator.CreateInstance(ImplementationType, values);
+
+            return service;
+        }
+
         public override Instance CloseType(Type serviceType, Type[] templateTypes)
         {
             if (!ImplementationType.IsOpenGeneric())

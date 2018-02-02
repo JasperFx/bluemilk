@@ -88,6 +88,16 @@ namespace BlueMilk.IoC.Instances
         }
 
         public abstract object Resolve(Scope scope);
+
+        /// <summary>
+        /// Resolve the service as if it were only going to ever be resolved once
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <returns></returns>
+        public virtual object QuickResolve(Scope scope)
+        {
+            return Resolve(scope);
+        }
         
         public int Hash { get; private set; }
 
