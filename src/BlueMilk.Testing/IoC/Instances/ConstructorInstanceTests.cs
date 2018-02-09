@@ -7,6 +7,7 @@ using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
 using BlueMilk.IoC.Resolvers;
 using BlueMilk.Testing.IoC.Acceptance;
+using BlueMilk.Util;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using StructureMap.Testing.Widget;

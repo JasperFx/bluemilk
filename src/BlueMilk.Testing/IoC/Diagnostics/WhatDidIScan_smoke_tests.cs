@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using BlueMilk.IoC.Instances;
+using BlueMilk.Testing.IoC.Acceptance;
+using Shouldly;
 using StructureMap.Testing.GenericWidgets;
 using StructureMap.Testing.Widget;
 using Xunit;
@@ -9,6 +12,7 @@ namespace BlueMilk.Testing.IoC.Diagnostics
     [Collection("scanning")]
     public class WhatDidIScan_smoke_tester
     {
+
         [Fact]
         public void what_did_i_scan_usage()
         {

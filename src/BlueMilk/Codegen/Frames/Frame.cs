@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Baseline;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
+using BlueMilk.IoC.Instances;
 
 namespace BlueMilk.Codegen.Frames
 {
@@ -35,8 +37,8 @@ namespace BlueMilk.Codegen.Frames
         public Frame Next
         {
             get { return _next; }
-            set { 
-            
+            set {
+
                 if (_next != null) throw new InvalidOperationException("Frame chain is being re-arranged");
                 _next = value; }
         }
@@ -55,7 +57,7 @@ namespace BlueMilk.Codegen.Frames
         {
             return new Variable(typeof(T), this);
         }
-        
+
         public Variable Create<T>(string name)
         {
             return new Variable(typeof(T), name, this);
@@ -72,7 +74,7 @@ namespace BlueMilk.Codegen.Frames
             // This has to be idempotent
             if (_hasResolved) return;
 
-            var variables = FindVariables(method);
+            var variables = FindVariables(method).ToArray();
             if (variables.Any(x => x == null))
             {
                 throw new InvalidOperationException($"Frame {this} could not resolve one of its variables");

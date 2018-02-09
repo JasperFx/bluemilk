@@ -25,11 +25,12 @@ namespace BlueMilk
     {
         private readonly Scope _rootScope;
         private readonly object _familyLock = new object();
-        
-        
+
+
         private readonly Dictionary<Type, ServiceFamily> _families = new Dictionary<Type, ServiceFamily>();
-        
-       
+
+
+
         public ServiceGraph(IServiceCollection services, Scope rootScope)
         {
             Services = services;
@@ -38,31 +39,31 @@ namespace BlueMilk
 
             // This should blow up pretty fast if it's no good
             applyScanners(services).Wait(2.Seconds());
-            
+
             _rootScope = rootScope;
-            
+
 
             FamilyPolicies = services
                 .Where(x => x.ServiceType == typeof(IFamilyPolicy))
                 .Select(x => x.ImplementationInstance.As<IFamilyPolicy>())
                 .Concat(new IFamilyPolicy[]
                 {
-                    new EnumerablePolicy(), 
-                    new FuncOrLazyPolicy(), 
-                    new CloseGenericFamilyPolicy(), 
-                    new ConcreteFamilyPolicy(), 
+                    new EnumerablePolicy(),
+                    new FuncOrLazyPolicy(),
+                    new CloseGenericFamilyPolicy(),
+                    new ConcreteFamilyPolicy(),
                     new EmptyFamilyPolicy()
                 })
                 .ToArray();
-            
-            
+
+
             services.RemoveAll(x => x.ServiceType == typeof(IFamilyPolicy));
-            
+
             addScopeResolver<Scope>(services);
             addScopeResolver<IServiceProvider>(services);
             addScopeResolver<IContainer>(services);
             addScopeResolver<IServiceScopeFactory>(services);
-            
+
         }
 
         private async Task applyScanners(IServiceCollection services)
@@ -74,7 +75,7 @@ namespace BlueMilk
             {
                 await scanner.ApplyRegistrations(services);
             }
-                        
+
         }
 
         public IFamilyPolicy[] FamilyPolicies { get; }
@@ -85,12 +86,16 @@ namespace BlueMilk
             services.Add(instance);
         }
 
-        public void Initialize()
+        public void Initialize(PerfTimer timer = null)
         {
-            organizeIntoFamilies(Services);
+            timer = timer ?? new PerfTimer();
+            
+            timer.Record("Organize Into Families", () =>
+            {
+                organizeIntoFamilies(Services);
+            });
 
-
-            buildOutMissingResolvers();
+            timer.Record("Planning Instances", buildOutMissingResolvers);
 
             var generatedSingletons = AllInstances().OfType<GeneratedInstance>().Where(x => x.Lifetime != ServiceLifetime.Transient && !x.ServiceType.IsOpenGeneric()).ToArray();
             if (generatedSingletons.Any())
@@ -100,7 +105,7 @@ namespace BlueMilk
                 {
                     instance.GenerateResolver(assembly);
                 }
-                
+
                 assembly.CompileAll();
 
                 foreach (var instance in generatedSingletons)
@@ -110,7 +115,7 @@ namespace BlueMilk
             }
 
         }
-        
+
 
 
 
@@ -158,7 +163,7 @@ namespace BlueMilk
         {
             services
                 .Where(x => !x.ServiceType.HasAttribute<BlueMilkIgnoreAttribute>())
-                
+
                 .GroupBy(x => x.ServiceType)
                 .Select(group => buildFamilyForInstanceGroup(services, @group))
                 .Each(family => _families.Add(family.ServiceType, family));
@@ -198,11 +203,11 @@ namespace BlueMilk
                     }
                 })
                 .Where(x => x != null);
-            
-            
+
+
 
             var instances = templated.Concat(closed).ToArray();
-            
+
             return new ServiceFamily(serviceType, instances);
         }
 
@@ -224,7 +229,7 @@ namespace BlueMilk
         {
             return ResolveFamily(serviceType).InstanceFor(name);
         }
-        
+
         public ServiceFamily ResolveFamily(Type serviceType)
         {
             if (_families.ContainsKey(serviceType)) return _families[serviceType];
@@ -236,11 +241,11 @@ namespace BlueMilk
                 return TryToCreateMissingFamily(serviceType);
             }
         }
-        
+
         public Instance FindDefault(Type serviceType)
         {
             if (serviceType.IsSimple()) return null;
-            
+
             return ResolveFamily(serviceType)?.Default;
         }
 
@@ -248,7 +253,7 @@ namespace BlueMilk
         {
             return ResolveFamily(serviceType)?.All ?? new Instance[0];
         }
-        
+
         public bool CouldBuild(ConstructorInfo ctor)
         {
             return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null || x.IsOptional);
@@ -277,7 +282,7 @@ namespace BlueMilk
             {
                 throw new InvalidOperationException("Bi-directional dependencies detected:" + Environment.NewLine + _chain.Select(x => x.ToString()).Join(Environment.NewLine));
             }
-            
+
             _chain.Push(instance);
         }
 
@@ -295,7 +300,7 @@ namespace BlueMilk
         {
             var registry = new ServiceRegistry();
             configure(registry);
-            
+
             return new Scope(registry).ServiceGraph;
         }
 
@@ -303,10 +308,10 @@ namespace BlueMilk
         {
             // TODO -- will need to make this more formal somehow
             if (serviceType.IsSimple() || serviceType.IsDateTime() || serviceType == typeof(TimeSpan) || serviceType.IsValueType || serviceType == typeof(DateTimeOffset)) return new ServiceFamily(serviceType);
-            
+
             var family = FamilyPolicies.FirstValue(x => x.Build(serviceType, this));
             _families.SmartAdd(serviceType, family);
-            
+
             if (!_inPlanning)
             {
                 buildOutMissingResolvers();

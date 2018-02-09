@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Baseline;
 using BlueMilk.Codegen;
+using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Scanning.Conventions
@@ -19,7 +20,7 @@ namespace BlueMilk.Scanning.Conventions
 
         public bool Matches(Type type)
         {
-            return type.CanBeCastTo(_serviceType) && type.GetConstructors().Any() && type.CanBeCreated();
+            return Instance.CanBeCastTo(type, _serviceType) && type.GetConstructors().Any() && type.CanBeCreated();
         }
 
         public void ScanTypes(TypeSet types, IServiceCollection services)

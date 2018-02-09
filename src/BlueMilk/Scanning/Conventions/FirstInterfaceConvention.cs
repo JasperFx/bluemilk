@@ -12,7 +12,7 @@ namespace BlueMilk.Scanning.Conventions
             foreach (var type in types.FindTypes(TypeClassification.Concretes).Where(x => x.GetConstructors().Any()))
             {
                 var interfaceType = type.GetInterfaces().FirstOrDefault(x => x != typeof(IDisposable));
-                if (interfaceType != null && !interfaceType.HasAttribute<BlueMilkIgnoreAttribute>())
+                if (interfaceType != null && !interfaceType.HasAttribute<BlueMilkIgnoreAttribute>() && !type.IsOpenGeneric())
                 {
                     services.AddType(interfaceType, type);
                 }

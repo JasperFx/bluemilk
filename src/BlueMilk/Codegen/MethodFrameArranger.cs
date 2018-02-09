@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Baseline;
 using BlueMilk.Codegen.Frames;
@@ -10,7 +11,7 @@ using BlueMilk.Util;
 namespace BlueMilk.Codegen
 {
 
-    
+
     public class MethodFrameArranger : IMethodVariables
     {
         private readonly GeneratedMethod _method;
@@ -34,11 +35,11 @@ namespace BlueMilk.Codegen
         public void Arrange(out AsyncMode asyncMode, out Frame topFrame)
         {
             var compiled = compileFrames(_method.Frames);
-            
-            
+
+
 
             asyncMode = AsyncMode.AsyncTask;
-            
+
             if (compiled.All(x => !x.IsAsync))
             {
                 asyncMode = AsyncMode.None;
@@ -74,8 +75,7 @@ namespace BlueMilk.Codegen
             // Step 1a;) -- figure out if you can switch to inline service
             // creation instead of the container.
             _services?.ReplaceVariables();
-            
-            
+
             // Step 2, calculate dependencies
             var dependencies = new DependencyGatherer(this, frames);
             findInjectedFields(dependencies);

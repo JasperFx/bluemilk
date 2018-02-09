@@ -7,12 +7,15 @@ using BlueMilk.Codegen;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Instances;
 using BlueMilk.Scanning;
+using BlueMilk.Util;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
 {
     public class Container : Scope, IContainer, IServiceScopeFactory
     {
+        private bool _isDisposing;
+
         public new static Container Empty()
         {
             return For(_ => { });
@@ -22,16 +25,16 @@ namespace BlueMilk
         {
             return new Container(new T());
         }
-        
+
         public static Container For(Action<ServiceRegistry> configuration)
         {
             var registry = new ServiceRegistry();
             configuration(registry);
-            
+
             return new Container(registry);
         }
-        
-        
+
+
         public Container(IServiceCollection services) : base(services)
         {
 
@@ -39,11 +42,16 @@ namespace BlueMilk
 
         public Container(Action<ServiceRegistry> configuration) : this(ServiceRegistry.For(configuration))
         {
-            
+
         }
 
         private Container(ServiceGraph serviceGraph, Container container) : base(serviceGraph, container)
         {
+        }
+
+        public Container(IServiceCollection services, PerfTimer timer) : base(services, timer)
+        {
+
         }
 
 
@@ -51,8 +59,8 @@ namespace BlueMilk
         {
             return new Scope(ServiceGraph, this);
         }
-        
-        
+
+
         public IContainer GetNestedContainer()
         {
             assertNotDisposed();
@@ -61,12 +69,16 @@ namespace BlueMilk
 
         public override void Dispose()
         {
+            // Because a StackOverflowException when trying to cleanly shut down
+            // an application is really no fun
+            if (_isDisposing) return;
 
-            
+            _isDisposing = true;
+
             base.Dispose();
             ServiceGraph.Dispose();
         }
-        
+
 
         public void AssertConfigurationIsValid(AssertMode mode = AssertMode.Full)
         {
@@ -84,18 +96,18 @@ namespace BlueMilk
                 writer.WriteLine();
                 writer.WriteLine("The known registrations are:");
                 writer.WriteLine(WhatDoIHave());
-                
+
                 throw new ContainerValidationException(writer.ToString());
             }
-            
-            
-            
+
+
+
         }
 
         private bool buildAndValidateAll(StringWriter writer)
         {
             bool hasErrors = false;
-            
+
             foreach (var instance in Model.AllInstances.Where(x => x.Lifetime == ServiceLifetime.Singleton))
             {
                 try
@@ -125,7 +137,7 @@ namespace BlueMilk
                 catch (Exception e)
                 {
                     hasErrors = true;
-                    
+
                     writer.WriteLine("Error in " + instance);
                     writer.WriteLine(e.ToString());
                     writer.WriteLine();
@@ -140,7 +152,7 @@ namespace BlueMilk
                     try
                     {
                         var o = instance.Resolve(this);
-                    
+
                         if (o != null)
                         {
                             foreach (var method in ValidationMethodAttribute.GetValidationMethods(o.GetType()))
@@ -164,7 +176,7 @@ namespace BlueMilk
                     catch (Exception e)
                     {
                         hasErrors = true;
-                    
+
                         writer.WriteLine("Error in " + instance);
                         writer.WriteLine(e.ToString());
                         writer.WriteLine();
@@ -181,7 +193,7 @@ namespace BlueMilk
             var invalids = Model.AllInstances.Where(x => x.ErrorMessages.Any()).ToArray();
 
             if (!invalids.Any()) return false;
-            
+
 
             foreach (var instance in invalids)
             {
@@ -190,7 +202,7 @@ namespace BlueMilk
                 {
                     writer.WriteLine(message);
                 }
-                
+
                 writer.WriteLine();
                 writer.WriteLine();
             }
@@ -210,7 +222,7 @@ namespace BlueMilk
         {
             var services = new ServiceRegistry();
             configure(services);
-            
+
             Configure(services);
         }
     }
