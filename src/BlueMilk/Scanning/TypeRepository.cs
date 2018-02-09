@@ -11,7 +11,8 @@ namespace BlueMilk.Scanning
     public static class TypeRepository
     {
         private static readonly ConcurrentDictionary<Assembly, Task<AssemblyTypes>> _assemblies = new ConcurrentDictionary<Assembly, Task<AssemblyTypes>>();
-
+        private static readonly object _locker = new object();
+        
         public static void ClearAll()
         {
             _assemblies.Clear();
@@ -43,7 +44,23 @@ namespace BlueMilk.Scanning
 
         public static Task<AssemblyTypes> ForAssembly(Assembly assembly)
         {
-            return _assemblies.GetOrAdd(assembly, assem => Task.Factory.StartNew(() => new AssemblyTypes(assem)));
+            if (!_assemblies.ContainsKey(assembly))
+            {
+                lock (_locker)
+                {
+                    if (!_assemblies.ContainsKey(assembly))
+                    {
+                        var task = Task.Factory.StartNew(() => new AssemblyTypes(assembly));
+                        _assemblies[assembly] = task;
+
+                        return task;
+                    }
+                }
+
+                
+            }
+            
+            return _assemblies[assembly];
         }
 
         public static Task<TypeSet> FindTypes(IEnumerable<Assembly> assemblies, Func<Type, bool> filter = null)
