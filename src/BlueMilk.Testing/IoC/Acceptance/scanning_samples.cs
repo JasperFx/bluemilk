@@ -4,7 +4,6 @@ using Xunit;
 
 namespace BlueMilk.Testing.IoC.Acceptance
 {
-    [Collection("scanning")]
     public class scanning_samples
     {
         // SAMPLE: WithDefaultConventions

@@ -5,7 +5,6 @@ using Xunit;
 
 namespace BlueMilk.Testing.IoC.Acceptance
 {
-    [Collection("scanning")]
     public class generic_types
     {
         // SAMPLE: register_open_generic_type

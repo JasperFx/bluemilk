@@ -7,7 +7,6 @@ using Xunit;
 
 namespace BlueMilk.Testing.IoC.Acceptance
 {
-    [Collection("scanning")]
     public class type_scanning
     {
         public interface ISomeInterface<in T>
