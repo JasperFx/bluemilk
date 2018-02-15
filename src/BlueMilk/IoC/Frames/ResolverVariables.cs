@@ -12,7 +12,16 @@ namespace BlueMilk.IoC.Frames
     {
         private readonly IList<Variable> _cached = new List<Variable>();
         private readonly IList<Variable> _all = new List<Variable>();
-        
+
+        public ResolverVariables()
+        {
+        }
+
+        public ResolverVariables(IList<InjectedServiceField> fields)
+        {
+            _all.AddRange(fields);
+            _cached.AddRange(fields);
+        }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
@@ -46,15 +55,15 @@ namespace BlueMilk.IoC.Frames
                 {
                     transient.OverrideName(transient.Usage + (sameNamed.Length + 1));
                 }
-                
+
                 _all.Add(transient);
 
-                
-                
-                
+
+
+
                 return transient;
             }
-            
+
             var variable = AllFor(instance).SingleOrDefault();
             if (variable == null)
             {
@@ -74,7 +83,7 @@ namespace BlueMilk.IoC.Frames
             {
                 variable.OverrideName(variable.Usage + "_" + index);
             }
-            
+
             _cached.Add(variable);
         }
     }

@@ -28,11 +28,27 @@ namespace BlueMilk.Testing.IoC.Instances
         
 
         [Fact]
-        public void build_a_variable_returns_a_get_instance_frame()
+        public void build_a_variable_returns_a_get_instance_frame_when_scoped()
         {
-            var instance = LambdaInstance.For<IClock>(s => new Clock(), ServiceLifetime.Singleton);
+            var instance = LambdaInstance.For<IClock>(s => new Clock(), ServiceLifetime.Scoped);
             instance.CreateVariable(BuildMode.Inline, null, false)
                 .Creator.ShouldBeOfType<GetInstanceFrame>();
+        }
+        
+        [Fact]
+        public void build_a_variable_returns_a_get_instance_frame_when_transient()
+        {
+            var instance = LambdaInstance.For<IClock>(s => new Clock(), ServiceLifetime.Transient);
+            instance.CreateVariable(BuildMode.Inline, null, false)
+                .Creator.ShouldBeOfType<GetInstanceFrame>();
+        }
+        
+        [Fact]
+        public void build_a_variable_returns_an_injected_service_field_when_a_singleton_and_not_build()
+        {
+            var instance = LambdaInstance.For<IClock>(s => new Clock(), ServiceLifetime.Singleton);
+            instance.CreateVariable(BuildMode.Dependency, null, false)
+                .ShouldBeOfType<InjectedServiceField>();
         }
     }
 }

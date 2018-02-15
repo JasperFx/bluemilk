@@ -21,11 +21,17 @@ namespace BlueMilk
             foreach (var instance in instances)
             {
                 instance.IsDefault = false;
+                instance.IsOnlyOneOfServiceType = false;
             }
 
             if (instances.Any())
             {
                 instances.Last().IsDefault = true;
+            }
+
+            if (instances.Length == 1)
+            {
+                instances[0].IsOnlyOneOfServiceType = true;
             }
 
             ServiceType = serviceType;
@@ -42,7 +48,7 @@ namespace BlueMilk
 
             All = instances;
         }
-        
+
         public void Append(IEnumerable<ServiceDescriptor> services)
         {
             var instances = services.Select(Instance.For).ToArray();
@@ -55,7 +61,7 @@ namespace BlueMilk
             {
                 instances.Last().IsDefault = true;
             }
-            
+
             Default = instances.LastOrDefault();
 
 
@@ -65,6 +71,16 @@ namespace BlueMilk
             foreach (var instance in instances)
             {
                 _instances.Add(instance.Name, instance);
+            }
+
+            foreach (var instance in all)
+            {
+                instance.IsOnlyOneOfServiceType = false;
+            }
+
+            if (all.Length == 1)
+            {
+                all[0].IsOnlyOneOfServiceType = true;
             }
 
             All = all;
@@ -111,7 +127,7 @@ namespace BlueMilk
 
 
         /// <summary>
-        /// If the ServiceType is an open generic type, this method will create a 
+        /// If the ServiceType is an open generic type, this method will create a
         /// closed type copy of this PluginFamily
         /// </summary>
         /// <param name="types"></param>
@@ -120,7 +136,7 @@ namespace BlueMilk
         public ServiceFamily CreateTemplatedClone(Type serviceType, Type[] templateTypes)
         {
             if (!ServiceType.IsGenericType) throw new InvalidOperationException($"{ServiceType.FullNameInCode()} is not an open generic type");
-            
+
             var instances = _instances.Values.Select(x => {
                 var clone = x.CloseType(serviceType, templateTypes);
                 if (clone == null) return null;

@@ -89,7 +89,7 @@ namespace BlueMilk
         public void Initialize(PerfTimer timer = null)
         {
             timer = timer ?? new PerfTimer();
-            
+
             timer.Record("Organize Into Families", () =>
             {
                 organizeIntoFamilies(Services);
@@ -97,7 +97,15 @@ namespace BlueMilk
 
             timer.Record("Planning Instances", buildOutMissingResolvers);
 
-            var generatedSingletons = AllInstances().OfType<GeneratedInstance>().Where(x => x.Lifetime != ServiceLifetime.Transient && !x.ServiceType.IsOpenGeneric()).ToArray();
+            var generatedSingletons = AllInstances()
+                .OfType<GeneratedInstance>()
+                .Where(x => x.Lifetime != ServiceLifetime.Transient && !x.ServiceType.IsOpenGeneric())
+                .TopologicalSort(x => x.Dependencies.OfType<GeneratedInstance>())
+                .Where(x => x.Lifetime != ServiceLifetime.Transient && !x.ServiceType.IsOpenGeneric()) // to get rid of things that get injected in again
+                .Distinct()
+                .ToArray();
+
+
             if (generatedSingletons.Any())
             {
                 var assembly = ToGeneratedAssembly();
@@ -143,6 +151,7 @@ namespace BlueMilk
             AllInstances().SelectMany(x => x.ReferencedAssemblies())
                 .Distinct()
                 .Each(a => generatedAssembly.Generation.Assemblies.Fill(a));
+
             return generatedAssembly;
         }
 

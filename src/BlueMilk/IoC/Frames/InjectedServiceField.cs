@@ -9,9 +9,10 @@ namespace BlueMilk.IoC.Frames
         private bool _isOnlyOne;
 
         public InjectedServiceField(Instance instance) : base(instance.ServiceType,
-            DefaultArgName(instance.ServiceType) + instance.GetHashCode().ToString().Replace("-", "_"))
+            instance.DefaultArgName())
         {
             Instance = instance;
+            _isOnlyOne = instance.IsOnlyOneOfServiceType;
         }
 
         public bool IsOnlyOne

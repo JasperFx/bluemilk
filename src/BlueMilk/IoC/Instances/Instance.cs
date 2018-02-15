@@ -15,6 +15,14 @@ namespace BlueMilk.IoC.Instances
 {
     public abstract class Instance
     {
+        public bool IsOnlyOneOfServiceType { get; set; }
+
+        public string DefaultArgName()
+        {
+            var argName = Variable.DefaultArgName(ServiceType);
+            return IsOnlyOneOfServiceType ? argName : argName + GetHashCode().ToString().Replace("-", "_");
+        }
+
         internal IEnumerable<Assembly> ReferencedAssemblies()
         {
             yield return ServiceType.Assembly;
@@ -37,21 +45,21 @@ namespace BlueMilk.IoC.Instances
             }
         }
 
-        
+
         public Type ServiceType { get; }
         public Type ImplementationType { get; }
 
         public static Instance For(ServiceDescriptor service)
         {
             if (service.ImplementationInstance is Instance instance) return instance;
-            
+
             if (service.ImplementationInstance != null) return new ObjectInstance(service.ServiceType, service.ImplementationInstance);
-            
+
             if (service.ImplementationFactory != null) return new LambdaInstance(service.ServiceType, service.ImplementationFactory, service.Lifetime);
 
             return new ConstructorInstance(service.ServiceType, service.ImplementationType, service.Lifetime);
         }
-        
+
         public static bool CanBeCastTo(Type implementationType, Type serviceType)
         {
             if (implementationType == null) return false;
@@ -79,12 +87,12 @@ namespace BlueMilk.IoC.Instances
             {
                 throw new ArgumentOutOfRangeException(nameof(implementationType), $"{implementationType.FullNameInCode()} cannot be cast to {serviceType.FullNameInCode()}");
             }
-            
+
             ServiceType = serviceType;
             Lifetime = lifetime;
             ImplementationType = implementationType;
             Name = "default";
-            
+
         }
 
         public abstract object Resolve(Scope scope);
@@ -98,7 +106,7 @@ namespace BlueMilk.IoC.Instances
         {
             return Resolve(scope);
         }
-        
+
         public int Hash { get; private set; }
 
         public virtual bool RequiresServiceProvider => Dependencies.Any(x => x.RequiresServiceProvider);
@@ -124,17 +132,17 @@ namespace BlueMilk.IoC.Instances
             try
             {
                 services.StartingToPlan(this);
-                
+
             }
             catch (Exception e)
             {
                 ErrorMessages.Add(e.Message);
-                
+
                 services.FinishedPlanning();
                 HasPlanned = true;
                 return;
             }
-            
+
             // Can't do the planning on open generic types 'cause bad stuff happens
             if (!ServiceType.IsOpenGeneric())
             {

@@ -22,6 +22,8 @@ namespace BlueMilk.IoC.Instances
 
         public void GenerateResolver(GeneratedAssembly generatedAssembly)
         {
+            if (_resolverType != null) return; // got some kind of loop in here we need to short circuit
+
             if (ErrorMessages.Any() || Dependencies.SelectMany(x => x.ErrorMessages).Any()) return;
 
             var typeName = (ServiceType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")

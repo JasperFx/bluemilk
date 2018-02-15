@@ -41,6 +41,11 @@ namespace BlueMilk.IoC.Instances
 
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
         {
+            if (Lifetime == ServiceLifetime.Singleton && mode != BuildMode.Build)
+            {
+                return new InjectedServiceField(this);
+            }
+
             return new GetInstanceFrame(this).Variable;
         }
 

@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Baseline;
-using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.ServiceLocation;
 using BlueMilk.Codegen.Variables;
-using BlueMilk.Compilation;
 using BlueMilk.IoC;
 using BlueMilk.IoC.Frames;
-using BlueMilk.IoC.Instances;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Codegen
@@ -17,6 +14,8 @@ namespace BlueMilk.Codegen
     {
         private readonly ServiceGraph _services;
         private readonly IList<ServiceStandinVariable> _standins = new List<ServiceStandinVariable>();
+
+        private readonly IList<InjectedServiceField> _fields = new List<InjectedServiceField>();
 
         public ServiceVariableSource(ServiceGraph services)
         {
@@ -31,8 +30,18 @@ namespace BlueMilk.Codegen
         public Variable Create(Type type)
         {
             var instance = _services.FindDefault(type);
+            if (instance.Lifetime == ServiceLifetime.Singleton)
+            {
+                var field = new InjectedServiceField(instance);
+                _fields.Add(field);
+
+                return field;
+            }
+
+
             var standin =  new ServiceStandinVariable(instance);
             _standins.Add(standin);
+
 
             return standin;
         }
@@ -52,7 +61,7 @@ namespace BlueMilk.Codegen
 
         private void useInlineConstruction()
         {
-            var variables = new ResolverVariables();
+            var variables = new ResolverVariables(_fields);
             foreach (var standin in _standins)
             {
                 var variable = variables.Resolve(standin.Instance, BuildMode.Inline);
@@ -77,53 +86,6 @@ namespace BlueMilk.Codegen
                 var variable = new GetServiceFrame(provider, standin.VariableType).Variable;
                 standin.UseInner(variable);
             }
-        }
-    }
-
-    public class ServiceStandinVariable : Variable
-    {
-        private Variable _inner;
-        public Instance Instance { get; }
-
-        public ServiceStandinVariable(Instance instance) : base(instance.ServiceType)
-        {
-            Instance = instance;
-        }
-
-        public void UseInner(Variable variable)
-        {
-            _inner = variable;
-            Dependencies.Add(variable);
-        }
-
-        public override string Usage
-        {
-            get => _inner.Usage;
-            protected set {
-            {
-                base.Usage = value;
-            }}
-        }
-    }
-
-    public class GetServiceFrame : SyncFrame
-    {
-        private readonly Variable _provider;
-
-        public GetServiceFrame(Variable provider, Type serviceType)
-        {
-            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-            uses.Add(provider);
-
-            Variable = new Variable(serviceType, this);
-        }
-
-        public Variable Variable { get; }
-
-        public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
-        {
-            writer.Write($"var {Variable.Usage} = ({Variable.VariableType.FullNameInCode()}){_provider.Usage}.{nameof(IServiceProvider.GetService)}(typeof({Variable.VariableType.FullNameInCode()}));");
-            Next?.GenerateCode(method, writer);
         }
     }
 }
