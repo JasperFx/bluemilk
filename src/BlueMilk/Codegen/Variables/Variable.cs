@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Baseline;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.IoC.Enumerables;
@@ -54,6 +55,7 @@ namespace BlueMilk.Codegen.Variables
         }
 
         private Frame _frame;
+        private string _usage;
 
         public Frame Creator
         {
@@ -65,7 +67,12 @@ namespace BlueMilk.Codegen.Variables
             }
         }
         public Type VariableType { get; }
-        public virtual string Usage { get; protected set; }
+
+        public virtual string Usage
+        {
+            get => _usage;
+            protected set => _usage = Regex.Replace(value, @"[\#\<\>\,\.]", "_");
+        }
 
         public virtual string ArgumentDeclaration => Usage;
 
