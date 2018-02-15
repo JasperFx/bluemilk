@@ -20,7 +20,14 @@ namespace BlueMilk.IoC.Instances
         public string DefaultArgName()
         {
             var argName = Variable.DefaultArgName(ServiceType);
-            return IsOnlyOneOfServiceType ? argName : argName + GetHashCode().ToString().Replace("-", "_");
+
+            if (ServiceType.IsGenericType)
+            {
+                argName += "_of_" + ServiceType.GetGenericArguments().Select(t => t.NameInCode().Replace("<", "_").Replace(">", "_")).Join("_");
+            }
+            
+            
+            return IsOnlyOneOfServiceType ? argName : argName + HashCode(ServiceType, Name).ToString().Replace("-", "_");
         }
 
         internal IEnumerable<Assembly> ReferencedAssemblies()

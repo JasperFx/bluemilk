@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using StructureMap.Testing.GenericWidgets;
 using StructureMap.Testing.Widget;
 using Xunit;
 
@@ -93,7 +94,44 @@ namespace BlueMilk.Testing.IoC.Acceptance
                 .Thing.ShouldBe(thing);
         }
         
+        [Fact]
+        public void can_resolve_with_closed_generic_depencency()
+        {
+            var container = new Container(_ =>
+            {
+                _.For<IWidget>().Use<AWidget>();
+                _.For<IService<IWidget>>().Use<Service<IWidget>>();
+                _.ForSingletonOf<GenericUsingGuy>().Use<GenericUsingGuy>();
+            });
+
+            container.GetInstance<GenericUsingGuy>()
+                .WidgetService.Inner.ShouldBeOfType<AWidget>();
+        }
         
+        public interface IService<T>
+        {
+            T Inner { get; }
+        }
+
+        public class Service<T> : IService<T>
+        {
+            public T Inner { get; }
+
+            public Service(T inner)
+            {
+                Inner = inner;
+            }
+        }
+        
+        public class GenericUsingGuy
+        {
+            public IService<IWidget> WidgetService { get; }
+
+            public GenericUsingGuy(IService<IWidget> widgetService)
+            {
+                WidgetService = widgetService;
+            }
+        }
 
         public class GuyWithWidget
         {

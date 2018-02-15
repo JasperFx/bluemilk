@@ -391,8 +391,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
             theCode.ShouldContain("var widgetIReadOnlyListUser = new BlueMilk.Testing.IoC.Acceptance.WidgetIReadOnlyListUser(_widgetIReadOnlyList);");
         }
         
-        
-        
+
     }
 
     public class Widget : IWidget
@@ -407,6 +406,8 @@ namespace BlueMilk.Testing.IoC.Acceptance
     {
         public abstract Task Handle(Message1 message);
     }
+
+
 
     public class RedWidget : AWidget
     {
