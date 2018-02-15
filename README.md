@@ -2,7 +2,7 @@
 Runtime Codegen Chicanery with Roslyn
 
 It's a little hard to explain, but BlueMilk is the runtime code generation infrastructure 
-that originated in [Jasper](http://jasperfx.github.io/jasper). 
+that originated in [Jasper](http://jasperfx.github.io). 
 
 It's also meant to be a new IoC
 tool to replace the venerable [StructureMap](http://structuremap/structuremap) container, but use
