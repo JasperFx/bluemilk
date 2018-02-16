@@ -48,10 +48,23 @@ namespace BlueMilk
 
             All = instances;
         }
+        
+        
+        public void Append(ObjectInstance instance)
+        {
+            Append(new Instance[]{instance});
+        }
 
         public void Append(IEnumerable<ServiceDescriptor> services)
         {
             var instances = services.Select(Instance.For).ToArray();
+
+
+            Append(instances);
+        }
+
+        public void Append(Instance[] instances)
+        {
             foreach (var instance in instances)
             {
                 instance.IsDefault = false;
@@ -147,7 +160,6 @@ namespace BlueMilk
 
             return new ServiceFamily(serviceType, instances);
         }
-
 
 
     }

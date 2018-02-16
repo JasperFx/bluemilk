@@ -424,5 +424,18 @@ namespace BlueMilk
             buildOutMissingResolvers();
 
         }
+
+        internal void Inject(ObjectInstance instance)
+        {
+            if (_families.ContainsKey(instance.ServiceType))
+            {
+                _families[instance.ServiceType].Append(instance);
+            }
+            else
+            {
+                var family = new ServiceFamily(instance.ServiceType, instance);
+                _families.Add(instance.ServiceType, family);
+            }
+        }
     }
 }

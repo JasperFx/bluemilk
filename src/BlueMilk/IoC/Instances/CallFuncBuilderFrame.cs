@@ -10,38 +10,36 @@ using BlueMilk.IoC.Frames;
 
 namespace BlueMilk.IoC.Instances
 {
-    public class ConstructorFrame : SyncFrame
+    public class CallFuncBuilderFrame : SyncFrame
     {
+        private readonly Variable _func;
         private readonly Variable[] _arguments;
         private Variable _scope;
-        private readonly Type _implementationType;
 
-        public ConstructorFrame(ConstructorInstance instance, DisposeTracking disposal, Variable[] arguments)
+        public CallFuncBuilderFrame(ConstructorInstance instance, DisposeTracking disposal, Variable func, Variable[] arguments)
         {
             Disposal = disposal;
+            _func = func;
             _arguments = arguments;
             Variable = new ServiceVariable(instance, this);
-            _implementationType = instance.ImplementationType;
         }
-        
-        public ServiceVariable Variable { get; }
 
+        public ServiceVariable Variable { get; }
         public DisposeTracking Disposal { get; }
         public bool ReturnCreated { get; set; }
 
         public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
             var arguments = _arguments.Select(x => x.Usage).Join(", ");
-            var implementationTypeName = _implementationType.FullNameInCode();
 
             if (ReturnCreated)
             {
-                writer.Write($"return new {implementationTypeName}({arguments});");
+                writer.Write($"return {_func.Usage}({arguments});");
                 Next?.GenerateCode(method, writer);
                 return;
             }
             
-            var declaration = $"var {Variable.Usage} = new {implementationTypeName}({arguments})";
+            var declaration = $"var {Variable.Usage} = {_func.Usage}({arguments})";
 
             switch (Disposal)
             {
@@ -81,16 +79,13 @@ namespace BlueMilk.IoC.Instances
                 yield return argument;
             }
 
+            yield return _func;
+            
             if (Disposal == DisposeTracking.RegisterWithScope)
             {
                 _scope = chain.FindVariable(typeof(Scope));
                 yield return _scope;
             }
-        }
-
-        public override string ToString()
-        {
-            return $"new {_implementationType.NameInCode()}({_arguments.Select(x => x.VariableType.NameInCode()).Join(", ")})";
         }
     }
 }

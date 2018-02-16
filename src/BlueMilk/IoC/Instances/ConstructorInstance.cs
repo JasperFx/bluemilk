@@ -29,6 +29,7 @@ namespace BlueMilk.IoC.Instances
             "Cannot fill the dependencies of any of the public constructors";
 
         private CtorArg[] _arguments = new CtorArg[0];
+        private ObjectInstance _func;
 
 
         public ConstructorInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(
@@ -107,6 +108,16 @@ namespace BlueMilk.IoC.Instances
             var variables = new ResolverVariables();
             var ctorParameters = _arguments.Select(arg => arg.Resolve(variables, BuildMode.Dependency)).ToArray();
 
+            if (_func != null)
+            {
+                var funcArg = variables.Resolve(_func, BuildMode.Dependency);
+
+                return new CallFuncBuilderFrame(this, DisposeTracking.None, funcArg, ctorParameters)
+                {
+                    ReturnCreated = true
+                };
+            }
+            
             return new ConstructorFrame(this, DisposeTracking.None, ctorParameters)
             {
                 ReturnCreated = true
@@ -156,6 +167,16 @@ namespace BlueMilk.IoC.Instances
                 foreach (var argument in _arguments)
                 {
                     argument.Instance.CreatePlan(services);
+                }
+
+                if (ImplementationType.IsNotPublic)
+                {
+                    (var func, var funcType) = CtorFuncBuilder.LambdaTypeFor(ServiceType, Constructor);
+                    _func = new ObjectInstance(funcType, func);
+
+
+
+                    services.Inject(_func);
                 }
             }
 
@@ -208,8 +229,9 @@ namespace BlueMilk.IoC.Instances
         {
             message = null;
 
-            var constructors = implementationType
-                .GetConstructors() ?? new ConstructorInfo[0];
+            var constructors = implementationType.IsPublic
+                ? implementationType.GetConstructors() ?? new ConstructorInfo[0]
+                : implementationType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 
 
             if (constructors.Any())
