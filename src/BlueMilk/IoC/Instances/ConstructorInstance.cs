@@ -98,8 +98,17 @@ namespace BlueMilk.IoC.Instances
 
             var ctorParameters = _arguments.Select(arg => arg.Resolve(variables, dependencyMode)).ToArray();
 
+            if (_func == null)
+            {
+                return new ConstructorFrame(this, disposalTracking, ctorParameters).Variable;
+            }
+            else
+            {
+                var funcArg = variables.Resolve(_func, BuildMode.Dependency);
+                return new CallFuncBuilderFrame(this, disposalTracking, funcArg, ctorParameters).Variable;
+            }
 
-            return new ConstructorFrame(this, disposalTracking, ctorParameters).Variable;
+            
         }
 
 

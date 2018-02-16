@@ -29,6 +29,10 @@ namespace BlueMilk.Testing.IoC.Acceptance
             gadget.Service.ShouldBeOfType<WhateverService>();
             
             gadget.Clock.ShouldBeNull();
+            
+            
+            container.GetInstance<PrivateGadgetHolder>()
+                .ShouldNotBeNull();
         }
     }
 
@@ -37,11 +41,11 @@ namespace BlueMilk.Testing.IoC.Acceptance
         
     }
 
-    internal class PrivateGadgetHolder
+    public class PrivateGadgetHolder
     {
-        public PrivateGadget Gadget { get; }
+        public IGadget Gadget { get; }
 
-        public PrivateGadgetHolder(PrivateGadget gadget)
+        public PrivateGadgetHolder(IGadget gadget)
         {
             Gadget = gadget;
         }
