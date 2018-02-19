@@ -12,7 +12,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
         {
             var graph = ServiceGraph.For(x => x.AddTransient<IWidget, AWidget>());
 
-            var ctor = ConstructorInstance.DetermineConstructor(graph, typeof(WithSimples), out var message);
+            var ctor = ConstructorInstance.For<WithSimples>().DetermineConstructor(graph, typeof(WithSimples), out var message);
 
             message.ShouldContain("* int number is a 'simple' type that cannot be auto-filled");
         }
@@ -22,7 +22,7 @@ namespace BlueMilk.Testing.IoC.Acceptance
         {
             var graph = ServiceGraph.For(x => x.AddTransient<IWidget, AWidget>());
 
-            var ctor = ConstructorInstance.DetermineConstructor(graph, typeof(WithHitsAndMisses), out var message);
+            var ctor = ConstructorInstance.For<WithHitsAndMisses>().DetermineConstructor(graph, typeof(WithHitsAndMisses), out var message);
 
             message.ShouldContain("* int number is a 'simple' type that cannot be auto-filled");
             message.ShouldContain(

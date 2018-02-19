@@ -195,7 +195,7 @@ namespace BlueMilk.IoC
 
             if (!objectType.IsConcrete()) throw new InvalidOperationException("Type must be concrete");
 
-            var ctor = ConstructorInstance.DetermineConstructor(ServiceGraph, objectType, out var message);
+            var ctor = new ConstructorInstance(objectType, objectType, ServiceLifetime.Transient).DetermineConstructor(ServiceGraph, objectType, out var message);
             if (ctor == null) throw new InvalidOperationException(message);
 
             var dependencies = ctor.GetParameters().Select(x =>

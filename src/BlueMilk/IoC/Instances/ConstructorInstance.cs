@@ -252,7 +252,7 @@ namespace BlueMilk.IoC.Instances
 
         }
 
-        public static ConstructorInfo DetermineConstructor(ServiceGraph services, Type implementationType,
+        public ConstructorInfo DetermineConstructor(ServiceGraph services, Type implementationType,
             out string message)
         {
             message = null;
