@@ -23,7 +23,7 @@ namespace BlueMilk.IoC.Instances
 
             if (ServiceType.IsGenericType)
             {
-                argName += "_of_" + ServiceType.GetGenericArguments().Select(t => t.NameInCode().Replace("<", "_").Replace(">", "_")).Join("_");
+                argName += "_of_" + ServiceType.GetGenericArguments().Select(t => t.NameInCode().Replace("<", "_").Replace(">", "_").Replace(".", "_")).Join("_");
             }
             
             

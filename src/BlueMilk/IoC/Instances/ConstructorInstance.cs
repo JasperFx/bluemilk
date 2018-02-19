@@ -180,7 +180,7 @@ namespace BlueMilk.IoC.Instances
 
                 if (ImplementationType.IsNotPublic)
                 {
-                    (var func, var funcType) = CtorFuncBuilder.LambdaTypeFor(ServiceType, Constructor);
+                    (var func, var funcType) = CtorFuncBuilder.LambdaTypeFor(ServiceType, ImplementationType, Constructor);
                     _func = new ObjectInstance(funcType, func);
 
 
@@ -233,14 +233,31 @@ namespace BlueMilk.IoC.Instances
             return $"new {ImplementationType.NameInCode()}()";
         }
 
+        private static ConstructorInfo[] findConstructors(Type implementationType)
+        {
+            var publics = implementationType.GetConstructors() ?? new ConstructorInfo[0];
+
+            if (publics.Any()) return publics;
+            
+            
+            
+            if (implementationType.IsPublic)
+            {
+                return new ConstructorInfo[0];
+            }
+
+
+            return implementationType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance |
+                                                      BindingFlags.Public) ?? new ConstructorInfo[0];
+
+        }
+
         public static ConstructorInfo DetermineConstructor(ServiceGraph services, Type implementationType,
             out string message)
         {
             message = null;
 
-            var constructors = implementationType.IsPublic
-                ? implementationType.GetConstructors() ?? new ConstructorInfo[0]
-                : implementationType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+            var constructors = findConstructors(implementationType);
 
 
             if (constructors.Any())
