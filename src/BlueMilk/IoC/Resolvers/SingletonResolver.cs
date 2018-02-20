@@ -3,7 +3,7 @@ using Baseline;
 
 namespace BlueMilk.IoC.Resolvers
 {
-    public abstract class SingletonResolver<T> : IResolver where T : class
+    public abstract class SingletonResolver<T> : IResolver 
     {
         private readonly Scope _topLevelScope;
         private readonly object _locker = new object();

@@ -552,8 +552,11 @@ namespace BlueMilk.Testing.IoC.Acceptance
 
     public class WidgetUser
     {
+        public IWidget Widget { get; }
+
         public WidgetUser(IWidget widget)
         {
+            Widget = widget;
         }
 
         public void Handle(Message1 message)

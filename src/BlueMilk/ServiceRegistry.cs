@@ -160,25 +160,22 @@ namespace BlueMilk
             }
 
 
-            public LambdaInstance Add<TConcrete>(Func<IServiceProvider, TConcrete> func) where TConcrete : T
+            public LambdaInstance<IContainer, T> Add(Func<IContainer, T> func) 
             {
-                var instance = LambdaInstance.For<T, TConcrete>(func);
+                var instance = LambdaInstance.For(func);
 
                 _parent.Add(instance);
 
                 return instance;
 
             }
-
-            public LambdaInstance Add<TConcrete>(Func<TConcrete> func) where TConcrete : T
+            
+            public LambdaInstance<IContainer, T> Use(Func<IContainer, T> func)
             {
-                var instance = LambdaInstance.For<T, TConcrete>(s => func());
-
-                _parent.Add(instance);
-
-                return instance;
+                return Add(func);
 
             }
+
         }
 
         public DescriptorExpression<T> ForSingletonOf<T>() where T : class

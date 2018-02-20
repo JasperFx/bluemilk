@@ -1,21 +1,21 @@
 ﻿using System;
+using Baseline;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Resolvers
 {
-    public class TransientLambdaResolver<T> : TransientResolver<T>
+    public class TransientLambdaResolver<TContainer, T> : TransientResolver<T> 
     {
-        private readonly Func<IServiceProvider, object> _builder;
+        private readonly Func<TContainer, T> _builder;
         
-        public TransientLambdaResolver(Func<IServiceProvider, object> builder)
+        public TransientLambdaResolver(Func<TContainer, T> builder)
         {
             _builder = builder;
         }
         
         public override T Build(Scope scope)
         {
-            // TODO -- have an overload that lets you use Func<IServiceProvider, T>
-            return (T) _builder(scope.ServiceProvider);
+            return _builder(scope.As<TContainer>());
         }
     }
 }

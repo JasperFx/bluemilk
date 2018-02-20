@@ -4,38 +4,42 @@ using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Resolvers;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
-    public class LambdaInstance : Instance
+    public class LambdaInstance : LambdaInstance<IServiceProvider, object>
     {
-        public Func<IServiceProvider, object> Factory { get; }
-
-        public LambdaInstance(Type serviceType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime) :
-            base(serviceType, serviceType, lifetime)
+        public LambdaInstance(Type serviceType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime) : base(serviceType, factory, lifetime)
         {
-            Factory = factory;
-            Name = serviceType.NameInCode();
         }
 
-        private LambdaInstance(Type serviceType, Type concreteType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime) : base(serviceType, concreteType, lifetime)
+        public static LambdaInstance<TContainer, TReturn> For<TContainer, TReturn>(Func<TContainer, TReturn> func)
         {
-            Factory = factory;
-            Name = concreteType.NameInCode();
+            return new LambdaInstance<TContainer, TReturn>(typeof(TReturn), func, ServiceLifetime.Transient);
         }
-
+        
         public static LambdaInstance For<T>(Func<IServiceProvider, T> factory,
             ServiceLifetime lifetime = ServiceLifetime.Transient)
         {
             return new LambdaInstance(typeof(T), s => factory(s), lifetime);
         }
 
-        public static LambdaInstance For<T, TConcrete>(Func<IServiceProvider, TConcrete> factory,
-            ServiceLifetime lifetime = ServiceLifetime.Transient)
+
+    }
+    
+    public class LambdaInstance<TContainer, TReturn> : Instance
+    {
+        public Func<TContainer, TReturn> Factory { get; }
+
+        public LambdaInstance(Type serviceType, Func<TContainer, TReturn> factory, ServiceLifetime lifetime) :
+            base(serviceType, serviceType, lifetime)
         {
-            return new LambdaInstance(typeof(T), typeof(TConcrete), s => factory(s), lifetime);
+            Factory = factory;
+            Name = serviceType.NameInCode();
         }
+
 
         public override bool RequiresServiceProvider { get; } = true;
 
@@ -75,13 +79,13 @@ namespace BlueMilk.IoC.Instances
             switch (Lifetime)
             {
                 case ServiceLifetime.Transient:
-                    return typeof(TransientLambdaResolver<>).CloseAndBuildAs<IResolver>(Factory, ServiceType);
+                    return new TransientLambdaResolver<TContainer, TReturn>(Factory);
 
                 case ServiceLifetime.Scoped:
-                    return typeof(ScopedLambdaResolver<>).CloseAndBuildAs<IResolver>(Factory, ServiceType);
-
+                    return new ScopedLambdaResolver<TContainer, TReturn>(Factory);
+                    
                 case ServiceLifetime.Singleton:
-                    return typeof(SingletonLambdaResolver<>).CloseAndBuildAs<IResolver>(Factory, rootScope, ServiceType);
+                    return new SingletonLambdaResolver<TContainer, TReturn>(Factory, rootScope);
             }
 
             throw new ArgumentOutOfRangeException(nameof(Lifetime));

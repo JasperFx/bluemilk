@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
 {
-    public interface IContainer : IDisposable
+    public interface IContainer : IServiceProvider, IDisposable
     {
         /// <summary>
         /// Suitable for building concrete types that will be resolved only a few times

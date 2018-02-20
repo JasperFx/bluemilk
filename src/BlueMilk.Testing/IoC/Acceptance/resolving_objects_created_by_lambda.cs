@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using StructureMap.Testing.Widget;
 using Xunit;
 
 namespace BlueMilk.Testing.IoC.Acceptance
@@ -10,6 +11,21 @@ namespace BlueMilk.Testing.IoC.Acceptance
         public resolving_objects_created_by_lambda()
         {
             ClockFactory.Number = 0;
+        }
+        
+        [Fact]
+        public void build_with_container()
+        {
+            var container = Container.For(_ =>
+            {
+                _.For<IWidget>().Use<BlueWidget>().Named("Blue");
+                _.For<IWidget>().Use<RedWidget>();
+                _.For<WidgetUser>().Use(c => new WidgetUser(c.GetInstance<IWidget>("Blue")));
+            });
+
+            container.GetInstance<WidgetUser>()
+                .Widget.ShouldBeOfType<BlueWidget>();
+
         }
 
         [Fact]

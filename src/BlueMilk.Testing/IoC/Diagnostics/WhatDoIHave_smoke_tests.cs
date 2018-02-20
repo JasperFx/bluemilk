@@ -31,7 +31,7 @@ namespace BlueMilk.Testing.IoC.Diagnostics
                 x.For<IEngine>().Add<FourFiftyFour>();
                 x.For<IEngine>().Add<StraightSix>().Scoped();
 
-                x.For<IEngine>().Add(() => new Rotary()).Named("Rotary");
+                x.For<IEngine>().Add(c => new Rotary()).Named("Rotary");
                 x.For<IEngine>().Add(c => c.GetService<PluginElectric>());
 
                 x.For<IEngine>().Add(new InlineFour());
@@ -58,7 +58,7 @@ namespace BlueMilk.Testing.IoC.Diagnostics
                 x.For<IEngine>().Add<FourFiftyFour>();
                 x.For<IEngine>().Add<StraightSix>().Scoped();
 
-                x.For<IEngine>().Add(() => new Rotary()).Named("Rotary");
+                x.For<IEngine>().Add(c => new Rotary()).Named("Rotary");
                 x.For<IEngine>().Add(c => c.GetService<PluginElectric>());
 
                 x.For<IEngine>().Add(new InlineFour());
@@ -79,7 +79,7 @@ namespace BlueMilk.Testing.IoC.Diagnostics
                 x.For<IEngine>().Add<FourFiftyFour>();
                 x.For<IEngine>().Add<StraightSix>().Scoped();
 
-                x.For<IEngine>().Add(() => new Rotary()).Named("Rotary");
+                x.For<IEngine>().Add(c => new Rotary()).Named("Rotary");
                 x.For<IEngine>().Add(c => c.GetService<PluginElectric>());
 
                 x.For<IEngine>().Add(new InlineFour());
@@ -125,7 +125,7 @@ namespace BlueMilk.Testing.IoC.Diagnostics
                 x.For<IEngine>().Add<FourFiftyFour>();
                 x.For<IEngine>().Add<StraightSix>().Scoped();
 
-                x.For<IEngine>().Add(() => new Rotary()).Named("Rotary");
+                x.For<IEngine>().Add(c => new Rotary()).Named("Rotary");
                 x.For<IEngine>().Add(c => c.GetService<PluginElectric>());
 
                 x.For<IEngine>().Add(new InlineFour());
@@ -175,7 +175,7 @@ namespace BlueMilk.Testing.IoC.Diagnostics
                 x.For<IEngine>().Add<FourFiftyFour>();
                 x.For<IEngine>().Add<StraightSix>().Scoped();
 
-                x.For<IEngine>().Add(() => new Rotary()).Named("Rotary");
+                x.For<IEngine>().Add(c => new Rotary()).Named("Rotary");
                 x.For<IEngine>().Add(c => c.GetService<PluginElectric>());
 
                 x.For<IEngine>().Add(new InlineFour());

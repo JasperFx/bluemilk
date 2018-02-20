@@ -1,20 +1,21 @@
 ﻿using System;
+using Baseline;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Resolvers
 {
-    public class SingletonLambdaResolver<T> : SingletonResolver<T> where T : class
+    public class SingletonLambdaResolver<TContainer, T> : SingletonResolver<T> 
     {
-        private readonly Func<IServiceProvider, object> _builder;
+        private readonly Func<TContainer, T> _builder;
         
-        public SingletonLambdaResolver(Func<IServiceProvider, object> builder, Scope topLevelScope) : base(topLevelScope)
+        public SingletonLambdaResolver(Func<TContainer, T> builder, Scope topLevelScope) : base(topLevelScope)
         {
             _builder = builder;
         }
         
         public override T Build(Scope scope)
         {
-            return (T) _builder(scope.ServiceProvider);
+            return _builder(scope.As<TContainer>());
         }
     }
 }
