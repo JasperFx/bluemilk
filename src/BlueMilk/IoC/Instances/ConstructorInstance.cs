@@ -21,6 +21,7 @@ namespace BlueMilk.IoC.Instances
         }
     }
 
+    // TODO -- let's have an interface strictly for configuration to make things cleaner
     public class ConstructorInstance : GeneratedInstance
     {
         public static readonly string NoPublicConstructors = "No public constructors";
@@ -316,6 +317,22 @@ namespace BlueMilk.IoC.Instances
 
 
             return declaration;
+        }
+        
+        public IList<Instance> Inline { get; } = new List<Instance>();
+        
+        
+        
+        /// <summary>
+        ///     Inline definition of a constructor dependency.  Select the constructor argument by type and constructor name.
+        ///     Use this method if there is more than one constructor arguments of the same type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="constructorArg"></param>
+        /// <returns></returns>
+        public DependencyExpression<T> Ctor<T>(string constructorArg = null)
+        {
+            return new DependencyExpression<T>(this, constructorArg);
         }
 
 

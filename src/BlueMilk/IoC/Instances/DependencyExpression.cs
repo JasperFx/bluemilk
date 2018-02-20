@@ -1,54 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
-using BlueMilk.Codegen.Variables;
-using BlueMilk.IoC.Frames;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
-    public class DefaultInstance : Instance
-    {
-        public DefaultInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(serviceType, implementationType, lifetime)
-        {
-        }
-
-        public DefaultInstance(Type serviceType) : base(serviceType, serviceType, ServiceLifetime.Transient)
-        {
-        }
-
-        public override object Resolve(Scope scope)
-        {
-            throw new NotSupportedException();
-        }
-
-        public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
-        {
-            throw new NotSupportedException();
-        }
-    }
-
-    public class ReferencedInstance : Instance
-    {
-        public ReferencedInstance(Type serviceType, Type implementationType, ServiceLifetime lifetime) : base(serviceType, implementationType, lifetime)
-        {
-        }
-
-        public ReferencedInstance(Type serviceType, string instanceKey) : base(serviceType, serviceType, ServiceLifetime.Transient)
-        {
-        }
-
-        public override object Resolve(Scope scope)
-        {
-            throw new NotSupportedException();
-        }
-
-        public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
-        {
-            throw new NotSupportedException();
-        }
-    }
-    
-    /*
     /// <summary>
     /// Expression Builder that helps to define child dependencies inline 
     /// </summary>
@@ -71,19 +26,7 @@ namespace BlueMilk.IoC.Instances
         /// <returns></returns>
         public ConstructorInstance Is(Func<IContainer, TChild> func)
         {
-            var child = new LambdaInstance<TChild>(func);
-            return Is(child);
-        }
-
-
-        /// <summary>
-        /// Inline dependency by Lambda expression that uses IContext
-        /// </summary>
-        /// <param name="func"></param>
-        /// <returns></returns>
-        public ConstructorInstance Is(Func<IContainer, TChild> func)
-        {
-            var child = new LambdaInstance(func);
+            var child = LambdaInstance.For(func);
             return Is(child);
         }
 
@@ -95,7 +38,8 @@ namespace BlueMilk.IoC.Instances
         /// <returns></returns>
         public ConstructorInstance Is(string description, Func<IContainer, TChild> func)
         {
-            var child = new LambdaInstance<TChild>(description, func);
+            var child = LambdaInstance.For(func);
+            child.Description = description;
             return Is(child);
         }
 
@@ -106,7 +50,8 @@ namespace BlueMilk.IoC.Instances
         /// <returns></returns>
         public ConstructorInstance Is(Instance instance)
         {
-            _instance.Dependencies.Add(_propertyName, typeof (TChild), instance);
+            _instance.Inline.Add(instance);
+            if (_propertyName != null) _instance.Name = _propertyName;
             return _instance;
         }
 
@@ -117,8 +62,8 @@ namespace BlueMilk.IoC.Instances
         /// <returns></returns>
         public ConstructorInstance Is(TChild value)
         {
-            _instance.Dependencies.Add(_propertyName, typeof (TChild), value);
-            return _instance;
+            var instance = new ObjectInstance(typeof(TChild), value);
+            return Is(instance);
         }
 
         /// <summary>
@@ -150,7 +95,7 @@ namespace BlueMilk.IoC.Instances
         /// <returns></returns>
         public ConstructorInstance Is<TConcreteType>() where TConcreteType : TChild
         {
-            return Is(new ConstructorInstance<TConcreteType>(typeof(TChild), ServiceLifetime.Transient);
+            return Is(new ConstructorInstance<TConcreteType>(typeof(TChild), ServiceLifetime.Transient));
         }
 
 
@@ -178,5 +123,5 @@ namespace BlueMilk.IoC.Instances
             return Is(c => c.GetInstance<TChild>(name));
         }
     }
-    */
+    
 }

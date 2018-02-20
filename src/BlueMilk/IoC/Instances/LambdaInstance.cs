@@ -42,6 +42,7 @@ namespace BlueMilk.IoC.Instances
 
 
         public override bool RequiresServiceProvider { get; } = true;
+        public string Description { get; set; }
 
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
         {
@@ -93,7 +94,7 @@ namespace BlueMilk.IoC.Instances
 
         public override string ToString()
         {
-            return $"Lambda Factory of {ServiceType.NameInCode()}";
+            return Description ?? $"Lambda Factory of {ServiceType.NameInCode()}";
         }
     }
 }
