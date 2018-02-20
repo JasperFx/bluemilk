@@ -93,6 +93,16 @@ namespace BlueMilk.IoC.Instances
 
 
         /// <summary>
+        /// Shortcut method to define a child dependency as null
+        /// </summary>
+        /// <returns></returns>
+        public ConstructorInstance IsNull()
+        {
+            return Is(new NullInstance(typeof(TChild)));
+        }
+
+
+        /// <summary>
         /// Shortcut method to define a child dependency inline and configure
         /// the child dependency
         /// </summary>

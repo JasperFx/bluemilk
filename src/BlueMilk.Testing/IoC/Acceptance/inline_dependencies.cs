@@ -9,6 +9,22 @@ namespace BlueMilk.Testing.IoC.Acceptance
     public class inline_dependencies
     {
         [Fact]
+        public void use_null_as_inline_dependency()
+        {
+            var container = new Container(_ =>
+            {
+                _.For<IWidget>().Use<RedWidget>().Named("Red");
+                _.For<IWidget>().Use<BlueWidget>().Named("Blue");
+
+                _.ForConcreteType<ClassWithWidget>().Configure.Ctor<IWidget>().IsNull();
+
+            });
+
+            container.GetInstance<ClassWithWidget>()
+                .Widget.ShouldBeNull();
+        }
+        
+        [Fact]
         public void use_a_referenced_by_name_dependency()
         {
             var container = new Container(_ =>
