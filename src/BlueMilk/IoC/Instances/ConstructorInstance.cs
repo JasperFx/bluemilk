@@ -168,10 +168,9 @@ namespace BlueMilk.IoC.Instances
 
             if (Constructor != null)
             {
-                // TODO -- this will need to get smarter when we have inline dependencies and named stuff
-
-
-                _arguments = Constructor.GetParameters().Select(x => new CtorArg(x, services.FindDefault(x.ParameterType))).Where(x => x.Instance != null).ToArray();
+                _arguments = Constructor.GetParameters()
+                    .Select(x => determineArgument(services, x))
+                    .Where(x => x.Instance != null).ToArray();
 
 
                 foreach (var argument in _arguments)
@@ -192,6 +191,15 @@ namespace BlueMilk.IoC.Instances
 
 
             return _arguments.Select(x => x.Instance);
+        }
+
+        private CtorArg determineArgument(ServiceGraph services, ParameterInfo x)
+        {
+            var instance = Inline.FirstOrDefault(i => i.ServiceType == x.ParameterType && i.Name == x.Name)
+                           ?? Inline.FirstOrDefault(i => i.ServiceType == x.ParameterType)
+                           ?? services.FindDefault(x.ParameterType);
+            
+            return new CtorArg(x, instance);
         }
 
         public class CtorArg
@@ -253,6 +261,13 @@ namespace BlueMilk.IoC.Instances
 
         }
 
+        private bool couldBuild(ConstructorInfo ctor, ServiceGraph services)
+        {
+            return ctor.GetParameters().All(p =>
+                services.FindDefault(p.ParameterType) != null || Inline.Any(x => x.ServiceType == p.ParameterType) ||
+                p.IsOptional);
+        }
+        
         public ConstructorInfo DetermineConstructor(ServiceGraph services, Type implementationType,
             out string message)
         {
@@ -265,7 +280,7 @@ namespace BlueMilk.IoC.Instances
             {
                 var ctor = constructors
                     .OrderByDescending(x => x.GetParameters().Length)
-                    .FirstOrDefault(services.CouldBuild);
+                    .FirstOrDefault(x => couldBuild(x, services));
 
                 if (ctor == null)
                 {

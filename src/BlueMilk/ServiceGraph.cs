@@ -264,11 +264,6 @@ namespace BlueMilk
             return ResolveFamily(serviceType)?.All ?? new Instance[0];
         }
 
-        public bool CouldBuild(ConstructorInfo ctor)
-        {
-            return ctor.GetParameters().All(x => FindDefault(x.ParameterType) != null || x.IsOptional);
-        }
-
         public bool CouldBuild(Type concreteType)
         {
             var ctor = new ConstructorInstance(concreteType, concreteType, ServiceLifetime.Transient).DetermineConstructor(this, concreteType, out string message);

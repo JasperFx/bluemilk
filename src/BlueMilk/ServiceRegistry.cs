@@ -46,6 +46,34 @@ namespace BlueMilk
         public ServiceRegistry()
         {
         }
+        
+        /// <summary>
+        /// This method is a shortcut for specifying the default constructor and 
+        /// setter arguments for a ImplementationType.  ForConcreteType is shorthand for:
+        /// For[T]().Use[T].**************
+        /// when the ServiceType and ImplementationType are the same Type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public BuildWithExpression<T> ForConcreteType<T>() where T : class
+        {
+            var instance = For<T>().Use<T>();
+            return new BuildWithExpression<T>(instance);
+        }
+        
+        /// <summary>
+        /// Define the constructor and setter arguments for the default T
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public class BuildWithExpression<T>
+        {
+            public BuildWithExpression(ConstructorInstance instance)
+            {
+                Configure = instance;
+            }
+
+            public ConstructorInstance Configure { get; }
+        }
 
 
 
