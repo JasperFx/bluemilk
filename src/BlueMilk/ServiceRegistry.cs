@@ -67,19 +67,19 @@ namespace BlueMilk
         /// <typeparam name="T"></typeparam>
         public class BuildWithExpression<T>
         {
-            public BuildWithExpression(ConstructorInstance instance)
+            public BuildWithExpression(ConstructorInstance<T> instance)
             {
                 Configure = instance;
             }
 
-            public ConstructorInstance Configure { get; }
+            public ConstructorInstance<T> Configure { get; }
         }
 
 
 
-        public DescriptorExpression<T> For<T>() where T : class
+        public InstanceExpression<T> For<T>() where T : class
         {
-            return new DescriptorExpression<T>(this, ServiceLifetime.Transient);
+            return new InstanceExpression<T>(this, ServiceLifetime.Transient);
         }
 
         public DescriptorExpression For(Type serviceType)
@@ -114,12 +114,12 @@ namespace BlueMilk
             }
         }
 
-        public class DescriptorExpression<T> where T : class
+        public class InstanceExpression<T> where T : class
         {
             private readonly ServiceRegistry _parent;
             private readonly ServiceLifetime _lifetime;
 
-            public DescriptorExpression(ServiceRegistry parent, ServiceLifetime lifetime)
+            public InstanceExpression(ServiceRegistry parent, ServiceLifetime lifetime)
             {
                 _parent = parent;
                 _lifetime = lifetime;
@@ -206,9 +206,9 @@ namespace BlueMilk
 
         }
 
-        public DescriptorExpression<T> ForSingletonOf<T>() where T : class
+        public InstanceExpression<T> ForSingletonOf<T>() where T : class
         {
-            return new DescriptorExpression<T>(this, ServiceLifetime.Singleton);
+            return new InstanceExpression<T>(this, ServiceLifetime.Singleton);
         }
 
         public void Scan(Action<IAssemblyScanner> scan)

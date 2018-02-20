@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using Baseline;
+using Baseline.Reflection;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
@@ -18,6 +20,39 @@ namespace BlueMilk.IoC.Instances
     {
         public ConstructorInstance(Type serviceType, ServiceLifetime lifetime) : base(serviceType, typeof(T), lifetime)
         {
+        }
+        
+        public ConstructorInstance<T> SelectConstructor(Expression<Func<T>> constructor)
+        {
+            var finder = new ConstructorFinderVisitor(typeof(T));
+            finder.Visit(constructor);
+
+            Constructor = finder.Constructor;
+
+            return this;
+        }
+        
+        internal class ConstructorFinderVisitor : ExpressionVisitorBase
+        {
+            private readonly Type _type;
+            private ConstructorInfo _constructor;
+
+            public ConstructorFinderVisitor(Type type)
+            {
+                _type = type;
+            }
+
+            public ConstructorInfo Constructor => _constructor;
+
+            protected override NewExpression VisitNew(NewExpression nex)
+            {
+                if (nex.Type == _type)
+                {
+                    _constructor = nex.Constructor;
+                }
+
+                return base.VisitNew(nex);
+            }
         }
     }
 
@@ -39,7 +74,7 @@ namespace BlueMilk.IoC.Instances
             Name = Variable.DefaultArgName(implementationType);
         }
 
-        public ConstructorInfo Constructor { get; private set; }
+        public ConstructorInfo Constructor { get; set; }
 
 
 
@@ -243,6 +278,8 @@ namespace BlueMilk.IoC.Instances
             out string message)
         {
             message = null;
+
+            if (Constructor != null) return Constructor;
 
             var fromAttribute = DefaultConstructorAttribute.GetConstructor(ImplementationType);
             if (fromAttribute != null) return fromAttribute;
