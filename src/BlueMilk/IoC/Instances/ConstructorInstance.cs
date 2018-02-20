@@ -195,8 +195,8 @@ namespace BlueMilk.IoC.Instances
 
         private CtorArg determineArgument(ServiceGraph services, ParameterInfo x)
         {
-            var instance = Inline.FirstOrDefault(i => i.ServiceType == x.ParameterType && i.Name == x.Name)
-                           ?? Inline.FirstOrDefault(i => i.ServiceType == x.ParameterType)
+            var instance = _inlines.FirstOrDefault(i => i.ServiceType == x.ParameterType && i.Name == x.Name)
+                           ?? _inlines.FirstOrDefault(i => i.ServiceType == x.ParameterType)
                            ?? services.FindDefault(x.ParameterType);
             
             return new CtorArg(x, instance);
@@ -264,7 +264,7 @@ namespace BlueMilk.IoC.Instances
         private bool couldBuild(ConstructorInfo ctor, ServiceGraph services)
         {
             return ctor.GetParameters().All(p =>
-                services.FindDefault(p.ParameterType) != null || Inline.Any(x => x.ServiceType == p.ParameterType) ||
+                services.FindDefault(p.ParameterType) != null || _inlines.Any(x => x.ServiceType == p.ParameterType) ||
                 p.IsOptional);
         }
         

@@ -55,9 +55,11 @@ namespace BlueMilk.Codegen
             set => _asyncMode = value;
         }
         
-        public InjectedField[] Fields { get; set; } = new InjectedField[0];
+        public InjectedField[] Fields { get; internal set; } = new InjectedField[0];
         public IList<Frame> Frames { get; } = new List<Frame>();
         public IEnumerable<Argument> Arguments => _arguments;
+        
+        public IEnumerable<Setter> Setters { get; internal set; }
 
 
         public GeneratedMethod Add<T>() where T : Frame, new()
@@ -79,6 +81,7 @@ namespace BlueMilk.Codegen
         public IList<IVariableSource> Sources { get; } = new List<IVariableSource>();
 
         public Variable ReturnVariable { get; set; }
+        
 
         public void WriteMethod(ISourceWriter writer)
         {

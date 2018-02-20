@@ -27,6 +27,7 @@ namespace BlueMilk.Codegen
             TypeName = typeName;
         }
 
+        // TODO -- do something with this?
         public Visibility Visibility { get; set; } = Visibility.Public;
 
         public Type BaseType { get; private set; }
@@ -105,6 +106,7 @@ namespace BlueMilk.Codegen
             return _methods.FirstOrDefault(x => x.MethodName == methodName);
         }
 
+        // TODO -- UT's
         public GeneratedMethod AddVoidMethod(string name, params Argument[] args)
         {
             var method = new GeneratedMethod(name, typeof(void), args);
@@ -113,6 +115,7 @@ namespace BlueMilk.Codegen
             return method;
         }
 
+        // TODO -- UT's
         public GeneratedMethod AddMethodThatReturns<TReturn>(string name, params Argument[] args)
         {
             var method = new GeneratedMethod(name, typeof(TReturn), args);
@@ -134,6 +137,7 @@ namespace BlueMilk.Codegen
             {
                 writeFieldDeclarations(writer, args);
                 writeConstructorMethod(writer, args);
+                writeSetters(writer);
             }
 
 
@@ -146,10 +150,22 @@ namespace BlueMilk.Codegen
             writer.FinishBlock();
         }
 
+        private void writeSetters(ISourceWriter writer)
+        {
+            foreach (var setter in _methods.SelectMany(x => x.Setters).Distinct())
+            {
+                writer.BlankLine();
+                setter.WriteDeclaration(writer);
+            }
+            
+            writer.BlankLine();
+        }
+
         public InjectedField[] Args()
         {
             return _methods.SelectMany(x => x.Fields).Concat(BaseConstructorArguments).Distinct().ToArray();
         }
+
 
         private void writeConstructorMethod(ISourceWriter writer, InjectedField[] args)
         {

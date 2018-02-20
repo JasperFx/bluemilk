@@ -79,6 +79,7 @@ namespace BlueMilk.Codegen
             // Step 2, calculate dependencies
             var dependencies = new DependencyGatherer(this, frames);
             findInjectedFields(dependencies);
+            findSetters(dependencies);
 
             // Step 3, gather any missing frames and
             // add to the beginning of the list
@@ -103,6 +104,20 @@ namespace BlueMilk.Codegen
             });
 
             _method.Fields = list.ToArray();
+        }
+
+        internal void findSetters(DependencyGatherer dependencies)
+        {
+            var list = new List<Setter>();
+            dependencies.Variables.Each((key, _) =>
+            {
+                if (key is Setter)
+                {
+                    list.Add(key.As<Setter>());
+                }
+            });
+
+            _method.Setters = list.ToArray();
         }
 
         private IEnumerable<IVariableSource> allVariableSources(VariableSource variableSource)
