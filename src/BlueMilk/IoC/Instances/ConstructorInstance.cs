@@ -161,7 +161,7 @@ namespace BlueMilk.IoC.Instances
 
         protected override IEnumerable<Instance> createPlan(ServiceGraph services)
         {
-            Constructor = DetermineConstructor(services, ImplementationType, out var message);
+            Constructor = DetermineConstructor(services, out var message);
 
             if (message.IsNotEmpty()) ErrorMessages.Add(message);
 
@@ -239,12 +239,15 @@ namespace BlueMilk.IoC.Instances
                 p.IsOptional);
         }
         
-        public ConstructorInfo DetermineConstructor(ServiceGraph services, Type implementationType,
+        public ConstructorInfo DetermineConstructor(ServiceGraph services,
             out string message)
         {
             message = null;
 
-            var constructors = findConstructors(implementationType);
+            var fromAttribute = DefaultConstructorAttribute.GetConstructor(ImplementationType);
+            if (fromAttribute != null) return fromAttribute;
+
+            var constructors = findConstructors(ImplementationType);
 
 
             if (constructors.Any())
@@ -260,7 +263,7 @@ namespace BlueMilk.IoC.Instances
 
                     foreach (var constructor in constructors)
                     {
-                        message += explainWhyConstructorCannotBeUsed(implementationType, constructor, services);
+                        message += explainWhyConstructorCannotBeUsed(ImplementationType, constructor, services);
                         message += Environment.NewLine;
                     }
 

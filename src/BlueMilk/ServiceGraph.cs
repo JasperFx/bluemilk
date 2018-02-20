@@ -266,7 +266,7 @@ namespace BlueMilk
 
         public bool CouldBuild(Type concreteType)
         {
-            var ctor = new ConstructorInstance(concreteType, concreteType, ServiceLifetime.Transient).DetermineConstructor(this, concreteType, out string message);
+            var ctor = new ConstructorInstance(concreteType, concreteType, ServiceLifetime.Transient).DetermineConstructor(this, out string message);
             return ctor != null && message.IsEmpty();
         }
 

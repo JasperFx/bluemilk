@@ -123,6 +123,34 @@ namespace BlueMilk.Testing.IoC.Instances
                 .Select(x => x.ImplementationType)
                 .ShouldBe(new []{typeof(AWidget), typeof(BlueRule)});
         }
+
+        [Fact]
+        public void use_default_constructor_attribute_selection()
+        {
+            var theServices = new ServiceRegistry();
+            theServices.AddSingleton<IWidget, AWidget>();
+            theServices.AddTransient<Rule, BlueRule>();
+            
+            var theGraph = new ServiceGraph(theServices, Scope.Empty());
+            theGraph.Initialize();
+            
+            var instance = ConstructorInstance.For<GuyWithMultipleConstructors>();
+            instance.DetermineConstructor(theGraph, out string message)
+                .GetParameters().Single().ParameterType.ShouldBe(typeof(IWidget));
+            
+        }
+        
+        public class GuyWithMultipleConstructors
+        {
+            public GuyWithMultipleConstructors(IWidget widget, Rule rule)
+            {
+            }
+
+            [DefaultConstructor]
+            public GuyWithMultipleConstructors(IWidget widget)
+            {
+            }
+        }
         
         public class GuyWithGuys
         {
