@@ -202,5 +202,10 @@ namespace BlueMilk.IoC.Instances
         {
             return null;
         }
+        
+        /// <summary>
+        /// Only used to track naming within inline dependencies
+        /// </summary>
+        internal Instance Parent { get; set; }
     }
 }

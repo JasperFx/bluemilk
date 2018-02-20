@@ -51,7 +51,7 @@ namespace BlueMilk.IoC.Instances
         /// <returns></returns>
         public ConstructorInstance Is(Instance instance)
         {
-            _instance.Inline.Add(instance);
+            _instance.AddInline(instance);
             if (_propertyName != null) _instance.Name = _propertyName;
             return _instance;
         }

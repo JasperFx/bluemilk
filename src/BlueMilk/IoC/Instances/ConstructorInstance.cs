@@ -334,8 +334,13 @@ namespace BlueMilk.IoC.Instances
             return declaration;
         }
         
-        public IList<Instance> Inline { get; } = new List<Instance>();
-        
+        private readonly IList<Instance> _inlines = new List<Instance>();
+
+        internal void AddInline(Instance instance)
+        {
+            instance.Parent = this;
+            _inlines.Add(instance);
+        }
         
         
         /// <summary>
