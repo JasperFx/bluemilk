@@ -71,17 +71,6 @@ namespace BlueMilk.IoC.Instances
         }
 
         /// <summary>
-        /// Set an Inline dependency to the Default Instance of the Property type
-        /// Used mostly to force an optional Setter property to be filled by
-        /// StructureMap
-        /// </summary>
-        /// <returns></returns>
-        public ConstructorInstance IsTheDefault()
-        {
-            return Is(new DefaultInstance(typeof(TChild)));
-        }
-
-        /// <summary>
         /// Set the inline dependency to the named instance of the property type
         /// Used mostly to force an optional Setter property to be filled by
         /// StructureMap        /// </summary>
