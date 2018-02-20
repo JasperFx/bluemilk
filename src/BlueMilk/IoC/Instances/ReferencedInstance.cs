@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Frames;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +42,8 @@ namespace BlueMilk.IoC.Instances
         protected override IEnumerable<Instance> createPlan(ServiceGraph services)
         {
             _inner = services.FindInstance(ServiceType, _instanceKey);
+            if (_inner == null) throw new InvalidOperationException($"Referenced instance of {ServiceType.FullNameInCode()} named '{_instanceKey}' does not exist");
+            
             _inner.Parent = Parent;
             Lifetime = _inner.Lifetime;
 

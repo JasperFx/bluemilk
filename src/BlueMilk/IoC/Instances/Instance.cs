@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Baseline;
+using Baseline.Reflection;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
@@ -153,6 +154,21 @@ namespace BlueMilk.IoC.Instances
             // Can't do the planning on open generic types 'cause bad stuff happens
             if (!ServiceType.IsOpenGeneric())
             {
+                foreach (var policy in services.InstancePolicies)
+                {
+                    policy.Apply(this);
+                }
+
+                var atts = ImplementationType.GetAllAttributes<BlueMilkAttribute>();
+                foreach (var att in atts)
+                {
+                    att.Alter(this);
+                    if (this is IConfiguredInstance)
+                    {
+                        att.Alter(this.As<IConfiguredInstance>());
+                    }
+                }
+                
                 var dependencies = createPlan(services) ?? Enumerable.Empty<Instance>();
 
                 Dependencies = dependencies.Concat(dependencies.SelectMany(x => x.Dependencies)).Distinct().ToArray();
@@ -213,7 +229,7 @@ namespace BlueMilk.IoC.Instances
         /// </summary>
         internal Instance Parent { get; set; }
 
-        internal bool IsInlineDependency()
+        public bool IsInlineDependency()
         {
             return Parent != null;
         }

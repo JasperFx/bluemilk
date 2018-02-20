@@ -243,7 +243,7 @@ namespace BlueMilk
                 _parent = parent;
             }
 
-            /*
+            
             /// <summary>
             /// Adds a new instance policy to this container
             /// that can apply to every object instance created
@@ -252,7 +252,7 @@ namespace BlueMilk
             /// <param name="policy"></param>
             public void Add(IInstancePolicy policy)
             {
-                alter = graph => graph.Policies.Add(policy);
+                _parent.AddSingleton(policy);
             }
 
             /// <summary>
@@ -264,7 +264,7 @@ namespace BlueMilk
             {
                 Add(new T());
             }
-
+/*
             /// <summary>
             /// Register an interception policy
             /// </summary>

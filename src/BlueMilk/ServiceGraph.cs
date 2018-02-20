@@ -56,8 +56,12 @@ namespace BlueMilk
                 })
                 .ToArray();
 
+            InstancePolicies = services.Where(x => x.ServiceType == typeof(IInstancePolicy) && x.ImplementationInstance is IInstancePolicy)
+                .Select(x => x.ImplementationInstance.As<IInstancePolicy>()).ToArray();
+
 
             services.RemoveAll(x => x.ServiceType == typeof(IFamilyPolicy));
+            services.RemoveAll(x => x.ServiceType == typeof(IInstancePolicy));
 
             addScopeResolver<Scope>(services);
             addScopeResolver<IServiceProvider>(services);
@@ -65,6 +69,8 @@ namespace BlueMilk
             addScopeResolver<IServiceScopeFactory>(services);
 
         }
+
+        public IInstancePolicy[] InstancePolicies { get; set; }
 
         private async Task applyScanners(IServiceCollection services)
         {
@@ -266,7 +272,15 @@ namespace BlueMilk
 
         public bool CouldBuild(Type concreteType)
         {
-            var ctor = new ConstructorInstance(concreteType, concreteType, ServiceLifetime.Transient).DetermineConstructor(this, out string message);
+            var constructorInstance = new ConstructorInstance(concreteType, concreteType, ServiceLifetime.Transient);
+            foreach (var policy in InstancePolicies)
+            {
+                policy.Apply(constructorInstance);
+            }
+            
+            var ctor = constructorInstance.DetermineConstructor(this, out string message);
+            
+            
             return ctor != null && message.IsEmpty();
         }
 

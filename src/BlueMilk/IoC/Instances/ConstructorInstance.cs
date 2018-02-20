@@ -56,8 +56,7 @@ namespace BlueMilk.IoC.Instances
         }
     }
 
-    // TODO -- let's have an interface strictly for configuration to make things cleaner
-    public class ConstructorInstance : GeneratedInstance
+    public class ConstructorInstance : GeneratedInstance, IConfiguredInstance
     {
         public static readonly string NoPublicConstructors = "No public constructors";
 
@@ -88,6 +87,8 @@ namespace BlueMilk.IoC.Instances
         {
             return new ConstructorInstance<TConcrete>(typeof(T), lifetime);
         }
+
+        IList<Instance> IConfiguredInstance.InlineDependencies => _inlines;
 
         public override object QuickResolve(Scope scope)
         {
@@ -368,4 +369,6 @@ namespace BlueMilk.IoC.Instances
 
 
     }
+    
+    
 }
