@@ -1,5 +1,6 @@
 ﻿using System;
 using BlueMilk.Codegen;
+using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Resolvers;
@@ -35,6 +36,14 @@ namespace BlueMilk.IoC.Instances
         public override object QuickResolve(Scope scope)
         {
             return Service;
+        }
+
+        public override Variable CreateInlineVariable(ResolverVariables variables)
+        {
+            return new Setter(ServiceType, inlineSetterName())
+            {
+                InitialValue = Service
+            };
         }
 
         public void Dispose()

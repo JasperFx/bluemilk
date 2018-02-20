@@ -47,6 +47,7 @@ namespace BlueMilk.IoC.Instances
             else
             {
                 _resolver = (IResolver) root.QuickBuild(_resolverType.CompiledType);
+                _resolverType.ApplySetterValues(_resolver);
             }
 
             _resolver.Hash = GetHashCode();
@@ -105,6 +106,7 @@ namespace BlueMilk.IoC.Instances
                                 assembly.CompileAll();
 
                                 _resolver = (IResolver) scope.Root.QuickBuild(_resolverType.CompiledType);
+                                _resolverType.ApplySetterValues(_resolver);
                             }
                         }
 

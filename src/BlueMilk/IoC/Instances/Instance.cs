@@ -165,6 +165,11 @@ namespace BlueMilk.IoC.Instances
 
         public abstract Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot);
 
+        public virtual Variable CreateInlineVariable(ResolverVariables variables)
+        {
+            return CreateVariable(BuildMode.Dependency, variables, false);
+        }
+        
         protected virtual IEnumerable<Instance> createPlan(ServiceGraph services)
         {
             return Enumerable.Empty<Instance>();
@@ -207,5 +212,23 @@ namespace BlueMilk.IoC.Instances
         /// Only used to track naming within inline dependencies
         /// </summary>
         internal Instance Parent { get; set; }
+
+        internal bool IsInlineDependency()
+        {
+            return Parent != null;
+        }
+
+        protected string inlineSetterName()
+        {
+            var name = Name;
+            var parent = Parent;
+            while (parent != null)
+            {
+                name = parent.Name + "_" + name;
+                parent = parent.Parent;
+            }
+
+            return name;
+        }
     }
 }

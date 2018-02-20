@@ -202,35 +202,6 @@ namespace BlueMilk.IoC.Instances
             return new CtorArg(x, instance);
         }
 
-        public class CtorArg
-        {
-            public ParameterInfo Parameter { get; }
-            public Instance Instance { get; }
-
-            public CtorArg(ParameterInfo parameter, Instance instance)
-            {
-                Parameter = parameter;
-                Instance = instance;
-            }
-
-            public Variable Resolve(ResolverVariables variables, BuildMode mode)
-            {
-                var inner = variables.Resolve(Instance, mode);
-                if (Parameter.IsOptional)
-                {
-                    var wrapped = new Variable(inner.VariableType, $"{Parameter.Name}: {inner.Usage}");
-                    wrapped.Dependencies.Add(inner);
-
-                    return wrapped;
-                }
-                else
-                {
-                    return inner;
-                }
-            }
-        }
-
-
 
         public override string ToString()
         {

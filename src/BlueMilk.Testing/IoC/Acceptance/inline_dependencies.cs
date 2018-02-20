@@ -19,6 +19,18 @@ namespace BlueMilk.Testing.IoC.Acceptance
             widget.ShouldBeSameAs(container.GetInstance<ClassWithWidget>().Widget);
         }
         
+        [Fact]
+        public void specify_ctorarg_with_non_simple_argument_as_singleton()
+        {
+            var widget = new ColorWidget("Red");
+            var container = new Container(x => x.For<ClassWithWidget>()
+                .Use<ClassWithWidget>()
+                .Singleton()
+                .Ctor<IWidget>().Is(widget));
+
+            widget.ShouldBeSameAs(container.GetInstance<ClassWithWidget>().Widget);
+        }
+        
         public class ClassWithWidget
         {
             private readonly IWidget _widget;

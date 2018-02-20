@@ -6,6 +6,7 @@ using System.Threading;
 using Baseline;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
+using BlueMilk.IoC.Resolvers;
 
 namespace BlueMilk.Codegen
 {
@@ -137,8 +138,9 @@ namespace BlueMilk.Codegen
             {
                 writeFieldDeclarations(writer, args);
                 writeConstructorMethod(writer, args);
-                writeSetters(writer);
             }
+            
+            writeSetters(writer);
 
 
             foreach (var method in _methods)
@@ -150,9 +152,14 @@ namespace BlueMilk.Codegen
             writer.FinishBlock();
         }
 
+        private IEnumerable<Setter> setters()
+        {
+            return _methods.SelectMany(x => x.Setters).Distinct();
+        }
+        
         private void writeSetters(ISourceWriter writer)
         {
-            foreach (var setter in _methods.SelectMany(x => x.Setters).Distinct())
+            foreach (var setter in setters())
             {
                 writer.BlankLine();
                 setter.WriteDeclaration(writer);
@@ -266,6 +273,16 @@ namespace BlueMilk.Codegen
         Variable IVariableSource.Create(Type type)
         {
             return BaseConstructorArguments.FirstOrDefault(x => x.ArgType == type);
+        }
+
+        public void ApplySetterValues(object builtObject)
+        {
+            if (builtObject.GetType() != CompiledType) throw new ArgumentOutOfRangeException(nameof(builtObject), "This can only be applied to objects of the generated type");
+
+            foreach (var setter in setters())
+            {
+                setter.SetInitialValue(builtObject);
+            }
         }
     }
 }

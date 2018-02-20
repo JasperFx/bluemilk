@@ -54,6 +54,15 @@ namespace BlueMilk.IoC.Instances
             return new GetInstanceFrame(this).Variable;
         }
 
+        public override Variable CreateInlineVariable(ResolverVariables variables)
+        {
+            var setter = new Setter(typeof(Func<TContainer, TReturn>), inlineSetterName())
+            {
+                InitialValue = Factory
+            };
+            return new InlineLambdaCreationFrame<TContainer>(setter, this).Variable;
+        }
+
         private IResolver _resolver;
         private readonly object _locker = new object();
 
@@ -91,6 +100,8 @@ namespace BlueMilk.IoC.Instances
 
             throw new ArgumentOutOfRangeException(nameof(Lifetime));
         }
+        
+        
 
         public override string ToString()
         {

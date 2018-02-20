@@ -66,12 +66,8 @@ namespace BlueMilk.IoC.Instances
             // TODO -- allow nulls some day, because folks always wanna do crazy
             // stuff with them
             if (value == null) throw new ArgumentNullException(nameof(value));
-            
-            var instance = value.GetType().IsSimple()
-                ? (Instance) new ValueInstance(typeof(TChild),value) 
-                : new ObjectInstance(typeof(TChild), value);
-            
-            return Is(instance);
+
+            return Is(new ObjectInstance(typeof(TChild), value));
         }
 
         /// <summary>
