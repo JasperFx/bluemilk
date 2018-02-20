@@ -20,6 +20,17 @@ namespace BlueMilk.Testing.IoC.Acceptance
         }
         
         [Fact]
+        public void specify_ctorarg_with_non_simple_argument_by_type()
+        {
+            var container = new Container(x => x.For<ClassWithWidget>()
+                .Use<ClassWithWidget>()
+                .Ctor<IWidget>().Is<BlueWidget>());
+
+            container.GetInstance<ClassWithWidget>()
+                .Widget.ShouldBeOfType<BlueWidget>();
+        }
+        
+        [Fact]
         public void specify_ctorarg_with_non_simple_argument_as_singleton()
         {
             var widget = new ColorWidget("Red");
