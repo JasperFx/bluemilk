@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using Baseline;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -62,7 +63,14 @@ namespace BlueMilk.IoC.Instances
         /// <returns></returns>
         public ConstructorInstance Is(TChild value)
         {
-            var instance = new ObjectInstance(typeof(TChild), value);
+            // TODO -- allow nulls some day, because folks always wanna do crazy
+            // stuff with them
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            
+            var instance = value.GetType().IsSimple()
+                ? (Instance) new ValueInstance(typeof(TChild),value) 
+                : new ObjectInstance(typeof(TChild), value);
+            
             return Is(instance);
         }
 
