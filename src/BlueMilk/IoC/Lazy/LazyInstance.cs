@@ -29,9 +29,9 @@ namespace BlueMilk.IoC.Lazy
             return new Lazy<T>(scope.GetInstance<T>);
         }
 
-        public override IResolver ToResolver(Scope topScope)
+        public override Func<Scope, object> ToResolver(Scope topScope)
         {
-            return this;
+            return s => new Lazy<T>(s.GetInstance<T>);
         }
 
     }

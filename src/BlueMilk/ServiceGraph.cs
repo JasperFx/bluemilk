@@ -30,7 +30,7 @@ namespace BlueMilk
 
 
         private readonly Dictionary<Type, ServiceFamily> _families = new Dictionary<Type, ServiceFamily>();
-        private ImHashMap<Type, IResolver> _byType = ImHashMap<Type, IResolver>.Empty;
+        private ImHashMap<Type, Func<Scope, object>> _byType = ImHashMap<Type, Func<Scope, object>>.Empty;
 
 
         public ServiceGraph(IServiceCollection services, Scope rootScope)
@@ -275,9 +275,9 @@ namespace BlueMilk
             return family;
         }
 
-        public IResolver FindResolver(Type serviceType)
+        public Func<Scope, object> FindResolver(Type serviceType)
         {
-            if (_byType.TryFind(serviceType, out IResolver resolver))
+            if (_byType.TryFind(serviceType, out Func<Scope, object> resolver))
             {
                 return resolver;
             }

@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
-    public class ObjectInstance : Instance, IResolver, IDisposable
+    public class ObjectInstance : Instance, IDisposable
     {
         public static ObjectInstance For<T>(T @object)
         {
@@ -29,9 +29,9 @@ namespace BlueMilk.IoC.Instances
             return new InjectedServiceField(this);
         }
 
-        public override IResolver ToResolver(Scope topScope)
+        public override Func<Scope, object> ToResolver(Scope topScope)
         {
-            return this;
+            return s => Service;
         }
 
         public override object Resolve(Scope scope)

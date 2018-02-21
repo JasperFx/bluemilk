@@ -144,7 +144,7 @@ namespace BlueMilk.IoC
                 throw new BlueMilkMissingRegistrationException(serviceType);
             }
 
-            return resolver.Resolve(this);
+            return resolver(this);
         }
 
         public object GetInstance(Type serviceType, string name)
@@ -173,7 +173,7 @@ namespace BlueMilk.IoC
         public object TryGetInstance(Type serviceType)
         {
             assertNotDisposed();
-            return ServiceGraph.FindDefault(serviceType)?.Resolve(this);
+            return ServiceGraph.FindResolver(serviceType)?.Invoke(this);
         }
 
         public object TryGetInstance(Type serviceType, string name)

@@ -6,16 +6,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
 {
-    public class NullInstance : Instance, IResolver
+    public class NullInstance : Instance
     {
         public NullInstance(Type serviceType) : base(serviceType, serviceType, ServiceLifetime.Transient)
         {
             Hash = GetHashCode();
         }
 
-        public override IResolver ToResolver(Scope topScope)
+        public override Func<Scope, object> ToResolver(Scope topScope)
         {
-            return this;
+            return s => null;
         }
 
         public override object Resolve(Scope scope)

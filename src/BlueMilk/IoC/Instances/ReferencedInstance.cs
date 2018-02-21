@@ -18,7 +18,7 @@ namespace BlueMilk.IoC.Instances
             _instanceKey = instanceKey;
         }
 
-        public override IResolver ToResolver(Scope topScope)
+        public override Func<Scope, object> ToResolver(Scope topScope)
         {
             return _inner.ToResolver(topScope);
         }

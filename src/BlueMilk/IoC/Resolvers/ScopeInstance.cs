@@ -1,4 +1,5 @@
-﻿using BlueMilk.Codegen;
+﻿using System;
+using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Instances;
@@ -18,9 +19,9 @@ namespace BlueMilk.IoC.Resolvers
             return new CastScopeFrame(typeof(T)).Variable;
         }
 
-        public override IResolver ToResolver(Scope topScope)
+        public override Func<Scope, object> ToResolver(Scope topScope)
         {
-            return this;
+            return s => s;
         }
 
         public override object Resolve(Scope scope)

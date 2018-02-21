@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Lazy
 {
-    public class FuncByNameInstance<T> : Instance, IResolver
+    public class FuncByNameInstance<T> : Instance
     {
         public FuncByNameInstance() : base(typeof(Func<string, T>), typeof(Func<string, T>), ServiceLifetime.Transient)
         {
@@ -23,9 +23,14 @@ namespace BlueMilk.IoC.Lazy
 
         public override bool RequiresServiceProvider { get; } = true;
 
-        public override IResolver ToResolver(Scope topScope)
+        public override Func<Scope, object> ToResolver(Scope topScope)
         {
-            return this;
+            return scope =>
+            {
+                T Func(string name) => scope.GetInstance<T>(name);
+
+                return (Func<string, T>) Func;
+            };
         }
 
         public override object Resolve(Scope scope)

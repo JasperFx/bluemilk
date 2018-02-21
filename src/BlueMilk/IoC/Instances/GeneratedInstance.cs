@@ -80,7 +80,7 @@ namespace BlueMilk.IoC.Instances
         private readonly object _locker = new object();
         protected IResolver _resolver;
 
-        public override IResolver ToResolver(Scope topScope)
+        public override Func<Scope, object> ToResolver(Scope topScope)
         {
             if (_resolver == null)
             {
@@ -93,7 +93,7 @@ namespace BlueMilk.IoC.Instances
                 }
             }
 
-            return _resolver;
+            return scope => _resolver.Resolve(scope);
         }
 
         public override object Resolve(Scope scope)
