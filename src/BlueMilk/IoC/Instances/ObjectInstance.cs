@@ -31,7 +31,7 @@ namespace BlueMilk.IoC.Instances
 
         public override IResolver ToResolver(Scope topScope)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public override object Resolve(Scope scope)

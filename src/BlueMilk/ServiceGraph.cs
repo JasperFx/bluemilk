@@ -30,11 +30,13 @@ namespace BlueMilk
 
 
         private readonly Dictionary<Type, ServiceFamily> _families = new Dictionary<Type, ServiceFamily>();
-
+        private ImHashMap<Type, IResolver> _byType = ImHashMap<Type, IResolver>.Empty;
 
 
         public ServiceGraph(IServiceCollection services, Scope rootScope)
         {
+            
+            
             Services = services;
 
 
@@ -255,16 +257,47 @@ namespace BlueMilk
             {
                 if (_families.ContainsKey(serviceType)) return _families[serviceType];
 
-                var family = TryToCreateMissingFamily(serviceType);
-                
-                _families.SmartAdd(serviceType, family);
+                return addMissingFamily(serviceType);
+            }
+        }
 
-                if (!_inPlanning)
+        private ServiceFamily addMissingFamily(Type serviceType)
+        {
+            var family = TryToCreateMissingFamily(serviceType);
+
+            _families.SmartAdd(serviceType, family);
+
+            if (!_inPlanning)
+            {
+                buildOutMissingResolvers();
+            }
+
+            return family;
+        }
+
+        public IResolver FindResolver(Type serviceType)
+        {
+            if (_byType.TryFind(serviceType, out IResolver resolver))
+            {
+                return resolver;
+            }
+
+            lock (_familyLock)
+            {
+                if (_byType.TryFind(serviceType, out resolver))
                 {
-                    buildOutMissingResolvers();
+                    return resolver;
                 }
 
-                return family;
+                var family = _families.ContainsKey(serviceType)
+                    ? _families[serviceType]
+                    : addMissingFamily(serviceType);
+
+                resolver = family.Default?.ToResolver(_rootScope);
+
+                _byType = _byType.AddOrUpdate(serviceType, resolver);
+
+                return resolver;
             }
         }
 
