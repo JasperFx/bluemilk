@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using FastExpressionCompiler;
 
 namespace BlueMilk.IoC.Instances
 {
@@ -81,7 +82,7 @@ namespace BlueMilk.IoC.Instances
             var callCtor = Expression.New(ctor, ctorParams);
 
             var lambda = Expression.Lambda(funcType, callCtor, arguments);
-            var func = lambda.Compile();
+            var func = lambda.CompileFast();
             
             return (func, funcType);
         }
