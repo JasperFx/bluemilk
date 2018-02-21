@@ -39,6 +39,8 @@ public class BenchmarkBase : IDisposable
             .Where(x => x.ServiceType != typeof(IServiceProviderFactory<ServiceRegistry>))
             .ToArray();
 
+        Types = Instances.Select(x => x.ServiceType).Distinct().ToArray();
+
 
         singletons = Instances.Where(x => x.Lifetime == ServiceLifetime.Singleton).Select(x => x.ServiceType)
             .Distinct().ToArray();
