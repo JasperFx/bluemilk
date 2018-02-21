@@ -16,6 +16,7 @@ using BlueMilk.IoC.Lazy;
 using BlueMilk.IoC.Resolvers;
 using BlueMilk.Scanning.Conventions;
 using BlueMilk.Util;
+using ImTools;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,6 +26,7 @@ namespace BlueMilk
     {
         private readonly Scope _rootScope;
         private readonly object _familyLock = new object();
+        
 
 
         private readonly Dictionary<Type, ServiceFamily> _families = new Dictionary<Type, ServiceFamily>();
@@ -34,7 +36,6 @@ namespace BlueMilk
         public ServiceGraph(IServiceCollection services, Scope rootScope)
         {
             Services = services;
-
 
 
             // This should blow up pretty fast if it's no good

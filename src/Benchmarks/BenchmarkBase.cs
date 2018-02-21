@@ -40,34 +40,34 @@ public class BenchmarkBase : IDisposable
             .ToArray();
 
 
-        Singletons = Instances.Where(x => x.Lifetime == ServiceLifetime.Singleton).Select(x => x.ServiceType)
+        singletons = Instances.Where(x => x.Lifetime == ServiceLifetime.Singleton).Select(x => x.ServiceType)
             .Distinct().ToArray();
 
-        Scoped = Instances.Where(x => x.Lifetime == ServiceLifetime.Scoped).Select(x => x.ServiceType)
+        scoped = Instances.Where(x => x.Lifetime == ServiceLifetime.Scoped).Select(x => x.ServiceType)
             .Distinct().ToArray();
 
-        Transients = Instances.Where(x => x.Lifetime == ServiceLifetime.Transient).Select(x => x.ServiceType)
+        transients = Instances.Where(x => x.Lifetime == ServiceLifetime.Transient).Select(x => x.ServiceType)
             .Distinct().ToArray();
 
-        Objects = Instances.OfType<ObjectInstance>().Select(x => x.ServiceType).Distinct().ToArray();
+        objects = Instances.OfType<ObjectInstance>().Select(x => x.ServiceType).Distinct().ToArray();
 
-        Lambdas = Instances.OfType<LambdaInstance>().Select(x => x.ServiceType).Distinct().ToArray();
+        lambdas = Instances.OfType<LambdaInstance>().Select(x => x.ServiceType).Distinct().ToArray();
 
-        Internals = Instances.Where(x => x.ImplementationType.IsNotPublic).Select(x => x.ServiceType).Distinct();
+        internals = Instances.Where(x => x.ImplementationType.IsNotPublic).Select(x => x.ServiceType).Distinct().ToArray();
     }
 
-    public IEnumerable<Type> Internals { get; set; }
+    public Type[] internals { get; set; }
 
 
-    public Type[] Lambdas { get; set; }
+    public Type[] lambdas { get; set; }
 
-    public Type[] Objects { get; set; }
+    public Type[] objects { get; set; }
 
-    public Type[] Transients { get; set; }
+    public Type[] transients { get; set; }
 
-    public Type[] Scoped { get; set; }
+    public Type[] scoped { get; set; }
 
-    public Type[] Singletons { get; set; }
+    public Type[] singletons { get; set; }
 
     public Instance[] Instances { get; }
 

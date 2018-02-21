@@ -16,6 +16,8 @@ namespace BlueMilk.IoC.Instances
 {
     public abstract class Instance
     {
+        
+        
         public bool IsOnlyOneOfServiceType { get; set; }
 
         public string DefaultArgName()
