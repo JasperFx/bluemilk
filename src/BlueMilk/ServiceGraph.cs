@@ -73,6 +73,11 @@ namespace BlueMilk
 
         }
 
+        internal void Inject(Type serviceType, object @object)
+        {
+            _byType = _byType.AddOrUpdate(serviceType, s => @object);
+        }
+
         public IInstancePolicy[] InstancePolicies { get; set; }
 
         private async Task applyScanners(IServiceCollection services)
@@ -293,7 +298,26 @@ namespace BlueMilk
                     ? _families[serviceType]
                     : addMissingFamily(serviceType);
 
-                resolver = family.Default?.ToResolver(_rootScope);
+                var instance = family.Default;
+                if (instance == null)
+                {
+                    resolver = null;
+                }
+                else if (instance.Lifetime == ServiceLifetime.Singleton)
+                {
+                    var inner = instance.ToResolver(_rootScope);
+                    resolver = s =>
+                    {
+                        var value = inner(s);
+                        Inject(serviceType, value);
+
+                        return value;
+                    };
+                }
+                else
+                {
+                    resolver = instance.ToResolver(_rootScope);
+                }
 
                 _byType = _byType.AddOrUpdate(serviceType, resolver);
 
