@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Transactions;
 using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
@@ -51,6 +52,11 @@ namespace BlueMilk.IoC.Instances
                 return new InjectedServiceField(this);
             }
 
+            if (Lifetime == ServiceLifetime.Transient && mode != BuildMode.Build)
+            {
+                return CreateInlineVariable(variables);
+            }
+
             return new GetInstanceFrame(this).Variable;
         }
 
@@ -60,6 +66,7 @@ namespace BlueMilk.IoC.Instances
             {
                 InitialValue = Factory
             };
+
             return new InlineLambdaCreationFrame<TContainer>(setter, this).Variable;
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
@@ -22,7 +23,7 @@ namespace BlueMilk.IoC.Instances
 
         public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
-            writer.Write($"var {Variable.Usage} = {_setter.Usage}(({typeof(TContainer).FullNameInCode()}){_scope.Usage});");
+            writer.Write($"var {Variable.Usage} = ({Variable.VariableType.FullNameInCode()}){_setter.Usage}(({typeof(TContainer).FullNameInCode()}){_scope.Usage});");
             Next?.GenerateCode(method, writer);
         }
 

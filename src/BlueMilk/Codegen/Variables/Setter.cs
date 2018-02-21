@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BlueMilk.Compilation;
 
 namespace BlueMilk.Codegen.Variables
@@ -11,11 +12,14 @@ namespace BlueMilk.Codegen.Variables
 
         public Setter(Type variableType, string name) : base(variableType, name)
         {
+            PropName = name;
         }
+
+        public string PropName { get; set; }
 
         public void WriteDeclaration(ISourceWriter writer)
         {
-            writer.Write($"public {VariableType.FullNameInCode()} {Usage} {{get; set;}}");
+            writer.Write($"public {VariableType.FullNameInCode()} {PropName} {{get; set;}}");
         }
         
         /// <summary>

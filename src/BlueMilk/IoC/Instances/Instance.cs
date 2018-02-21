@@ -244,7 +244,7 @@ namespace BlueMilk.IoC.Instances
                 parent = parent.Parent;
             }
 
-            return name;
+            return "func_" + name;
         }
     }
 }
