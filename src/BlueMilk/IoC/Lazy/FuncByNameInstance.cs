@@ -10,11 +10,9 @@ namespace BlueMilk.IoC.Lazy
 {
     public class FuncByNameInstance<T> : Instance, IResolver
     {
-
         public FuncByNameInstance() : base(typeof(Func<string, T>), typeof(Func<string, T>), ServiceLifetime.Transient)
         {
             Name = "func_by_name_of_" + typeof(T).NameInCode();
-            Hash = GetHashCode();
         }
 
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
@@ -36,7 +34,5 @@ namespace BlueMilk.IoC.Lazy
 
             return (Func<string, T>) Func;
         }
-
-        public int Hash { get; set; }
     }
 }

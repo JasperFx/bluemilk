@@ -255,7 +255,16 @@ namespace BlueMilk
             {
                 if (_families.ContainsKey(serviceType)) return _families[serviceType];
 
-                return TryToCreateMissingFamily(serviceType);
+                var family = TryToCreateMissingFamily(serviceType);
+                
+                _families.SmartAdd(serviceType, family);
+
+                if (!_inPlanning)
+                {
+                    buildOutMissingResolvers();
+                }
+
+                return family;
             }
         }
 
@@ -329,15 +338,8 @@ namespace BlueMilk
             // TODO -- will need to make this more formal somehow
             if (serviceType.IsSimple() || serviceType.IsDateTime() || serviceType == typeof(TimeSpan) || serviceType.IsValueType || serviceType == typeof(DateTimeOffset)) return new ServiceFamily(serviceType);
 
-            var family = FamilyPolicies.FirstValue(x => x.Build(serviceType, this));
-            _families.SmartAdd(serviceType, family);
 
-            if (!_inPlanning)
-            {
-                buildOutMissingResolvers();
-            }
-
-            return family;
+            return FamilyPolicies.FirstValue(x => x.Build(serviceType, this));
         }
 
         IServiceFamilyConfiguration IModel.For<T>()

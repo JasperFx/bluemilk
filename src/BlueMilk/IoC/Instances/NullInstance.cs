@@ -23,7 +23,6 @@ namespace BlueMilk.IoC.Instances
             return null;
         }
 
-        public int Hash { get; set; }
 
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
         {

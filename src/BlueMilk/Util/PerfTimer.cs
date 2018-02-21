@@ -89,7 +89,7 @@ namespace BlueMilk.Util
 
         public IEnumerable<TimedStep> TimedSteps()
         {
-            var steps = new Cache<string, TimedStep>(text => new TimedStep {Text = text});
+            var steps = new LightweightCache<string, TimedStep>(text => new TimedStep {Text = text});
             _checkpoints.Where(x => x.Status == Started).Each(x => { steps[x.Text].Start = x.Time; });
 
             _checkpoints.Where(x => x.Status == Finished).Each(x => { steps[x.Text].Finished = x.Time; });

@@ -14,7 +14,6 @@ namespace BlueMilk.IoC.Lazy
         public LazyInstance() : base(typeof(Lazy<T>), typeof(Lazy<T>), ServiceLifetime.Transient)
         {
             Name = "lazy_of_" + typeof(T).NameInCode();
-            Hash = GetHashCode();
         }
 
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
@@ -35,6 +34,5 @@ namespace BlueMilk.IoC.Lazy
             return this;
         }
 
-        public int Hash { get; set; }
     }
 }

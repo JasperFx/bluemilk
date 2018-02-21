@@ -11,7 +11,6 @@ namespace BlueMilk.IoC.Resolvers
         public ScopeInstance() : base(typeof(T), typeof(T), ServiceLifetime.Scoped)
         {
             Name = typeof(T).Name;
-            Hash = GetHashCode();
         }
 
         public override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
@@ -28,8 +27,6 @@ namespace BlueMilk.IoC.Resolvers
         {
             return scope;
         }
-
-        public int Hash { get; set; }
 
         public override string ToString()
         {

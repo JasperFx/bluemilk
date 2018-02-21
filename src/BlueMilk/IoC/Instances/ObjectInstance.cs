@@ -39,8 +39,6 @@ namespace BlueMilk.IoC.Instances
             return Service;
         }
 
-        public int Hash { get; set; }
-
         public override object QuickResolve(Scope scope)
         {
             return Service;

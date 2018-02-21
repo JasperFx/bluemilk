@@ -117,7 +117,7 @@ namespace BlueMilk.IoC.Instances
             return Resolve(scope);
         }
 
-        public int Hash { get; private set; }
+        public int Hash { get; set; }
 
         public virtual bool RequiresServiceProvider => Dependencies.Any(x => x.RequiresServiceProvider);
 
