@@ -5,9 +5,9 @@ namespace Benchmarks
     public class GetByType : ComparisonBenchmark
     {
         [Benchmark]
-        public void Singletons()
+        public void Transients()
         {
-            buildAll(singletons);
+            buildAll(transients);
         }
         
         
@@ -19,23 +19,19 @@ namespace Benchmarks
             buildAll(objects);
         }
          
-         
+        [Benchmark]
+        public void Singletons()
+        {
+            buildAll(singletons);
+        }
 
-        */
-        
-        /*
         [Benchmark]
         public void Scope()
         {
             buildAll(scoped);
         }
         
-        
-        [Benchmark]
-        public void Transients()
-        {
-            buildAll(transients);
-        }
+
         
         
 

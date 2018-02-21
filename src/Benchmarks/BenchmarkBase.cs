@@ -46,7 +46,7 @@ public class BenchmarkBase : IDisposable
         scoped = Instances.Where(x => x.Lifetime == ServiceLifetime.Scoped).Select(x => x.ServiceType)
             .Distinct().ToArray();
 
-        transients = Instances.Where(x => x.Lifetime == ServiceLifetime.Transient).Select(x => x.ServiceType)
+        transients = Instances.Where(x => x.Lifetime == ServiceLifetime.Transient && x.ServiceType.IsPublic).Select(x => x.ServiceType)
             .Distinct().ToArray();
 
         objects = Instances.OfType<ObjectInstance>().Select(x => x.ServiceType).Distinct().ToArray();

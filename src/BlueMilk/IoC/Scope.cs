@@ -94,11 +94,6 @@ namespace BlueMilk.IoC
         // TODO -- hide this from the public class?
         public IList<IDisposable> Disposables { get; } = new List<IDisposable>();
 
-        public void RegisterDisposable(IDisposable disposable)
-        {
-            Disposables.Add(disposable);
-        }
-
         internal readonly Dictionary<int, object> Services = new Dictionary<int, object>();
 
 

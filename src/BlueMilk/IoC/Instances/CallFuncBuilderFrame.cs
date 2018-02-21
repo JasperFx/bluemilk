@@ -63,7 +63,7 @@ namespace BlueMilk.IoC.Instances
                     
                 case DisposeTracking.RegisterWithScope:
                     writer.Write(declaration + ";");
-                    writer.Write($"{_scope.Usage}.{nameof(Scope.RegisterDisposable)}({Variable.Usage});");
+                    writer.Write($"{_scope.Usage}.{nameof(Scope.Disposables)}.Add({Variable.Usage});");
                     Next?.GenerateCode(method, writer);
                     break;
                    
