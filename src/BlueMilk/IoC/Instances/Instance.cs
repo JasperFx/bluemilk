@@ -16,7 +16,7 @@ namespace BlueMilk.IoC.Instances
 {
     public abstract class Instance
     {
-        
+        public abstract IResolver ToResolver(Scope topScope);
         
         public bool IsOnlyOneOfServiceType { get; set; }
 

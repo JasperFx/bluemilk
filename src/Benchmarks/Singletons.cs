@@ -10,6 +10,7 @@ namespace Benchmarks
             buildAll(singletons);
         }
         
+        /*
         [Benchmark]
         public void Scope()
         {
@@ -40,5 +41,6 @@ namespace Benchmarks
         {
             buildAll(internals);
         }
+        */
     }
 }

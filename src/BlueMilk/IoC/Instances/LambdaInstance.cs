@@ -73,6 +73,24 @@ namespace BlueMilk.IoC.Instances
         private IResolver _resolver;
         private readonly object _locker = new object();
 
+        public override IResolver ToResolver(Scope topScope)
+        {
+            if (_resolver == null)
+            {
+                lock (_locker)
+                {
+                    if (_resolver == null)
+                    {
+                        _resolver = buildResolver(topScope.Root);
+                        _resolver.Hash = Hash;
+                        _resolver.Name = Name;
+                    }
+                }
+            }
+
+            return _resolver;
+        }
+
         public override object Resolve(Scope scope)
         {
             if (_resolver == null)

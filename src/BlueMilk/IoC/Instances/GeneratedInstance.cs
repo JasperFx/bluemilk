@@ -80,6 +80,22 @@ namespace BlueMilk.IoC.Instances
         private readonly object _locker = new object();
         protected IResolver _resolver;
 
+        public override IResolver ToResolver(Scope topScope)
+        {
+            if (_resolver == null)
+            {
+                lock (_locker)
+                {
+                    if (_resolver == null)
+                    {
+                        buildResolver(topScope);
+                    }
+                }
+            }
+
+            return _resolver;
+        }
+
         public override object Resolve(Scope scope)
         {
             if (_resolver == null)
@@ -88,36 +104,41 @@ namespace BlueMilk.IoC.Instances
                 {
                     if (_resolver == null)
                     {
-                        if (ErrorMessages.Any() || Dependencies.Any(x => x.ErrorMessages.Any()))
-                        {
-                            _resolver = new ErrorMessageResolver(this);
-                        }
-                        else
-                        {
-                            var assembly = scope.ServiceGraph.ToGeneratedAssembly();
-                            GenerateResolver(assembly);
-
-                            if (_resolverType == null)
-                            {
-                                _resolver = new ErrorMessageResolver(this);
-                            }
-                            else
-                            {
-                                assembly.CompileAll();
-
-                                _resolver = (IResolver) scope.Root.QuickBuild(_resolverType.CompiledType);
-                                _resolverType.ApplySetterValues(_resolver);
-                            }
-                        }
-
-                        _resolver.Hash = GetHashCode();
-                        _resolver.Name = Name;
+                        buildResolver(scope);
                     }
                 }
             }
 
 
             return _resolver.Resolve(scope);
+        }
+
+        private void buildResolver(Scope scope)
+        {
+            if (ErrorMessages.Any() || Dependencies.Any(x => x.ErrorMessages.Any()))
+            {
+                _resolver = new ErrorMessageResolver(this);
+            }
+            else
+            {
+                var assembly = scope.ServiceGraph.ToGeneratedAssembly();
+                GenerateResolver(assembly);
+
+                if (_resolverType == null)
+                {
+                    _resolver = new ErrorMessageResolver(this);
+                }
+                else
+                {
+                    assembly.CompileAll();
+
+                    _resolver = (IResolver) scope.Root.QuickBuild(_resolverType.CompiledType);
+                    _resolverType.ApplySetterValues(_resolver);
+                }
+            }
+
+            _resolver.Hash = GetHashCode();
+            _resolver.Name = Name;
         }
 
         public override string GetBuildPlan()

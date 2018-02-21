@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Frames;
+using BlueMilk.IoC.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -15,6 +16,11 @@ namespace BlueMilk.IoC.Instances
         public ReferencedInstance(Type serviceType, string instanceKey) : base(serviceType, serviceType, ServiceLifetime.Transient)
         {
             _instanceKey = instanceKey;
+        }
+
+        public override IResolver ToResolver(Scope topScope)
+        {
+            return _inner.ToResolver(topScope);
         }
 
         public override object Resolve(Scope scope)
