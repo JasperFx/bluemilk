@@ -76,7 +76,7 @@ public class BenchmarkBase : IDisposable
         
     }
 
-    public IServiceProvider BlueMilk => _blueMilkHost.Services;
+    public IContainer BlueMilk => _blueMilkHost.Services.As<IContainer>();
 
     public Type[] Types { get; }
 

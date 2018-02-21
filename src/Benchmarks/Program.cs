@@ -6,7 +6,8 @@ namespace Benchmarks
     {
         private static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<GetByType>();
+            //var summary = BenchmarkRunner.Run<GetByType>();
+            var summary2 = BenchmarkRunner.Run<GetByTypeAndName>();
         }
     }
 }
