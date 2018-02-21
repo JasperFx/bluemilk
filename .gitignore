@@ -288,3 +288,5 @@ __pycache__/
 *.xsd.cs
 
 .DS_Store
+
+src/Benchmarks/BenchmarkDotNet.Artifacts/
