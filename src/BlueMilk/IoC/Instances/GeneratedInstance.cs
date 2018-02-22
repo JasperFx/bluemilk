@@ -7,6 +7,7 @@ using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Resolvers;
+using BlueMilk.Scanning.Conventions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -29,7 +30,7 @@ namespace BlueMilk.IoC.Instances
             var typeName = (ServiceType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
                 .Replace(',', '_').Replace('.', '_').Replace("[", "").Replace("]", "");
 
-            _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType));
+            _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType.MustBeBuiltWithFunc() ? typeof(object) : ServiceType ));
 
             var method = _resolverType.MethodFor("Build");
 
@@ -57,10 +58,14 @@ namespace BlueMilk.IoC.Instances
         public sealed override Variable CreateVariable(BuildMode mode, ResolverVariables variables, bool isRoot)
         {
             if (Lifetime == ServiceLifetime.Singleton)
-                return mode == BuildMode.Build
-                    ? generateVariableForBuilding(variables, mode, isRoot)
-                    : new InjectedServiceField(this);
+            {
+                if (mode == BuildMode.Build)
+                {
+                    return generateVariableForBuilding(variables, mode, isRoot);
+                }
 
+                return new InjectedServiceField(this);
+            }
 
 
 
@@ -176,4 +181,5 @@ namespace BlueMilk.IoC.Instances
             }
         }
     }
+
 }

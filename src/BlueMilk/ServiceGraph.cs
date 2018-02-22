@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Baseline;
 using Baseline.Dates;
+using Baseline.Reflection;
 using BlueMilk.Codegen;
 using BlueMilk.Compilation;
 using BlueMilk.IoC;
@@ -111,7 +112,6 @@ namespace BlueMilk
 
             timer.Record("Planning Instances", buildOutMissingResolvers);
 
-
             var generatedSingletons = AllInstances()
                 .OfType<GeneratedInstance>()
                 .Where(x => x.Lifetime != ServiceLifetime.Transient && !x.ServiceType.IsOpenGeneric())
@@ -181,6 +181,23 @@ namespace BlueMilk
                     instance.CreatePlan(this);
                 }
             }
+        }
+
+        internal Instance FindInstance(ParameterInfo parameter)
+        {
+            if (parameter.HasAttribute<NamedAttribute>())
+            {
+                var att = parameter.GetAttribute<NamedAttribute>();
+                if (att.TypeName.IsNotEmpty())
+                {
+                    var family = _families.Values.ToArray().FirstOrDefault(x => x.FullNameInCode == att.TypeName);
+                    return family.InstanceFor(att.Name);
+                }
+
+                return FindInstance(parameter.ParameterType, att.Name);
+            }
+
+            return FindDefault(parameter.ParameterType);
         }
 
         private void organizeIntoFamilies(IServiceCollection services)

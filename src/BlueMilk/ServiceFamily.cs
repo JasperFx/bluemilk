@@ -47,9 +47,13 @@ namespace BlueMilk
             }
 
             All = instances;
+
+            FullNameInCode = serviceType.FullNameInCode();
         }
-        
-        
+
+        public string FullNameInCode { get; }
+
+
         public void Append(ObjectInstance instance)
         {
             Append(new Instance[]{instance});

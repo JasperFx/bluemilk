@@ -48,7 +48,7 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
             container.GetInstance<IOptions<KestrelServerOptions>>();
         }
 
-        //[Fact] -- dammit, works locally, fails in AppVeyor for some reason
+        [Fact] //-- dammit, works locally, fails in AppVeyor for some reason
         public void use_in_app()
         {
             var builder = new WebHostBuilder();

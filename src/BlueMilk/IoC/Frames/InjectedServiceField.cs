@@ -1,6 +1,7 @@
 ﻿using BlueMilk.Codegen;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.IoC.Instances;
+using BlueMilk.Scanning.Conventions;
 
 namespace BlueMilk.IoC.Frames
 {
@@ -8,7 +9,7 @@ namespace BlueMilk.IoC.Frames
     {
         private bool _isOnlyOne;
 
-        public InjectedServiceField(Instance instance) : base(instance.ServiceType,
+        public InjectedServiceField(Instance instance) : base(instance.ServiceType.MustBeBuiltWithFunc() ? typeof(object) : instance.ServiceType,
             instance.DefaultArgName())
         {
             Instance = instance;
@@ -30,9 +31,20 @@ namespace BlueMilk.IoC.Frames
             }
         }
 
-        public override string CtorArgDeclaration => IsOnlyOne
-            ? $"{ArgType.NameInCode()} {CtorArg}"
-            : $"[BlueMilk.Named(\"{Instance.Name}\")] {ArgType.NameInCode()} {CtorArg}";
+        public override string CtorArgDeclaration
+        {
+            get
+            {
+                if (Instance.ServiceType.MustBeBuiltWithFunc())
+                {
+                    return $"[BlueMilk.Named(\"{Instance.Name}\", \"{Instance.ServiceType.FullNameInCode()}\")] object {CtorArg}";
+                }
+
+                return IsOnlyOne
+                    ? $"{ArgType.NameInCode()} {CtorArg}"
+                    : $"[BlueMilk.Named(\"{Instance.Name}\")] {ArgType.NameInCode()} {CtorArg}";
+            }
+        }
 
         public Instance Instance { get; }
     }

@@ -12,6 +12,7 @@ using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Resolvers;
+using BlueMilk.Scanning.Conventions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances
@@ -214,7 +215,7 @@ namespace BlueMilk.IoC.Instances
                     argument.Instance.CreatePlan(services);
                 }
 
-                if (ImplementationType.IsNotPublic)
+                if (ImplementationType.MustBeBuiltWithFunc())
                 {
                     (var func, var funcType) = CtorFuncBuilder.LambdaTypeFor(ServiceType, ImplementationType, Constructor);
                     _func = new ObjectInstance(funcType, func);
@@ -228,6 +229,8 @@ namespace BlueMilk.IoC.Instances
 
             return _arguments.Select(x => x.Instance);
         }
+
+        
 
         private CtorArg determineArgument(ServiceGraph services, ParameterInfo x)
         {

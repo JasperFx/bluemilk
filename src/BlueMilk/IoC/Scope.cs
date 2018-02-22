@@ -195,9 +195,9 @@ namespace BlueMilk.IoC
 
             var dependencies = ctor.GetParameters().Select(x =>
             {
-                var instance = x.HasAttribute<NamedAttribute>()
-                    ? ServiceGraph.FindInstance(x.ParameterType, x.GetAttribute<NamedAttribute>().Name)
-                    : ServiceGraph.FindDefault(x.ParameterType);
+                var instance = ServiceGraph.FindInstance(x);
+
+
 
                 return instance.QuickResolve(this);
             }).ToArray();

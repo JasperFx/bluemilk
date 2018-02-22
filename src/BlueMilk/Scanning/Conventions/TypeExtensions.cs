@@ -8,6 +8,15 @@ namespace BlueMilk.Scanning.Conventions
 {
     public static class TypeExtensions
     {
+        public static bool MustBeBuiltWithFunc(this Type type)
+        {
+            if (type.IsNotPublic) return true;
+
+            if (type.IsGenericType && type.GetGenericArguments().Any(x => x.MustBeBuiltWithFunc())) return true;
+
+            return false;
+        }
+
         public static bool CanBeCreated(this Type type)
         {
             return type.IsConcrete() && type.GetConstructors().Any();
