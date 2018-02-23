@@ -116,8 +116,13 @@ namespace BlueMilk.IoC.Instances
             var callCtor = Expression.New(ctor, ctorParams);
 
             var lambda = Expression.Lambda(funcType, callCtor, arguments);
+ 
+            if(parameterTypes.Count > 8) {
+                var bigAssFunc = lambda.Compile();
+                return (bigAssFunc, funcType);
+            }
+
             var func = lambda.CompileFast();
-            
             return (func, funcType);
         }
     }
