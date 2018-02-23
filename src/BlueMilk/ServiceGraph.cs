@@ -111,7 +111,7 @@ namespace BlueMilk
             });
 
             timer.Record("Planning Instances", buildOutMissingResolvers);
-
+            return;
             var generatedSingletons = AllInstances()
                 .OfType<GeneratedInstance>()
                 .Where(x => x.Lifetime != ServiceLifetime.Transient && !x.ServiceType.IsOpenGeneric())

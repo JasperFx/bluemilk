@@ -7,6 +7,7 @@ using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Enumerables;
+using BlueMilk.Scanning.Conventions;
 
 namespace BlueMilk.IoC.Frames
 {
@@ -16,6 +17,11 @@ namespace BlueMilk.IoC.Frames
         {
             Elements = elements;
             Variable = new ServiceVariable(instance, this);
+            if (typeof(T).MustBeBuiltWithFunc())
+            {
+                Variable.OverrideType(typeof(object[]));
+            }
+            
             ElementType = typeof(T);
         }
 
@@ -32,13 +38,15 @@ namespace BlueMilk.IoC.Frames
         {
             var elements = Elements.Select(x => x.Usage).Join(", ");
 
+            var arrayType = ElementType.MustBeBuiltWithFunc() ? "object" : ElementType.FullNameInCode();
+
             if (ReturnCreated)
             {
-                writer.Write($"return new {ElementType.FullNameInCode()}[]{{{elements}}};");
+                writer.Write($"return new {arrayType}[]{{{elements}}};");
             }
             else
             {
-                writer.Write($"var {Variable.Usage} = new {ElementType.FullNameInCode()}[]{{{elements}}};");
+                writer.Write($"var {Variable.Usage} = new {arrayType}[]{{{elements}}};");
             }
             
             

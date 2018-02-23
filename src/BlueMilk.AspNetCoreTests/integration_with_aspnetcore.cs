@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Baseline;
+using BlueMilk.Codegen;
 using BlueMilk.Microsoft.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
@@ -12,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Shouldly;
@@ -48,7 +51,7 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
             container.GetInstance<IOptions<KestrelServerOptions>>();
         }
 
-        [Fact] //-- dammit, works locally, fails in AppVeyor for some reason
+        [Fact]
         public void use_in_app()
         {
             var builder = new WebHostBuilder();
@@ -56,7 +59,10 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
                 .UseBlueMilk()
                 .UseUrls("http://localhost:5002")
                 .UseServer(new NulloServer())
+                .UseApplicationInsights()
                 .UseStartup<Startup>();
+
+            var failures = new List<Type>();
 
             using (var host = builder.Start())
             {
@@ -69,10 +75,27 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
                 if (errors.Any()) throw new Exception(errors.Join(", "));
 
 
+
+
                 foreach (var instance in container.Model.AllInstances.Where(x => !x.ServiceType.IsOpenGeneric()))
-                    instance.Resolve(container).ShouldNotBeNull();
+                {
+                    try
+                    {
+                        instance.Resolve(container).ShouldNotBeNull();
+                    }
+                    catch (Exception e)
+                    {
+                        failures.Add(instance.ServiceType);
+                    }
+                }
+            }
+
+            if (failures.Any())
+            {
+                throw new Exception(failures.Select(x => x.FullNameInCode()).Join(Environment.NewLine));
             }
         }
+
     }
 
     public class NulloServer : IServer

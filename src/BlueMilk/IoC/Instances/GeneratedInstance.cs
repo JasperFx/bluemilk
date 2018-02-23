@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
@@ -30,7 +31,12 @@ namespace BlueMilk.IoC.Instances
             var typeName = (ServiceType.FullNameInCode() + "_" + Name).Replace('<', '_').Replace('>', '_').Replace(" ", "")
                 .Replace(',', '_').Replace('.', '_').Replace("[", "").Replace("]", "");
 
-            _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(ServiceType.MustBeBuiltWithFunc() ? typeof(object) : ServiceType ));
+
+            var buildType = ServiceType.MustBeBuiltWithFunc() || ImplementationType.MustBeBuiltWithFunc()
+                ? typeof(object)
+                : ServiceType;
+            
+            _resolverType = generatedAssembly.AddType(typeName, ResolverBaseType.MakeGenericType(buildType));
 
             var method = _resolverType.MethodFor("Build");
 

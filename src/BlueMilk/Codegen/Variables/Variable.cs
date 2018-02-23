@@ -78,6 +78,15 @@ namespace BlueMilk.Codegen.Variables
             Usage = variableName;
         }
 
+        /// <summary>
+        /// On rare occasions you may need to override the variable type
+        /// </summary>
+        /// <param name="variableType"></param>
+        public void OverrideType(Type variableType)
+        {
+            
+        }
+
         public IList<Variable> Dependencies { get; } = new List<Variable>();
 
         public Variable(Type variableType) : this(variableType, DefaultArgName(variableType))

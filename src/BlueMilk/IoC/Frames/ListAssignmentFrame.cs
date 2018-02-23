@@ -7,6 +7,7 @@ using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Enumerables;
+using BlueMilk.Scanning.Conventions;
 
 namespace BlueMilk.IoC.Frames
 {
@@ -16,6 +17,11 @@ namespace BlueMilk.IoC.Frames
         {
             ElementType = typeof(T);
             Variable = new ServiceVariable(instance, this);
+
+            if (ElementType.MustBeBuiltWithFunc())
+            {
+                Variable.OverrideType(typeof(object[]));
+            }
 
             Elements = elements;
         }
@@ -29,14 +35,18 @@ namespace BlueMilk.IoC.Frames
 
         public override void GenerateCode(GeneratedMethod method, ISourceWriter writer)
         {
+            var declaration = ElementType.MustBeBuiltWithFunc()
+                ? "object[]"
+                : $"{typeof(List<>).Namespace}.List<{ElementType.FullNameInCode()}>";
+            
             var elements = Elements.Select(x => x.Usage).Join(", ");
             if (ReturnCreated)
             {
-                writer.Write($"return new {typeof(List<>).Namespace}.List<{ElementType.FullNameInCode()}>{{{elements}}};");
+                writer.Write($"return new {declaration}{{{elements}}};");
             }
             else
             {
-                writer.Write($"var {Variable.Usage} = new {typeof(List<>).Namespace}.List<{ElementType.FullNameInCode()}>{{{elements}}};");
+                writer.Write($"var {Variable.Usage} = new {declaration}{{{elements}}};");
             }
             Next?.GenerateCode(method, writer);
         }
