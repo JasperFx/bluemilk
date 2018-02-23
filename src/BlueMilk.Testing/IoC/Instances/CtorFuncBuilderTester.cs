@@ -36,6 +36,16 @@ namespace BlueMilk.Testing.IoC.Instances
             func.As<Func<object, IWidget, object>>()(new Gadget("Blue"), new AWidget())
                 .ShouldBeOfType<GadgetHolder>();
         }
+
+        [Fact]
+        public void do_not_blow_up_with_ridiculous_number_of_parameters()
+        {
+            var constructors = typeof(RidiculousParameters).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+
+            (var func1, var funcType1) = CtorFuncBuilder.LambdaTypeFor(typeof(RidiculousParameters),constructors[0]);
+
+            func1.As<Func<IClock,IClock,IClock,IClock,IClock,IClock,IClock,IClock,object>>()(new Clock(), new Clock(), new Clock(), new Clock(), new Clock(), new Clock(), new Clock(), new Clock()).ShouldBeOfType<RidiculousParameters>();
+        }
     }
 
     public interface IGadget
@@ -73,6 +83,17 @@ namespace BlueMilk.Testing.IoC.Instances
         {
             Name = name;
             Age = age;
+        }
+    }
+
+    public class RidiculousParameters : IWidget
+    {
+        public RidiculousParameters(IClock c1, IClock c2, IClock c3, IClock c4, IClock c5, IClock c6, IClock c7, IClock c8)
+        {
+        }
+
+        public void DoSomething()
+        {
         }
     }
 }
