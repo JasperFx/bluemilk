@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -10,6 +11,7 @@ using BlueMilk.IoC.Resolvers;
 
 namespace BlueMilk.Codegen
 {
+    [DebuggerDisplay("GeneratedType: {BaseType}")]
     public class GeneratedType : IVariableSource
     {
         public GenerationRules Rules { get; }

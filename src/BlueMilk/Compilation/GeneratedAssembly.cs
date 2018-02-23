@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Baseline;
@@ -57,6 +58,9 @@ namespace BlueMilk.Compilation
         {
             foreach (var generatedType in GeneratedTypes)
             {
+                if(generatedType.TypeName == "Microsoft_AspNetCore_Cors_Infrastructure_ICorsPolicyProvider_corsPolicyProvider") {
+                    Debugger.Break();
+                }
                 generatedType.ArrangeFrames(services);
             }
 

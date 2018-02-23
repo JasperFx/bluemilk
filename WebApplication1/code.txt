@@ -1,0 +1,45 @@
+using IdentityServer4.Configuration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using System;
+using System.Threading.Tasks;
+
+namespace Jasper.Generated
+{
+    // START: Microsoft_AspNetCore_Cors_Infrastructure_ICorsPolicyProvider_corsPolicyProvider
+    public class Microsoft_AspNetCore_Cors_Infrastructure_ICorsPolicyProvider_corsPolicyProvider : BlueMilk.IoC.Resolvers.TransientResolver<object>
+    {
+        private readonly IOptions<Microsoft.AspNetCore.Cors.Infrastructure.CorsOptions> _options_of_CorsOptions;
+        private readonly Func<Microsoft.AspNetCore.Cors.Infrastructure.DefaultCorsPolicyProvider, object> _func_of_DefaultCorsPolicyProvider_object;
+        private readonly IdentityServerOptions _identityServerOptions;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly Func<object, object, IdentityServer4.Configuration.IdentityServerOptions, Microsoft.AspNetCore.Http.IHttpContextAccessor, Microsoft.AspNetCore.Cors.Infrastructure.ICorsPolicyProvider> _func_of_object_object_IdentityServerOptions_IHttpContextAccessor_ICorsPolicyProvider;
+
+        public Microsoft_AspNetCore_Cors_Infrastructure_ICorsPolicyProvider_corsPolicyProvider(IOptions<Microsoft.AspNetCore.Cors.Infrastructure.CorsOptions> options_of_CorsOptions, Func<Microsoft.AspNetCore.Cors.Infrastructure.DefaultCorsPolicyProvider, object> func_of_DefaultCorsPolicyProvider_object, IdentityServerOptions identityServerOptions, IHttpContextAccessor httpContextAccessor, Func<object, object, IdentityServer4.Configuration.IdentityServerOptions, Microsoft.AspNetCore.Http.IHttpContextAccessor, Microsoft.AspNetCore.Cors.Infrastructure.ICorsPolicyProvider> func_of_object_object_IdentityServerOptions_IHttpContextAccessor_ICorsPolicyProvider)
+        {
+            _options_of_CorsOptions = options_of_CorsOptions;
+            _func_of_DefaultCorsPolicyProvider_object = func_of_DefaultCorsPolicyProvider_object;
+            _identityServerOptions = identityServerOptions;
+            _httpContextAccessor = httpContextAccessor;
+            _func_of_object_object_IdentityServerOptions_IHttpContextAccessor_ICorsPolicyProvider = func_of_object_object_IdentityServerOptions_IHttpContextAccessor_ICorsPolicyProvider;
+        }
+
+
+        public System.Func<System.IServiceProvider, object> func_ILogger<IdentityServer4.Hosting.CorsPolicyProvider> {get; set;}
+
+
+        public override object Build(BlueMilk.IoC.Scope scope)
+        {
+            var defaultCorsPolicyProvider = new Microsoft.AspNetCore.Cors.Infrastructure.DefaultCorsPolicyProvider(_options_of_CorsOptions);
+            var decorator = _func_of_DefaultCorsPolicyProvider_object(defaultCorsPolicyProvider);
+            var ILogger<IdentityServer4_Hosting_CorsPolicyProvider> = (Microsoft.Extensions.Logging.ILogger<IdentityServer4.Hosting.CorsPolicyProvider>)func_ILogger<IdentityServer4.Hosting.CorsPolicyProvider>((System.IServiceProvider)scope);
+            return _func_of_object_object_IdentityServerOptions_IHttpContextAccessor_ICorsPolicyProvider(ILogger<IdentityServer4_Hosting_CorsPolicyProvider>, decorator, _identityServerOptions, _httpContextAccessor);
+        }
+
+    }
+
+    // END: Microsoft_AspNetCore_Cors_Infrastructure_ICorsPolicyProvider_corsPolicyProvider
+    
+    
+}
+
