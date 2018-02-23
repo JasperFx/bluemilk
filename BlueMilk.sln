@@ -1,33 +1,35 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.0.0
-MinimumVisualStudioVersion = 10.0.0.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueMilk.Testing", "src\BlueMilk.Testing\BlueMilk.Testing.csproj", "{865C14C3-4B54-46EC-B394-9BAD73905086}"
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueMilk.Testing", "src\BlueMilk.Testing\BlueMilk.Testing.csproj", "{865C14C3-4B54-46EC-B394-9BAD73905086}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueMilk", "src\BlueMilk\BlueMilk.csproj", "{49A01091-63D7-427B-8B26-063DEC63EE63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueMilk", "src\BlueMilk\BlueMilk.csproj", "{49A01091-63D7-427B-8B26-063DEC63EE63}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Widgets", "Widgets", "{FD91278B-4618-491E-87D6-F82CFCFFD049}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructureMap.Testing.Widget", "src\StructureMap.Testing.Widget\StructureMap.Testing.Widget.csproj", "{738AE0A3-4C29-4919-9534-2713254F7181}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StructureMap.Testing.Widget", "src\StructureMap.Testing.Widget\StructureMap.Testing.Widget.csproj", "{738AE0A3-4C29-4919-9534-2713254F7181}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructureMap.Testing.Widget2", "src\StructureMap.Testing.Widget2\StructureMap.Testing.Widget2.csproj", "{D95E0FA6-5085-414D-994C-CA8A4C9E3CCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StructureMap.Testing.Widget2", "src\StructureMap.Testing.Widget2\StructureMap.Testing.Widget2.csproj", "{D95E0FA6-5085-414D-994C-CA8A4C9E3CCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructureMap.Testing.Widget4", "src\StructureMap.Testing.Widget4\StructureMap.Testing.Widget4.csproj", "{962BDA5B-BE5F-4867-9B6A-C5D8F0505D39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StructureMap.Testing.Widget4", "src\StructureMap.Testing.Widget4\StructureMap.Testing.Widget4.csproj", "{962BDA5B-BE5F-4867-9B6A-C5D8F0505D39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructureMap.Testing.Widget3", "src\StructureMap.Testing.Widget3\StructureMap.Testing.Widget3.csproj", "{BDBA3B4D-6313-4741-BB57-53D062DF6232}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StructureMap.Testing.Widget3", "src\StructureMap.Testing.Widget3\StructureMap.Testing.Widget3.csproj", "{BDBA3B4D-6313-4741-BB57-53D062DF6232}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructureMap.Testing.Widget5", "src\StructureMap.Testing.Widget5\StructureMap.Testing.Widget5.csproj", "{4DE5B1E6-1C00-46C4-9B8E-919D90893D86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StructureMap.Testing.Widget5", "src\StructureMap.Testing.Widget5\StructureMap.Testing.Widget5.csproj", "{4DE5B1E6-1C00-46C4-9B8E-919D90893D86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructureMap.Testing.ExeWidget", "src\StructureMap.Testing.ExeWidget\StructureMap.Testing.ExeWidget.csproj", "{536AFF1A-15BF-43E0-8002-9C149388C1A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StructureMap.Testing.ExeWidget", "src\StructureMap.Testing.ExeWidget\StructureMap.Testing.ExeWidget.csproj", "{536AFF1A-15BF-43E0-8002-9C149388C1A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructureMap.Testing.GenericWidgets", "src\StructureMap.Testing.GenericWidgets\StructureMap.Testing.GenericWidgets.csproj", "{BFC9380C-E94F-462B-96EA-0BCF5E431AB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StructureMap.Testing.GenericWidgets", "src\StructureMap.Testing.GenericWidgets\StructureMap.Testing.GenericWidgets.csproj", "{BFC9380C-E94F-462B-96EA-0BCF5E431AB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueMilk.Microsoft.DependencyInjection", "src\BlueMilk.Microsoft.DependencyInjection\BlueMilk.Microsoft.DependencyInjection.csproj", "{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueMilk.Microsoft.DependencyInjection", "src\BlueMilk.Microsoft.DependencyInjection\BlueMilk.Microsoft.DependencyInjection.csproj", "{D4C52DA9-2B17-4479-8541-1444C4CEA2C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueMilk.AspNetCoreTests", "src\BlueMilk.AspNetCoreTests\BlueMilk.AspNetCoreTests.csproj", "{EFFC9632-2B12-4A67-AE59-B9C4698AF0CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueMilk.AspNetCoreTests", "src\BlueMilk.AspNetCoreTests\BlueMilk.AspNetCoreTests.csproj", "{EFFC9632-2B12-4A67-AE59-B9C4698AF0CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "src\Benchmarks\Benchmarks.csproj", "{F4454378-F439-4B0A-9331-03816AE8013D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "src\Benchmarks\Benchmarks.csproj", "{F4454378-F439-4B0A-9331-03816AE8013D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{FDB7DACF-F891-44F0-8F66-2AC13F894B53}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +85,10 @@ Global
 		{F4454378-F439-4B0A-9331-03816AE8013D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4454378-F439-4B0A-9331-03816AE8013D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4454378-F439-4B0A-9331-03816AE8013D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDB7DACF-F891-44F0-8F66-2AC13F894B53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDB7DACF-F891-44F0-8F66-2AC13F894B53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDB7DACF-F891-44F0-8F66-2AC13F894B53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDB7DACF-F891-44F0-8F66-2AC13F894B53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,5 +101,8 @@ Global
 		{4DE5B1E6-1C00-46C4-9B8E-919D90893D86} = {FD91278B-4618-491E-87D6-F82CFCFFD049}
 		{536AFF1A-15BF-43E0-8002-9C149388C1A5} = {FD91278B-4618-491E-87D6-F82CFCFFD049}
 		{BFC9380C-E94F-462B-96EA-0BCF5E431AB2} = {FD91278B-4618-491E-87D6-F82CFCFFD049}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {91FA5377-2697-4D0A-B0EE-6FECA3D8E48C}
 	EndGlobalSection
 EndGlobal
