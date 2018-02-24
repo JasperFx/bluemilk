@@ -14,7 +14,7 @@ namespace BlueMilk.IoC.Instances
             Parameter = parameter;
             Instance = instance;
 
-            if (instance.IsInlineDependency())
+            if (instance.IsInlineDependency() || instance is LambdaInstance && instance.ServiceType.IsGenericType)
             {
                 instance.Name = Parameter.Name;
             }

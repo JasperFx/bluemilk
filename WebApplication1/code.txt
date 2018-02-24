@@ -25,15 +25,15 @@ namespace Jasper.Generated
         }
 
 
-        public System.Func<System.IServiceProvider, object> func_ILogger<IdentityServer4.Hosting.CorsPolicyProvider> {get; set;}
+        public System.Func<System.IServiceProvider, object> func_logger {get; set;}
 
 
         public override object Build(BlueMilk.IoC.Scope scope)
         {
             var defaultCorsPolicyProvider = new Microsoft.AspNetCore.Cors.Infrastructure.DefaultCorsPolicyProvider(_options_of_CorsOptions);
             var decorator = _func_of_DefaultCorsPolicyProvider_object(defaultCorsPolicyProvider);
-            var ILogger<IdentityServer4_Hosting_CorsPolicyProvider> = (Microsoft.Extensions.Logging.ILogger<IdentityServer4.Hosting.CorsPolicyProvider>)func_ILogger<IdentityServer4.Hosting.CorsPolicyProvider>((System.IServiceProvider)scope);
-            return _func_of_object_object_IdentityServerOptions_IHttpContextAccessor_ICorsPolicyProvider(ILogger<IdentityServer4_Hosting_CorsPolicyProvider>, decorator, _identityServerOptions, _httpContextAccessor);
+            var logger = (Microsoft.Extensions.Logging.ILogger<IdentityServer4.Hosting.CorsPolicyProvider>)func_logger((System.IServiceProvider)scope);
+            return _func_of_object_object_IdentityServerOptions_IHttpContextAccessor_ICorsPolicyProvider(logger, decorator, _identityServerOptions, _httpContextAccessor);
         }
 
     }
