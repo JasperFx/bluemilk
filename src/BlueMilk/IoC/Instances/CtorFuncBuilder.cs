@@ -117,7 +117,8 @@ namespace BlueMilk.IoC.Instances
 
             var lambda = Expression.Lambda(funcType, callCtor, arguments);
  
-            if(parameterTypes.Count > 8) {
+            const int FastExpressionCompilerParameterLimit = 8;
+            if(parameterTypes.Count > FastExpressionCompilerParameterLimit) {
                 var bigAssFunc = lambda.Compile();
                 return (bigAssFunc, funcType);
             }
