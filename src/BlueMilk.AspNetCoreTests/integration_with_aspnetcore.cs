@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Microsoft.DependencyInjection;
+using IdentityServer4.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Hosting;
@@ -57,6 +58,7 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
             var builder = new WebHostBuilder();
             builder
                 .UseBlueMilk()
+            
                 .UseUrls("http://localhost:5002")
                 .UseServer(new NulloServer())
                 .UseApplicationInsights()
@@ -79,14 +81,16 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
 
                 foreach (var instance in container.Model.AllInstances.Where(x => !x.ServiceType.IsOpenGeneric()))
                 {
-                    try
-                    {
-                        instance.Resolve(container).ShouldNotBeNull();
-                    }
-                    catch (Exception e)
-                    {
-                        failures.Add(instance.ServiceType);
-                    }
+                    instance.Resolve(container).ShouldNotBeNull();
+                    
+//                    try
+//                    {
+//                        
+//                    }
+//                    catch (Exception e)
+//                    {
+//                        failures.Add(instance.ServiceType);
+//                    }
                 }
             }
 
@@ -123,17 +127,49 @@ namespace BlueMilk.Testing.AspNetCoreIntegration
         {
             services.AddMvc();
             services.AddLogging();
+            services.AddIdentityServer()
+                .AddDeveloperSigningCredential()
+                .AddInMemoryApiResources(Config.GetApiResources())
+                .AddInMemoryClients(Config.GetClients());
             services.For<IMessageMaker>().Use(new MessageMaker("Hey there."));
+            
         }
 
         public void Configure(IApplicationBuilder app)
         {
+            app.UseIdentityServer();
+            
             app.Run(c =>
             {
                 var maker = c.RequestServices.GetService<IMessageMaker>();
                 return c.Response.WriteAsync(maker.ToString());
             });
         }
+    }
+    
+    public class Config {
+        public static IEnumerable<ApiResource> GetApiResources() => new List<ApiResource> {
+            new ApiResource("api1", "My API")
+        };
+
+        public static IEnumerable<Client> GetClients() => new List<Client> {
+            new Client {
+                ClientId = "client",
+
+                // no interactive user, use the clientid/secret for authentication
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+
+                // secret for authentication
+                ClientSecrets = {
+                    new Secret("secret".Sha256())
+                },
+
+                // scopes that client has access to
+                AllowedScopes = {
+                    "api1"
+                }
+            }
+        };
     }
 
     public interface IMessageMaker

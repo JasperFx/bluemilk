@@ -26,7 +26,6 @@ namespace BlueMilk.Microsoft.DependencyInjection
         {
             services.AddSingleton<IServiceProviderFactory<ServiceRegistry>, BlueMilkServiceProviderFactory>();
             services.AddSingleton<IServiceProviderFactory<IServiceCollection>, BlueMilkServiceProviderFactory>();
-            services.AddSingleton<IFamilyPolicy>(new LoggerPolicy());
             
             return services;
         }

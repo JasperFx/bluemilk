@@ -28,17 +28,9 @@ namespace BlueMilk.IoC.Instances
             }
                 
             var inner = variables.Resolve(Instance, mode);
-            if (Parameter.IsOptional)
-            {
-                var wrapped = new Variable(inner.VariableType, $"{Parameter.Name}: {inner.Usage}");
-                wrapped.Dependencies.Add(inner);
-
-                return wrapped;
-            }
-            else
-            {
-                return inner;
-            }
+            return Parameter.IsOptional 
+                ? new OptionalArgumentVariable(inner, Parameter) 
+                : inner;
         }
     }
 }
