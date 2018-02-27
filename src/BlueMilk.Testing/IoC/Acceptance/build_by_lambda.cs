@@ -7,6 +7,14 @@ namespace BlueMilk.Testing.IoC.Acceptance
 {
     public class build_by_lambdas
     {
+        [Fact]
+        public void build_with_lambda_that_gets_from_context()
+        {
+            var container = new Container(x => { x.For<Rule>().Add(c => c.GetInstance<inline_dependencies.RuleBuilder>().ForColor("Beige")); });
+
+            container.GetInstance<Rule>().ShouldBeOfType<ColorRule>().Color.ShouldBe("Beige");
+        }
+
         // SAMPLE: build-with-lambdas
         [Fact]
         public void build_with_lambdas_1()
