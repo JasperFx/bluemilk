@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Baseline;
-using Baseline.Reflection;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Diagnostics;
 using BlueMilk.IoC.Instances;
@@ -16,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC
 {
-    public class Scope : IServiceScope, IServiceProvider, ISupportRequiredService, IServiceScopeFactory
+    public class Scope : IServiceScope, ISupportRequiredService, IServiceScopeFactory, IServiceContext
     {
         protected bool _hasDisposed;
 
