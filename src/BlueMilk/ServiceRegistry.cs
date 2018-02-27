@@ -188,7 +188,7 @@ namespace BlueMilk
             }
 
 
-            public LambdaInstance<IContainer, T> Add(Func<IContainer, T> func) 
+            public LambdaInstance<IServiceContext, T> Add(Func<IServiceContext, T> func) 
             {
                 var instance = LambdaInstance.For(func);
 
@@ -198,7 +198,7 @@ namespace BlueMilk
 
             }
             
-            public LambdaInstance<IContainer, T> Use(Func<IContainer, T> func)
+            public LambdaInstance<IServiceContext, T> Use(Func<IServiceContext, T> func)
             {
                 return Add(func);
 
