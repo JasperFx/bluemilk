@@ -111,6 +111,9 @@ namespace BlueMilk
             });
 
             timer.Record("Planning Instances", buildOutMissingResolvers);
+
+            
+            rebuildReferencedAssemblyArray();
             
             
             var generatedSingletons = AllInstances()
@@ -140,7 +143,11 @@ namespace BlueMilk
 
         }
 
-
+        private void rebuildReferencedAssemblyArray()
+        {
+            _allAssemblies = AllInstances().SelectMany(x => x.ReferencedAssemblies())
+                .Distinct().ToArray();
+        }
 
 
         private void buildOutMissingResolvers()
@@ -164,9 +171,8 @@ namespace BlueMilk
         {
             // TODO -- will need to get at the GenerationRules from somewhere
             var generatedAssembly = new GeneratedAssembly(new GenerationRules("Jasper.Generated"));
-            AllInstances().SelectMany(x => x.ReferencedAssemblies())
-                .Distinct()
-                .Each(a => generatedAssembly.Generation.Assemblies.Fill(a));
+
+            generatedAssembly.Generation.Assemblies.Fill(_allAssemblies);
 
             return generatedAssembly;
         }
@@ -293,6 +299,11 @@ namespace BlueMilk
             if (!_inPlanning)
             {
                 buildOutMissingResolvers();
+
+                if (family != null)
+                {
+                    rebuildReferencedAssemblyArray();
+                }
             }
 
             return family;
@@ -379,6 +390,7 @@ namespace BlueMilk
 
         private readonly Stack<Instance> _chain = new Stack<Instance>();
         private AssemblyScanner[] _scanners = new AssemblyScanner[0];
+        private Assembly[] _allAssemblies;
 
         internal void StartingToPlan(Instance instance)
         {
@@ -482,10 +494,6 @@ namespace BlueMilk
             return FindDefault(type) != null;
         }
 
-        public static ServiceGraph For(IServiceCollection services)
-        {
-            return new Scope(services).ServiceGraph;
-        }
 
         public void AppendServices(IServiceCollection services)
         {
@@ -510,6 +518,8 @@ namespace BlueMilk
                 });
 
             buildOutMissingResolvers();
+            
+            rebuildReferencedAssemblyArray();
 
         }
 
