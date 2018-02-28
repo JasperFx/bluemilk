@@ -45,6 +45,46 @@ namespace BlueMilk.Testing.IoC.Diagnostics
             Console.WriteLine(container.WhatDidIScan());
             // ENDSAMPLE
         }
+
+        [Fact]
+        public void what_did_i_scan_should_list_assemblies()
+        {
+            var c = new Container(x => x.For<IWidget>().Use<ColorWidget>());
+
+
+            var container = new Container(_ =>
+                                          {
+                                              _.Scan(x =>
+                                                     {
+                                                         x.TheCallingAssembly();
+
+                                                         x.WithDefaultConventions();
+                                                         x.RegisterConcreteTypesAgainstTheFirstInterface();
+                                                         x.SingleImplementationsOfInterface();
+                                                     });
+
+                                              _.Scan(x =>
+                                                     {
+                                                         // Give your scanning operation a descriptive name
+                                                         // to help the diagnostics to be more useful
+                                                         x.Description = "Second Scanner";
+
+                                                         x.AssembliesFromApplicationBaseDirectory(assem => assem.FullName.Contains("Widget"));
+                                                         x.ConnectImplementationsToTypesClosing(typeof(IService<>));
+                                                         x.AddAllTypesOf<IWidget>();
+                                                     });
+                                          });
+
+            var whatDidIScan = container.WhatDidIScan();
+            whatDidIScan.ShouldContain("* StructureMap.Testing.GenericWidgets");
+            whatDidIScan.ShouldContain("* StructureMap.Testing.Widget");
+            whatDidIScan.ShouldContain("* StructureMap.Testing.Widget2");
+            whatDidIScan.ShouldContain("* StructureMap.Testing.Widget3");
+            whatDidIScan.ShouldContain("* StructureMap.Testing.Widget4");
+            whatDidIScan.ShouldContain("* StructureMap.Testing.Widget5");
+
+            Console.WriteLine(whatDidIScan);
+        }
     }
 
     // SAMPLE: whatdidiscan-result
