@@ -144,7 +144,7 @@ namespace BlueMilk.Scanning.Conventions
             writer.WriteLine("Assemblies");
             writer.WriteLine("----------");
 
-            _records.OrderBy(x => x.Name).Each(x => writer.WriteLine("* " + x));
+            _assemblies.OrderBy(x => x.FullName).Each(x => writer.WriteLine("* " + x));
             writer.WriteLine();
 
             writer.WriteLine("Conventions");
