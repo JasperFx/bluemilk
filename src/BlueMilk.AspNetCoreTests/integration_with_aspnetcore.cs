@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Microsoft.DependencyInjection;
 using IdentityServer4.Models;
@@ -20,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Shouldly;
 using Xunit;
+using Baseline;
 
 namespace BlueMilk.Testing.AspNetCoreIntegration
 {

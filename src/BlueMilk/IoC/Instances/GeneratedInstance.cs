@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
-using Baseline;
 using BlueMilk.Codegen;
 using BlueMilk.Codegen.Frames;
 using BlueMilk.Codegen.Variables;
@@ -9,6 +8,7 @@ using BlueMilk.Compilation;
 using BlueMilk.IoC.Frames;
 using BlueMilk.IoC.Resolvers;
 using BlueMilk.Scanning.Conventions;
+using BlueMilk.Util;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Instances

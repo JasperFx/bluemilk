@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Baseline;
+using BlueMilk.Util;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.Scanning.Conventions

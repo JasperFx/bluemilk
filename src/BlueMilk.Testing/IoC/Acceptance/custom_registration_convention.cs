@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Baseline;
 using BlueMilk.Scanning;
 using BlueMilk.Scanning.Conventions;
 using Microsoft.Extensions.DependencyInjection;

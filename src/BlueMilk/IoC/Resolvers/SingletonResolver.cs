@@ -1,5 +1,5 @@
 ﻿using System;
-using Baseline;
+using BlueMilk.Util;
 
 namespace BlueMilk.IoC.Resolvers
 {

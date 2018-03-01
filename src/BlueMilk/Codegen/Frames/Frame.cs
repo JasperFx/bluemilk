@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using Baseline;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
-using BlueMilk.IoC.Instances;
+using BlueMilk.Util;
 
 namespace BlueMilk.Codegen.Frames
 {
@@ -25,28 +23,36 @@ namespace BlueMilk.Codegen.Frames
 
     public abstract class Frame
     {
-        protected readonly IList<Frame> dependencies = new List<Frame>();
         protected internal readonly IList<Variable> creates = new List<Variable>();
+        protected readonly IList<Frame> dependencies = new List<Frame>();
         protected internal readonly IList<Variable> uses = new List<Variable>();
         private bool _hasResolved;
         private Frame _next;
+
+        protected Frame(bool isAsync)
+        {
+            IsAsync = isAsync;
+        }
 
         public bool IsAsync { get; }
         public bool Wraps { get; protected set; } = false;
 
         public Frame Next
         {
-            get { return _next; }
-            set {
-
+            get => _next;
+            set
+            {
                 if (_next != null) throw new InvalidOperationException("Frame chain is being re-arranged");
-                _next = value; }
+                _next = value;
+            }
         }
 
-        protected Frame(bool isAsync)
-        {
-            IsAsync = isAsync;
-        }
+        public IEnumerable<Variable> Uses => uses;
+
+        public virtual IEnumerable<Variable> Creates => creates;
+
+
+        public Frame[] Dependencies => dependencies.ToArray();
 
         public Variable Create(Type variableType)
         {
@@ -63,10 +69,6 @@ namespace BlueMilk.Codegen.Frames
             return new Variable(typeof(T), name, this);
         }
 
-        public IEnumerable<Variable> Uses => uses;
-
-        public virtual IEnumerable<Variable> Creates => creates;
-
         public abstract void GenerateCode(GeneratedMethod method, ISourceWriter writer);
 
         public void ResolveVariables(IMethodVariables method)
@@ -76,9 +78,7 @@ namespace BlueMilk.Codegen.Frames
 
             var variables = FindVariables(method).ToArray();
             if (variables.Any(x => x == null))
-            {
                 throw new InvalidOperationException($"Frame {this} could not resolve one of its variables");
-            }
 
             uses.AddRange(variables.Where(x => x != null));
 
@@ -90,10 +90,10 @@ namespace BlueMilk.Codegen.Frames
             yield break;
         }
 
-        public virtual bool CanReturnTask() => false;
-
-
-        public Frame[] Dependencies => dependencies.ToArray();
+        public virtual bool CanReturnTask()
+        {
+            return false;
+        }
 
         public IEnumerable<Frame> AllFrames()
         {
@@ -103,7 +103,6 @@ namespace BlueMilk.Codegen.Frames
                 yield return frame;
                 frame = frame.Next;
             }
-
         }
     }
 }

@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Baseline;
+using BlueMilk.Util;
 
 namespace BlueMilk.Compilation
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Baseline;
 using BlueMilk.IoC.Instances;
 using BlueMilk.Scanning.Conventions;
+using BlueMilk.Util;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk

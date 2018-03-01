@@ -1,5 +1,5 @@
 ﻿using System;
-using Baseline;
+using BlueMilk.Util;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk.IoC.Resolvers

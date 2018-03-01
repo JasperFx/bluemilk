@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Baseline;
-using Baseline.Dates;
-using Baseline.Reflection;
 using BlueMilk.Codegen;
 using BlueMilk.Compilation;
 using BlueMilk.IoC;
@@ -17,7 +12,6 @@ using BlueMilk.IoC.Lazy;
 using BlueMilk.IoC.Resolvers;
 using BlueMilk.Scanning.Conventions;
 using BlueMilk.Util;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlueMilk
@@ -41,7 +35,7 @@ namespace BlueMilk
 
 
             // This should blow up pretty fast if it's no good
-            applyScanners(services).Wait(2.Seconds());
+            applyScanners(services).Wait(TimeSpan.FromSeconds(2));
 
             _rootScope = rootScope;
 
@@ -496,7 +490,7 @@ namespace BlueMilk
 
         public void AppendServices(IServiceCollection services)
         {
-            applyScanners(services).Wait(2.Seconds());
+            applyScanners(services).Wait(TimeSpan.FromSeconds(2));
 
             services
                 .Where(x => !x.ServiceType.HasAttribute<BlueMilkIgnoreAttribute>())

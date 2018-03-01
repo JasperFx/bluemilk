@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
-using Baseline;
+using BlueMilk.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -123,8 +123,6 @@ namespace BlueMilk.Compilation
                 var result = compilation.Emit(stream);
                 if (!result.Success)
                 {
-                    new FileSystem().WriteStringToFile("code.txt", code);
-
                     var failures = result.Diagnostics.Where(diagnostic =>
                         diagnostic.IsWarningAsError ||
                         diagnostic.Severity == DiagnosticSeverity.Error);

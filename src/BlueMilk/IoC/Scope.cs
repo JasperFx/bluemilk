@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Baseline;
 using BlueMilk.Compilation;
 using BlueMilk.IoC.Diagnostics;
 using BlueMilk.IoC.Instances;

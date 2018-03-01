@@ -2978,9 +2978,6 @@ namespace BlueMilk.Util
     // it is done to prevent conflicts with helpers with standard names
     internal static class Tools
     {
-        public static bool IsNullable(this Type type) =>
-            type.GetTypeInfo().IsGenericType && type.GetTypeInfo().GetGenericTypeDefinition() == typeof(Nullable<>);
-
         public static Type GetWrappedTypeFromNullable(this Type type) =>
             type.GetTypeInfo().GenericTypeArguments[0];
 

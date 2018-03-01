@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Baseline;
 using BlueMilk.Util.TextWriting;
 
 namespace BlueMilk.Util

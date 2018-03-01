@@ -3,20 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using Baseline;
 using BlueMilk.Codegen.Variables;
 using BlueMilk.Compilation;
-using BlueMilk.IoC.Resolvers;
+using BlueMilk.Util;
 
 namespace BlueMilk.Codegen
 {
     [DebuggerDisplay("GeneratedType: {BaseType}")]
     public class GeneratedType : IVariableSource
     {
-        public GenerationRules Rules { get; }
-
-        public string TypeName { get; }
         private readonly IList<Type> _interfaces = new List<Type>();
         private readonly IList<GeneratedMethod> _methods = new List<GeneratedMethod>();
 
@@ -30,10 +25,35 @@ namespace BlueMilk.Codegen
             TypeName = typeName;
         }
 
+        public GenerationRules Rules { get; }
+
+        public string TypeName { get; }
+
         // TODO -- do something with this?
         public Visibility Visibility { get; set; } = Visibility.Public;
 
         public Type BaseType { get; private set; }
+
+        public InjectedField[] BaseConstructorArguments { get; private set; } = new InjectedField[0];
+
+        public IEnumerable<Type> Interfaces => _interfaces;
+
+
+        public IEnumerable<GeneratedMethod> Methods => _methods;
+
+        public string SourceCode { get; set; }
+
+        public Type CompiledType { get; private set; }
+
+        bool IVariableSource.Matches(Type type)
+        {
+            return BaseConstructorArguments.Any(x => x.ArgType == type);
+        }
+
+        Variable IVariableSource.Create(Type type)
+        {
+            return BaseConstructorArguments.FirstOrDefault(x => x.ArgType == type);
+        }
 
         public GeneratedType InheritsFrom<T>()
         {
@@ -45,44 +65,33 @@ namespace BlueMilk.Codegen
         {
             var ctors = baseType.GetConstructors();
             if (ctors.Length > 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(baseType), $"The base type for the code generation must only have one public constructor. {baseType.FullNameInCode()} has {ctors.Length}");
-            }
+                throw new ArgumentOutOfRangeException(nameof(baseType),
+                    $"The base type for the code generation must only have one public constructor. {baseType.FullNameInCode()} has {ctors.Length}");
 
             if (ctors.Length == 1)
-            {
-                BaseConstructorArguments = ctors.Single().GetParameters().Select(x => new InjectedField(x.ParameterType, x.Name)).ToArray();
-            }
-            
+                BaseConstructorArguments = ctors.Single().GetParameters()
+                    .Select(x => new InjectedField(x.ParameterType, x.Name)).ToArray();
+
 
             BaseType = baseType;
-            foreach (var methodInfo in baseType.GetMethods().Where(x => x.DeclaringType != typeof(object)).Where(x => x.CanBeOverridden()))
-            {
-                _methods.Add(new GeneratedMethod(methodInfo) {Overrides = true});
-            }
-            
-            
+            foreach (var methodInfo in baseType.GetMethods().Where(x => x.DeclaringType != typeof(object))
+                .Where(x => x.CanBeOverridden())) _methods.Add(new GeneratedMethod(methodInfo) {Overrides = true});
+
 
             return this;
         }
-
-        public InjectedField[] BaseConstructorArguments { get; private set; } = new InjectedField[0];
 
 
         // TODO -- need ut's
         public GeneratedType Implements(Type type)
         {
             if (!type.GetTypeInfo().IsInterface)
-            {
                 throw new ArgumentOutOfRangeException(nameof(type), "Must be an interface type");
-            }
 
             _interfaces.Add(type);
 
             foreach (var methodInfo in type.GetMethods().Where(x => x.DeclaringType != typeof(object)))
-            {
                 _methods.Add(new GeneratedMethod(methodInfo));
-            }
 
             return this;
         }
@@ -92,11 +101,6 @@ namespace BlueMilk.Codegen
         {
             return Implements(typeof(T));
         }
-
-        public IEnumerable<Type> Interfaces => _interfaces;
-
-
-        public IEnumerable<GeneratedMethod> Methods => _methods;
 
         // TODO -- need ut's
         public void AddMethod(GeneratedMethod method)
@@ -126,13 +130,10 @@ namespace BlueMilk.Codegen
 
             return method;
         }
-        
-        public string SourceCode { get; set; }
 
 
         public void Write(ISourceWriter writer)
         {
-
             writeDeclaration(writer);
 
             var args = Args();
@@ -141,7 +142,7 @@ namespace BlueMilk.Codegen
                 writeFieldDeclarations(writer, args);
                 writeConstructorMethod(writer, args);
             }
-            
+
             writeSetters(writer);
 
 
@@ -158,7 +159,7 @@ namespace BlueMilk.Codegen
         {
             return _methods.SelectMany(x => x.Setters).Distinct();
         }
-        
+
         private void writeSetters(ISourceWriter writer)
         {
             foreach (var setter in setters())
@@ -166,7 +167,7 @@ namespace BlueMilk.Codegen
                 writer.BlankLine();
                 setter.WriteDeclaration(writer);
             }
-            
+
             writer.BlankLine();
         }
 
@@ -181,26 +182,18 @@ namespace BlueMilk.Codegen
             var ctorArgs = args.Select(x => x.CtorArgDeclaration).Join(", ");
             var declaration = $"BLOCK:public {TypeName}({ctorArgs})";
             if (BaseConstructorArguments.Any())
-            {
                 declaration = $"{declaration} : base({BaseConstructorArguments.Select(x => x.CtorArg).Join(", ")})";
-            }
-            
+
             writer.Write(declaration);
 
-            foreach (var field in args)
-            {
-                field.WriteAssignment(writer);
-            }
+            foreach (var field in args) field.WriteAssignment(writer);
 
             writer.FinishBlock();
         }
 
         private void writeFieldDeclarations(ISourceWriter writer, InjectedField[] args)
         {
-            foreach (var field in args)
-            {
-                field.WriteDeclaration(writer);
-            }
+            foreach (var field in args) field.WriteDeclaration(writer);
 
             writer.BlankLine();
         }
@@ -210,29 +203,18 @@ namespace BlueMilk.Codegen
             var implemented = implements().ToArray();
 
             if (implemented.Any())
-            {
-                writer.Write($"BLOCK:public class {TypeName} : {implemented.Select(x => x.FullNameInCode()).Join(", ")}");
-            }
+                writer.Write(
+                    $"BLOCK:public class {TypeName} : {implemented.Select(x => x.FullNameInCode()).Join(", ")}");
             else
-            {
                 writer.Write($"BLOCK:public class {TypeName}");
-            }
         }
 
         private IEnumerable<Type> implements()
         {
-            if (BaseType != null)
-            {
-                yield return BaseType;
-            }
+            if (BaseType != null) yield return BaseType;
 
-            foreach (var @interface in Interfaces)
-            {
-                yield return @interface;
-            }
+            foreach (var @interface in Interfaces) yield return @interface;
         }
-        
-        public Type CompiledType { get; private set; }
 
         public void FindType(Type[] generated)
         {
@@ -241,50 +223,31 @@ namespace BlueMilk.Codegen
 
         public void ArrangeFrames(ServiceGraph services = null)
         {
-            foreach (var method in _methods)
-            {
-                method.ArrangeFrames(this, services);
-            }
+            foreach (var method in _methods) method.ArrangeFrames(this, services);
         }
 
         public IEnumerable<Assembly> AssemblyReferences()
         {
             if (BaseType != null) yield return BaseType.Assembly;
 
-            foreach (var @interface in _interfaces)
-            {
-                yield return @interface.Assembly;
-            }
+            foreach (var @interface in _interfaces) yield return @interface.Assembly;
         }
 
         public T CreateInstance<T>(params object[] arguments)
         {
             if (CompiledType == null)
-            {
                 throw new InvalidOperationException("This generated assembly has not yet been successfully compiled");
-            }
 
             return (T) Activator.CreateInstance(CompiledType, arguments);
         }
 
-        bool IVariableSource.Matches(Type type)
-        {
-            return BaseConstructorArguments.Any(x => x.ArgType == type);
-        }
-
-        Variable IVariableSource.Create(Type type)
-        {
-            return BaseConstructorArguments.FirstOrDefault(x => x.ArgType == type);
-        }
-
         public void ApplySetterValues(object builtObject)
         {
-            if (builtObject.GetType() != CompiledType) throw new ArgumentOutOfRangeException(nameof(builtObject), "This can only be applied to objects of the generated type");
+            if (builtObject.GetType() != CompiledType)
+                throw new ArgumentOutOfRangeException(nameof(builtObject),
+                    "This can only be applied to objects of the generated type");
 
-            foreach (var setter in setters())
-            {
-                setter.SetInitialValue(builtObject);
-            }
+            foreach (var setter in setters()) setter.SetInitialValue(builtObject);
         }
     }
 }
