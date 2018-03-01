@@ -85,8 +85,15 @@ namespace BlueMilk
             var all = All.Concat(instances).ToArray();
             makeNamesUnique(all);
 
-            foreach (var instance in instances)
+            _instances.Clear();
+            
+            foreach (var instance in all)
             {
+                while (_instances.ContainsKey(instance.Name))
+                {
+                    instance.Name += "_2";
+                }   
+                
                 _instances.Add(instance.Name, instance);
             }
 
