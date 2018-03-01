@@ -17,7 +17,6 @@ using BlueMilk.IoC.Lazy;
 using BlueMilk.IoC.Resolvers;
 using BlueMilk.Scanning.Conventions;
 using BlueMilk.Util;
-using ImTools;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 
