@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using StructureMap.Testing.Acceptance;
 using StructureMap.Testing.Widget;
 using StructureMap.Testing.Widget3;
 using Xunit;
@@ -42,6 +43,30 @@ namespace BlueMilk.Testing.IoC.Acceptance
                 .Select(x => x.GetType())
                 .ShouldHaveTheSameElementsAs(typeof(RedWidget), typeof(BlueWidget), typeof(GreenWidget));
 
+        }
+        
+        [Fact]
+        public void bug_74_trygetinstance_then_configure()
+        {
+            var container = Container.Empty();
+            
+            container.TryGetInstance<IWidget>().ShouldBeNull();
+            
+            container.Configure(x => x.AddTransient<IWidget, AWidget>());
+
+            container.GetInstance<IWidget>().ShouldBeOfType<AWidget>();
+        }
+        
+        [Fact]
+        public void configure_overwrites_default()
+        {
+            var container = Container.For(x => x.AddTransient<IWidget, AWidget>());
+
+            container.GetInstance<IWidget>().ShouldBeOfType<AWidget>();
+            
+            container.Configure(x => x.AddTransient<IWidget, BWidget>());
+            
+            container.GetInstance<IWidget>().ShouldBeOfType<BWidget>();
         }
     }
 }

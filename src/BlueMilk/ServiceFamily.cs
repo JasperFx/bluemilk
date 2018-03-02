@@ -54,21 +54,23 @@ namespace BlueMilk
         public string FullNameInCode { get; }
 
 
-        public void Append(ObjectInstance instance)
+        public AppendState Append(ObjectInstance instance)
         {
-            Append(new Instance[]{instance});
+            return Append(new Instance[]{instance});
         }
 
-        public void Append(IEnumerable<ServiceDescriptor> services)
+        public AppendState Append(IEnumerable<ServiceDescriptor> services)
         {
             var instances = services.Select(Instance.For).ToArray();
 
 
-            Append(instances);
+            return Append(instances);
         }
 
-        public void Append(Instance[] instances)
+        public AppendState Append(Instance[] instances)
         {
+            var currentDefault = Default;
+            
             foreach (var instance in instances)
             {
                 instance.IsDefault = false;
@@ -108,6 +110,10 @@ namespace BlueMilk
             }
 
             All = all;
+
+            if (currentDefault == null && Default != null) return AppendState.NewDefault;
+
+            return currentDefault == Default ? AppendState.SameDefault : AppendState.NewDefault;
         }
 
         public override string ToString()
@@ -173,5 +179,11 @@ namespace BlueMilk
         }
 
 
+    }
+
+    public enum AppendState
+    {
+        NewDefault,
+        SameDefault
     }
 }

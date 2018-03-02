@@ -501,7 +501,11 @@ namespace BlueMilk
                     if (_families.ContainsKey(group.Key))
                     {
                         var family = _families[group.Key];
-                        family.Append(group);
+                        if (family.Append(group) == AppendState.NewDefault)
+                        {
+                            _byType = _byType.Remove(group.Key);
+                        }
+                        
                     }
                     else
                     {
@@ -520,7 +524,10 @@ namespace BlueMilk
         {
             if (_families.ContainsKey(instance.ServiceType))
             {
-                _families[instance.ServiceType].Append(instance);
+                if (_families[instance.ServiceType].Append(instance) == AppendState.NewDefault)
+                {
+                    _byType = _byType.Remove(instance.ServiceType);
+                }
             }
             else
             {
