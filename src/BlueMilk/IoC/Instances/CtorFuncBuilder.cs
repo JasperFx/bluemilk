@@ -121,7 +121,7 @@ namespace BlueMilk.IoC.Instances
                 return (bigAssFunc, funcType);
             }
 
-            var func = lambda.Compile();
+            var func = lambda.CompileFast();
             return (func, funcType);
         }
     }
